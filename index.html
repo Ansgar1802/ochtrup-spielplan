@@ -981,6 +981,7 @@ function toggleFilter(name) {
 
 function toggleTeam(team) {
   backToList();
+  _startMannschaftenTimer();
   showTeams[team] = !showTeams[team];
   document.getElementById('btn-' + team).classList.toggle('on', showTeams[team]);
   saveState();
@@ -998,11 +999,28 @@ function applyStateToButtons() {
   });
 }
 
+let _mannschaftenTimer = null;
+
+function _closeMannschaften() {
+  clearTimeout(_mannschaftenTimer);
+  _mannschaftenTimer = null;
+  const row = document.getElementById('team-row');
+  const btn = document.getElementById('btn-mannschaften');
+  row.classList.remove('visible');
+  btn.classList.remove('on');
+}
+
+function _startMannschaftenTimer() {
+  clearTimeout(_mannschaftenTimer);
+  _mannschaftenTimer = setTimeout(_closeMannschaften, 10000);
+}
+
 function toggleMannschaften() {
   const row = document.getElementById('team-row');
   const btn = document.getElementById('btn-mannschaften');
   const open = row.classList.toggle('visible');
   btn.classList.toggle('on', open);
+  if (open) { _startMannschaftenTimer(); } else { clearTimeout(_mannschaftenTimer); }
 }
 
 function refreshData() { loadAllData(); }
