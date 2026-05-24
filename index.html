@@ -295,7 +295,9 @@
     vertical-align: top;
   }
   .report-table td:nth-child(1),
-  .report-table th:nth-child(1) { width: 1px; white-space: nowrap; }
+  .report-table th:nth-child(1),
+  .report-table td:nth-child(3),
+  .report-table th:nth-child(3) { width: 1px; white-space: nowrap; }
   .report-table td:nth-child(1),
   .report-table td:nth-child(2),
   .report-table td:nth-child(4) { text-align: left; color: #e8eaf0; }
@@ -1134,8 +1136,16 @@ function renderReport(html, m) {
   for (const section of sections) {
     if (section.label) out += `<div class="report-section">${esc(section.label)}</div>`;
 
-    const hdrRows = section.rows.filter(r => r.querySelectorAll('th').length > 0);
-    const dataRows = section.rows.filter(r => r.querySelectorAll('th').length === 0);
+    let hdrRows = section.rows.filter(r => r.querySelectorAll('th').length > 0);
+    /* Fallback: wenn keine <th>-Zeile, erste Zeile ohne Scores als Header verwenden */
+    if (!hdrRows.length && section.rows.length) {
+      const first = section.rows[0];
+      if (![...first.cells].some(c => /^\d+:\d+$/.test(c.textContent.trim()))) {
+        hdrRows = [first];
+      }
+    }
+    const hdrSet = new Set(hdrRows);
+    const dataRows = section.rows.filter(r => !hdrSet.has(r));
     const isDoppel = section.label === 'Doppelspiele';
 
     /* numSatzCols aus Header-Zeile ermitteln */
@@ -1154,7 +1164,8 @@ function renderReport(html, m) {
     const preRows = [];
     for (const row of dataRows) {
       const raw = [...row.cells];
-      const isTot = /einzel|doppel|gesamt/i.test(row.textContent.trim()) && raw.length < 8;
+      const lblCell = raw[0]?.textContent.trim() || '';
+      const isTot = /^(einzel|doppel|gesamt)$/i.test(lblCell);
       if (isTot) { preRows.push({ cells: raw, isTot: true, isOcht: false }); continue; }
 
       /* Kombinierte Doppel-Zeile: 12 Zellen (inkl. 2 Summen-Zellen an Pos. 1 und 4) */
