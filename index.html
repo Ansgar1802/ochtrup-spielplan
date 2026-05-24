@@ -981,7 +981,8 @@ function toggleFilter(name) {
 
 function toggleTeam(team) {
   backToList();
-  _startMannschaftenTimer();
+  clearTimeout(_mannschaftenTimer);
+  _mannschaftenTimer = setTimeout(_closeMannschaften, 5000);
   showTeams[team] = !showTeams[team];
   document.getElementById('btn-' + team).classList.toggle('on', showTeams[team]);
   saveState();
