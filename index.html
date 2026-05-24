@@ -107,6 +107,26 @@
   .btn.on    { color: #fff; font-weight: 700; }
 
   .btn-filter.on { border-color: #9095b0; background: rgba(144,149,176,0.08); }
+  .btn-mannschaften {
+    width: 100%;
+    padding: 6px;
+    border-radius: 20px;
+    border: 1px solid #2e3150;
+    background: transparent;
+    color: #555a7a;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.71rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .btn-mannschaften:hover { background: #1a1d2e; color: #9095b0; border-color: #444a68; }
+  .btn-mannschaften.on { color: #fff; font-weight: 700; border-color: #9095b0; background: rgba(144,149,176,0.08); }
+  .team-row { display: none; }
+  .team-row.visible { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
   .btn-classic.on{ border-color: #7ab3ff; background: rgba(30,90,200,0.12); }
   .btn-2er.on    { border-color: #7effa8; background: rgba(30,160,80,0.12); }
   .btn-mixed.on  { border-color: #ffe57f; background: rgba(200,170,20,0.12); }
@@ -418,7 +438,8 @@
     <button class="btn btn-filter on" id="btn-heim"      onclick="toggleFilter('showHome')">Heim</button>
     <button class="btn btn-filter on" id="btn-auswaerts" onclick="toggleFilter('showAway')">Auswärts</button>
   </div>
-  <div class="controls-row">
+  <button class="btn-mannschaften" id="btn-mannschaften" onclick="toggleMannschaften()">Mannschaften</button>
+  <div class="team-row" id="team-row">
     <button class="btn btn-classic on" id="btn-classic" onclick="toggleTeam('classic')">U15 classic</button>
     <button class="btn btn-2er on"     id="btn-2er"     onclick="toggleTeam('2er')">U15 2er</button>
     <button class="btn btn-mixed on"   id="btn-mixed"   onclick="toggleTeam('mixed')">U15 2er Mixed</button>
@@ -857,6 +878,13 @@ function applyStateToButtons() {
   ['classic', '2er', 'mixed', 'u8', 'u10'].forEach(t => {
     document.getElementById('btn-' + t).classList.toggle('on', showTeams[t]);
   });
+}
+
+function toggleMannschaften() {
+  const row = document.getElementById('team-row');
+  const btn = document.getElementById('btn-mannschaften');
+  const open = row.classList.toggle('visible');
+  btn.classList.toggle('on', open);
 }
 
 function refreshData() { loadAllData(); }
