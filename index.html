@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>TC 1928 Ochtrup – Spielplan 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0f1117;
+    font-family: 'DM Sans', sans-serif;
+    color: #e8eaf0;
+    padding: 24px 16px 48px;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .header { text-align: center; margin-bottom: 20px; }
+  .header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem;
+    letter-spacing: 0.08em;
+    color: #fff;
+    line-height: 1;
+  }
+  .header p {
+    color: #7a7f96;
+    font-size: 0.75rem;
+    margin-top: 5px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* ── Next match box ── */
+  .next-match-box {
+    background: #1a1d2e;
+    border: 1px solid #252840;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .nm-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #c0c4d8;
+    margin-bottom: 5px;
+  }
+  .nm-teams {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.3;
+  }
+  .nm-date { font-size: 0.88rem; color: #c8cae0; margin-top: 3px; }
+  .nm-right { text-align: right; flex-shrink: 0; }
+  .nm-days {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.6rem;
+    line-height: 1;
+    color: #7ab3ff;
+  }
+  .nm-days.today { font-size: 1.5rem; color: #7effa8; }
+  .nm-unit {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #9095b0;
+  }
+
+  /* ── Controls ── */
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+  .btn {
+    padding: 5px 13px;
+    border-radius: 20px;
+    border: 1px solid #2e3150;
+    background: transparent;
+    color: #555a7a;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.71rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    user-select: none;
+  }
+  .btn:hover { background: #1a1d2e; color: #9095b0; border-color: #444a68; }
+  .btn.on    { color: #fff; font-weight: 700; }
+
+  .btn-filter.on { border-color: #9095b0; background: rgba(144,149,176,0.08); }
+  .btn-mannschaften {
+    width: 100%;
+    padding: 6px;
+    border-radius: 20px;
+    border: 1px solid #2e3150;
+    background: transparent;
+    color: #555a7a;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.71rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .btn-mannschaften:hover { background: #1a1d2e; color: #9095b0; border-color: #444a68; }
+  .btn-mannschaften.on { color: #fff; font-weight: 700; border-color: #9095b0; background: rgba(144,149,176,0.08); }
+  .team-row { display: none; }
+  .team-row .btn { color: #9095b0; }
+  .team-row.visible { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+  .btn-classic.on{ border-color: #7ab3ff; background: rgba(30,90,200,0.12); }
+  .btn-2er.on    { border-color: #7effa8; background: rgba(30,160,80,0.12); }
+  .btn-mixed.on  { border-color: #ffe57f; background: rgba(200,170,20,0.12); }
+  .btn-u8.on     { border-color: #ff9f7f; background: rgba(200,80,30,0.12); }
+  .btn-u10.on    { border-color: #d07fff; background: rgba(130,40,200,0.12); }
+  .btn-d4.on    { border-color: #ff7fad; background: rgba(220,50,120,0.12); }
+  .btn-d30bz.on { border-color: #ff9966; background: rgba(220,100,30,0.12); }
+  .btn-d30kl.on { border-color: #ffcc44; background: rgba(200,160,20,0.12); }
+  .btn-d40.on   { border-color: #ff5588; background: rgba(220,30,90,0.12); }
+  .btn-d50.on   { border-color: #dd88ff; background: rgba(170,50,230,0.12); }
+  .btn-d60.on   { border-color: #ff8866; background: rgba(220,90,50,0.12); }
+  .btn-h4.on    { border-color: #55bbff; background: rgba(20,130,220,0.12); }
+  .btn-h40bk.on { border-color: #44ddaa; background: rgba(20,180,130,0.12); }
+  .btn-h40kl.on { border-color: #88ee66; background: rgba(70,190,40,0.12); }
+  .btn-h50.on   { border-color: #22ddee; background: rgba(10,170,200,0.12); }
+  .btn-h60.on   { border-color: #6688ff; background: rgba(60,100,230,0.12); }
+  .btn-h65kl.on { border-color: #44eecc; background: rgba(20,190,170,0.12); }
+  .btn-h65ml.on { border-color: #aabbff; background: rgba(100,120,230,0.12); }
+
+  .btn-refresh {
+    margin-left: auto;
+    font-size: 1rem;
+    padding: 3px 10px;
+    letter-spacing: 0;
+  }
+  .btn-refresh:disabled { opacity: 0.4; cursor: default; }
+  .btn-refresh.spinning { animation: spin 0.7s linear infinite; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Cards ── */
+  .card {
+    border-radius: 12px;
+    margin-bottom: 10px;
+    padding: 12px 14px;
+    border: 1px solid transparent;
+  }
+  .card.u15-classic { background: rgba(30,90,200,0.2);  border-color: rgba(30,90,200,0.25); }
+  .card.u15-2er     { background: rgba(30,160,80,0.2);  border-color: rgba(30,160,80,0.25); }
+  .card.u8-klein    { background: rgba(200,80,30,0.2);  border-color: rgba(200,80,30,0.25); }
+  .card.u10-gross   { background: rgba(130,40,200,0.2); border-color: rgba(130,40,200,0.25); }
+  .card.mixed       { background: rgba(200,170,20,0.2); border-color: rgba(200,170,20,0.25); }
+  .card.d4    { background: rgba(220,50,120,0.2);  border-color: rgba(220,50,120,0.25); }
+  .card.d30bz { background: rgba(220,100,30,0.2);  border-color: rgba(220,100,30,0.25); }
+  .card.d30kl { background: rgba(200,160,20,0.2);  border-color: rgba(200,160,20,0.25); }
+  .card.d40   { background: rgba(220,30,90,0.2);   border-color: rgba(220,30,90,0.25); }
+  .card.d50   { background: rgba(170,50,230,0.2);  border-color: rgba(170,50,230,0.25); }
+  .card.d60   { background: rgba(220,90,50,0.2);   border-color: rgba(220,90,50,0.25); }
+  .card.h4    { background: rgba(20,130,220,0.2);  border-color: rgba(20,130,220,0.25); }
+  .card.h40bk { background: rgba(20,180,130,0.2);  border-color: rgba(20,180,130,0.25); }
+  .card.h40kl { background: rgba(70,190,40,0.2);   border-color: rgba(70,190,40,0.25); }
+  .card.h50   { background: rgba(10,170,200,0.2);  border-color: rgba(10,170,200,0.25); }
+  .card.h60   { background: rgba(60,100,230,0.2);  border-color: rgba(60,100,230,0.25); }
+  .card.h65kl { background: rgba(20,190,170,0.2);  border-color: rgba(20,190,170,0.25); }
+  .card.h65ml { background: rgba(100,120,230,0.2); border-color: rgba(100,120,230,0.25); }
+  .card.home-game   { border-color: #fff !important; border-width: 2px; }
+  .card.past-game   { opacity: 0.55; }
+  .past-divider     { height: 32px; }
+
+  /* ── Detail-View (Tabelle) ── */
+  #detail-view { display: none; }
+  .detail-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .btn-back {
+    background: none;
+    border: 1px solid #3a3f5c;
+    color: #9095b0;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-back:hover { border-color: #7a7f96; color: #e8eaf0; }
+  .detail-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.06em;
+    color: #fff;
+  }
+  .standings-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+  }
+  .standings-table th {
+    text-align: center;
+    color: #7a7f96;
+    font-weight: 600;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 6px 4px;
+    border-bottom: 1px solid #252840;
+  }
+  .standings-table th:nth-child(2) { text-align: left; }
+  .standings-table td {
+    text-align: center;
+    padding: 8px 4px;
+    border-bottom: 1px solid #1a1d2e;
+    color: #c8cad8;
+  }
+  .standings-table td:nth-child(2) { text-align: left; color: #e8eaf0; }
+  .standings-table tr.ochtrup-row td { color: #fff; font-weight: 600; }
+  .standings-table tr.ochtrup-row td:nth-child(2) { color: #7ab3ff; }
+
+  /* ── Report-View ── */
+  #report-view { display: none; }
+  .report-match-header {
+    background: #1a1d2e;
+    border: 1px solid #252840;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    text-align: center;
+  }
+  .report-teams {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.06em;
+    color: #fff;
+    line-height: 1.2;
+  }
+  .report-result {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    color: #7ab3ff;
+    margin: 4px 0 2px;
+  }
+  .report-date { font-size: 0.78rem; color: #9095b0; }
+  .report-section {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.06em;
+    color: #9095b0;
+    margin: 18px 0 8px;
+    text-align: left;
+  }
+  .report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.72rem;
+  }
+  .report-table th {
+    text-align: center;
+    color: #7a7f96;
+    font-size: 0.63rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 5px 3px;
+    border-bottom: 1px solid #252840;
+    font-weight: 600;
+  }
+  .report-table th:nth-child(1),
+  .report-table th:nth-child(2) { text-align: left; }
+  .report-table td {
+    text-align: center;
+    padding: 7px 3px;
+    border-bottom: 1px solid #1a1d2e;
+    color: #c8cad8;
+    vertical-align: top;
+  }
+  .report-table td:nth-child(1),
+  .report-table th:nth-child(1) { width: 1px; white-space: nowrap; }
+  .report-table td:nth-child(1),
+  .report-table td:nth-child(2),
+  .report-table td:nth-child(4) { text-align: left; color: #e8eaf0; }
+  .report-table tr.total-row td { color: #fff; font-weight: 700; border-top: 1px solid #3a3f5c; border-bottom: none; text-align: center; }
+  .report-table tr.ochtrup-player td { color: #fff; }
+  .set-win  { color: #7effa8; font-weight: 600; }
+  .set-loss { color: #ff7f7f; }
+
+  .card-tag-row {
+    text-align: center;
+    margin-bottom: 7px;
+  }
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    gap: 8px;
+  }
+  .card-date {
+    font-size: 0.78rem;
+    color: #9095b0;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+  .card-time { font-size: 0.75rem; color: #666a85; margin-left: 4px; }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .tag-classic { background: rgba(30,90,200,0.4);  color: #fff; font-weight: 700; border: 1px solid #3060c0; }
+  .tag-2er     { background: rgba(30,160,80,0.4);  color: #fff; font-weight: 700; border: 1px solid #2a9050; }
+  .tag-mixed   { background: rgba(200,170,20,0.4); color: #fff; font-weight: 700; border: 1px solid #a08800; }
+  .tag-u8      { background: rgba(200,80,30,0.4);  color: #fff; font-weight: 700; border: 1px solid #c04010; }
+  .tag-u10     { background: rgba(130,40,200,0.4); color: #fff; font-weight: 700; border: 1px solid #8020c0; }
+  .tag-d4    { background: rgba(220,50,120,0.4);  color: #fff; font-weight: 700; border: 1px solid #c03070; }
+  .tag-d30bz { background: rgba(220,100,30,0.4);  color: #fff; font-weight: 700; border: 1px solid #b05010; }
+  .tag-d30kl { background: rgba(200,160,20,0.4);  color: #fff; font-weight: 700; border: 1px solid #a08010; }
+  .tag-d40   { background: rgba(220,30,90,0.4);   color: #fff; font-weight: 700; border: 1px solid #c01050; }
+  .tag-d50   { background: rgba(170,50,230,0.4);  color: #fff; font-weight: 700; border: 1px solid #9030c0; }
+  .tag-d60   { background: rgba(220,90,50,0.4);   color: #fff; font-weight: 700; border: 1px solid #b04020; }
+  .tag-h4    { background: rgba(20,130,220,0.4);  color: #fff; font-weight: 700; border: 1px solid #1060b0; }
+  .tag-h40bk { background: rgba(20,180,130,0.4);  color: #fff; font-weight: 700; border: 1px solid #10a070; }
+  .tag-h40kl { background: rgba(70,190,40,0.4);   color: #fff; font-weight: 700; border: 1px solid #40a020; }
+  .tag-h50   { background: rgba(10,170,200,0.4);  color: #fff; font-weight: 700; border: 1px solid #0090b0; }
+  .tag-h60   { background: rgba(60,100,230,0.4);  color: #fff; font-weight: 700; border: 1px solid #3060c0; }
+  .tag-h65kl { background: rgba(20,190,170,0.4);  color: #fff; font-weight: 700; border: 1px solid #10a090; }
+  .tag-h65ml { background: rgba(100,120,230,0.4); color: #fff; font-weight: 700; border: 1px solid #6070c0; }
+
+  .btn-tabelle {
+    background: none;
+    border: 1px solid #3a3f5c;
+    border-radius: 6px;
+    color: #fff;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    padding: 2px 10px;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-tabelle:hover { border-color: #7a7f96; color: #e8eaf0; }
+
+  .card-match {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    row-gap: 2px;
+  }
+  .team          { font-size: 0.92rem; font-weight: 700; color: #fff; line-height: 1.3; }
+  .team.opponent { font-weight: 400; color: #c0c4d8; }
+  .vs { font-size: 0.75rem; color: #555a7a; font-style: italic; margin: 0 6px; flex-shrink: 0; }
+
+  .result { font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .result.win  { color: #7effa8; }
+  .result.loss { color: #ff7a7a; }
+  .result.open { color: #444a68; font-style: italic; font-weight: 400; font-size: 0.9rem; }
+
+  .note {
+    font-size: 0.7rem;
+    color: #555a7a;
+    font-style: italic;
+  }
+
+  .card-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 6px;
+  }
+
+  /* ── Status ── */
+  .status-msg {
+    text-align: center;
+    color: #555a7a;
+    padding: 32px 16px;
+    font-size: 0.85rem;
+  }
+  .loading-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #555a7a;
+    padding: 32px 16px;
+    font-size: 0.85rem;
+  }
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid #2e3150;
+    border-top-color: #7ab3ff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+  .error-msg {
+    background: rgba(255,80,80,0.07);
+    border: 1px solid rgba(255,80,80,0.22);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: #ff9090;
+    font-size: 0.77rem;
+    margin-bottom: 12px;
+    line-height: 1.6;
+  }
+  .error-msg code {
+    font-family: monospace;
+    background: rgba(255,255,255,0.08);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+  .update-info {
+    text-align: center;
+    font-size: 0.63rem;
+    color: #333650;
+    margin-top: 24px;
+    letter-spacing: 0.04em;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>TC 1928 Ochtrup</h1>
+  <p>Spielplan · Münsterland · Sommer 2026</p>
+</div>
+
+<!-- Nächstes Spiel -->
+<div id="next-match-box" class="next-match-box">
+  <div>
+    <div class="nm-label">Nächstes Spiel</div>
+    <div class="nm-teams" id="nm-teams"></div>
+    <div class="nm-date"  id="nm-date"></div>
+  </div>
+  <div class="nm-right">
+    <div class="nm-days" id="nm-days"></div>
+    <div class="nm-unit" id="nm-unit"></div>
+  </div>
+</div>
+
+<!-- Filter-Buttons -->
+<div class="controls">
+  <div class="controls-row">
+    <button class="btn btn-filter"    id="btn-vergangen" onclick="toggleFilter('showPast')">Vergangen</button>
+    <button class="btn btn-filter on" id="btn-aktuell"   onclick="toggleFilter('showFuture')">Aktuell</button>
+    <button class="btn btn-filter on" id="btn-heim"      onclick="toggleFilter('showHome')">Heim</button>
+    <button class="btn btn-filter on" id="btn-auswaerts" onclick="toggleFilter('showAway')">Auswärts</button>
+  </div>
+  <button class="btn-mannschaften" id="btn-mannschaften" onclick="toggleMannschaften()">Mannschaften</button>
+  <div class="team-row" id="team-row">
+    <button class="btn btn-classic on" id="btn-classic" onclick="toggleTeam('classic')">Junioren U15 classic Kreisklasse 1</button>
+    <button class="btn btn-2er on"     id="btn-2er"     onclick="toggleTeam('2er')">Junioren U15 2er Kreisklasse 1</button>
+    <button class="btn btn-mixed on"   id="btn-mixed"   onclick="toggleTeam('mixed')">Mixed U15 2er Kreisliga</button>
+    <button class="btn btn-u8 on"      id="btn-u8"      onclick="toggleTeam('u8')">Gemischt U8 Kleinfeld Kreisliga</button>
+    <button class="btn btn-u10 on"     id="btn-u10"     onclick="toggleTeam('u10')">Gemischt U10 Grossfeld Kreisklasse 1</button>
+    <button class="btn btn-d4 on"     id="btn-d4"     onclick="toggleTeam('d4')">Damen 4er Kreisliga</button>
+    <button class="btn btn-d30bz on"  id="btn-d30bz"  onclick="toggleTeam('d30bz')">Damen 30 4er Bezirksliga</button>
+    <button class="btn btn-d30kl on"  id="btn-d30kl"  onclick="toggleTeam('d30kl')">Damen 30 4er Kreisliga</button>
+    <button class="btn btn-d40 on"    id="btn-d40"    onclick="toggleTeam('d40')">Damen 40 4er Bezirksliga</button>
+    <button class="btn btn-d50 on"    id="btn-d50"    onclick="toggleTeam('d50')">Damen 50 4er Bezirksliga</button>
+    <button class="btn btn-d60 on"    id="btn-d60"    onclick="toggleTeam('d60')">Damen 60 Doppel Bezirksliga</button>
+    <button class="btn btn-h4 on"     id="btn-h4"     onclick="toggleTeam('h4')">Herren 4er Kreisklasse 1</button>
+    <button class="btn btn-h40bk on"  id="btn-h40bk"  onclick="toggleTeam('h40bk')">Herren 40 4er Bezirksklasse</button>
+    <button class="btn btn-h40kl on"  id="btn-h40kl"  onclick="toggleTeam('h40kl')">Herren 40 4er Kreisklasse 2</button>
+    <button class="btn btn-h50 on"    id="btn-h50"    onclick="toggleTeam('h50')">Herren 50 4er Kreisklasse 1</button>
+    <button class="btn btn-h60 on"    id="btn-h60"    onclick="toggleTeam('h60')">Herren 60 4er Bezirksliga</button>
+    <button class="btn btn-h65kl on"  id="btn-h65kl"  onclick="toggleTeam('h65kl')">Herren 65 4er Kreisklasse 1</button>
+    <button class="btn btn-h65ml on"  id="btn-h65ml"  onclick="toggleTeam('h65ml')">Herren 65 Doppel Münsterlandliga</button>
+    <button class="btn btn-refresh" id="btn-refresh" onclick="refreshData()" title="Neu laden">↺</button>
+  </div>
+</div>
+
+
+<div id="error-banner"    class="error-msg"  style="display:none"></div>
+<div id="loading-banner"  class="loading-row"><div class="spinner"></div>Spieldaten werden geladen …</div>
+<div id="matches-container"></div>
+<div id="update-info"     class="update-info" style="display:none"></div>
+
+<div id="detail-view">
+  <div class="detail-header">
+    <button class="btn-back" onclick="backToList()">← Zurück</button>
+    <div class="detail-title" id="detail-title"></div>
+  </div>
+  <div id="detail-table-container"></div>
+</div>
+
+<div id="report-view">
+  <div class="detail-header">
+    <button class="btn-back" onclick="backToList()">← Zurück</button>
+    <button class="btn-back" id="report-tabelle-btn" onclick="showTableFromReport()" style="margin-left:auto;">Tabelle</button>
+  </div>
+  <div id="report-content"></div>
+</div>
+
+
+<script>
+/* ── Konfiguration ─────────────────────────────────────────── */
+const LEAGUES = [
+  {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=249',
+    team:  'classic',
+    label: 'Junioren U15 classic Kreisklasse 1'
+  },
+  {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=237',
+    team:  '2er',
+    label: 'Junioren U15 2er Kreisklasse 1'
+  },
+  {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=194',
+    team:  'mixed',
+    label: 'Mixed U15 2er Kreisliga'
+  },
+  {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=201',
+    team:  'u8',
+    label: 'Gemischt U8 Kleinfeld Kreisliga'
+  },
+  {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=222',
+    team:  'u10',
+    label: 'Gemischt U10 Grossfeld Kreisklasse 1'
+  },
+  {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=7',
+    team:  'd4',
+    label: 'Damen 4er Kreisliga'
+  },
+  {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=18',
+    team:  'd30bz',
+    label: 'Damen 30 4er Bezirksliga'
+  },
+  {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=22',
+    team:  'd30kl',
+    label: 'Damen 30 4er Kreisliga'
+  },
+  {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=32',
+    team:  'd40',
+    label: 'Damen 40 4er Bezirksliga'
+  },
+  {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=45',
+    team:  'd50',
+    label: 'Damen 50 4er Bezirksliga'
+  },
+  {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=57',
+    team:  'd60',
+    label: 'Damen 60 Doppel Bezirksliga'
+  },
+  {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=65',
+    team:  'h4',
+    label: 'Herren 4er Kreisklasse 1'
+  },
+  {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=105',
+    team:  'h40bk',
+    label: 'Herren 40 4er Bezirksklasse'
+  },
+  {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=109',
+    team:  'h40kl',
+    label: 'Herren 40 4er Kreisklasse 2'
+  },
+  {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=128',
+    team:  'h50',
+    label: 'Herren 50 4er Kreisklasse 1'
+  },
+  {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=143',
+    team:  'h60',
+    label: 'Herren 60 4er Bezirksliga'
+  },
+  {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=154',
+    team:  'h65kl',
+    label: 'Herren 65 4er Kreisklasse 1'
+  },
+  {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=158',
+    team:  'h65ml',
+    label: 'Herren 65 Doppel Münsterlandliga'
+  }
+];
+
+const WEEKDAYS = ['So.','Mo.','Di.','Mi.','Do.','Fr.','Sa.'];
+
+/* ── Zustand ───────────────────────────────────────────────── */
+let allMatches  = [];
+
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem('spielplan-state') || '{}');
+    return {
+      showPast:   s.showPast   !== undefined ? s.showPast   : false,
+      showFuture: s.showFuture !== undefined ? s.showFuture : true,
+      showHome:   s.showHome   !== undefined ? s.showHome   : true,
+      showAway:   s.showAway   !== undefined ? s.showAway   : true,
+      showTeams:  s.showTeams  || { classic: true, '2er': true, mixed: true, u8: true, u10: true, d4: true, d30bz: true, d30kl: true, d40: true, d50: true, d60: true, h4: true, h40bk: true, h40kl: true, h50: true, h60: true, h65kl: true, h65ml: true }
+    };
+  } catch(e) {
+    return { showPast: false, showFuture: true, showHome: true, showAway: true,
+             showTeams: { classic: true, '2er': true, mixed: true, u8: true, u10: true, d4: true, d30bz: true, d30kl: true, d40: true, d50: true, d60: true, h4: true, h40bk: true, h40kl: true, h50: true, h60: true, h65kl: true, h65ml: true } };
+  }
+}
+
+function saveState() {
+  localStorage.setItem('spielplan-state', JSON.stringify({ showPast, showFuture, showHome, showAway, showTeams }));
+}
+
+const _state    = loadState();
+let showPast    = _state.showPast;
+let showFuture  = _state.showFuture;
+let showHome    = _state.showHome;
+let showAway    = _state.showAway;
+let showTeams   = _state.showTeams;
+const leagueHtml = {};
+
+/* ── Fetch ─────────────────────────────────────────────────── */
+async function fetchURL(targetUrl) {
+  const encoded = encodeURIComponent(targetUrl);
+  const ctrls   = [new AbortController(), new AbortController(), new AbortController()];
+
+  async function via(idx, url, isJson) {
+    const timer = setTimeout(() => ctrls[idx].abort(), 10000);
+    try {
+      const res = await fetch(url, { signal: ctrls[idx].signal });
+      clearTimeout(timer);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      if (isJson) {
+        const j = await res.json();
+        if (!j.contents || j.contents.length < 1000) throw new Error('Zu kurz');
+        return j.contents;
+      }
+      const t = await res.text();
+      if (t.length < 500) throw new Error('Zu kurz');
+      return t;
+    } catch(e) { clearTimeout(timer); throw e; }
+  }
+
+  /* Alle drei Proxies gleichzeitig — schnellster gewinnt, die anderen werden abgebrochen */
+  try {
+    const result = await Promise.any([
+      via(0, 'https://api.allorigins.win/get?url=' + encoded, true),
+      via(1, 'https://corsproxy.io/?' + encoded, false),
+      via(2, 'https://api.allorigins.win/raw?url=' + encoded, false),
+    ]);
+    ctrls.forEach(c => c.abort());
+    return result;
+  } catch {
+    throw new Error('Alle Proxies fehlgeschlagen');
+  }
+}
+
+/* ── Parse ─────────────────────────────────────────────────── */
+function toDate(ddmmyyyy) {
+  const m = ddmmyyyy.match(/(\d{2})\.(\d{2})\.(\d{4})/);
+  return m ? new Date(+m[3], +m[2] - 1, +m[1]) : null;
+}
+
+/* Gibt true zurück wenn der Text kein Datum, keine Uhrzeit, kein Ergebnis und kein Status ist */
+function looksLikeTeam(t) {
+  if (!t || t.length < 4)          return false;  // "Fr.", "Mo." etc. herausfiltern
+  if (/\d{2}\.\d{2}\.\d{4}/.test(t)) return false;   // Datum
+  if (/^\d{2}:\d{2}$/.test(t))     return false;     // Uhrzeit
+  if (/^\d+:\d+$/.test(t))         return false;     // Ergebnis
+  const low = t.toLowerCase();
+  if (low === 'offen' || low === 'anzeigen' || low.includes('zurückgezogen')) return false;
+  return true;
+}
+
+function parseLeague(html, league) {
+  const doc     = new DOMParser().parseFromString(html, 'text/html');
+  const matches = [];
+  let lastDateStr = '';
+  let lastTimeStr = '??:??';
+
+  for (const row of doc.querySelectorAll('table tr')) {
+    const cells = [...row.querySelectorAll('td')];
+    if (cells.length < 3) continue;
+
+    const texts = cells.map(c => c.textContent.trim());
+
+    /* Datum aus JEDER Zeile lesen und vorwärts merken.
+       liga.nu zeigt das Datum oft nur in einer Kopfzeile, die nachfolgenden
+       Spielzeilen haben dann leere Datumszellen. */
+    for (const t of texts) {
+      const m = t.match(/(\d{2}\.\d{2}\.\d{4})/);
+      if (m) {
+        lastDateStr = m[1];
+        const tm = t.match(/(\d{2}:\d{2})/);
+        lastTimeStr = tm ? tm[1] : '??:??';
+        break;
+      }
+    }
+
+    /* Ochtrup in dieser Zeile? */
+    if (!texts.some(t => t.includes('Ochtrup'))) continue;
+
+    /* Zuletzt gesehenes Datum und Uhrzeit verwenden */
+    const dateStr = lastDateStr;
+    const timeStr = lastTimeStr;
+    if (!dateStr) continue;
+
+    /* Die ersten zwei Team-ähnlichen Zellen = Heim / Gast */
+    const teamTexts = texts.filter(looksLikeTeam);
+    if (teamTexts.length < 2) continue;
+
+    const homeTeam = teamTexts[0];
+    const awayTeam = teamTexts[1];
+
+    if (!homeTeam.includes('Ochtrup') && !awayTeam.includes('Ochtrup')) continue;
+
+    /* Ergebnis: erste Zelle die genau X:Y enthält (keine Sub-Ergebnisse) */
+    let result = 'offen';
+    for (const t of texts) {
+      if (/^\d+:\d+$/.test(t)) { result = t; break; }
+    }
+    if (result === 'offen') {
+      for (const t of texts) {
+        if (t.toLowerCase().includes('zurückgezogen')) { result = 'zurückgezogen'; break; }
+      }
+    }
+
+    /* Verlegungshinweis erkennen */
+    let note = '';
+    for (const t of texts) {
+      if (t.toLowerCase().startsWith('ursprünglich')) { note = t; break; }
+    }
+
+    if (result === 'zurückgezogen') continue;
+
+    /* Spielbericht-Link ("anzeigen") extrahieren */
+    let reportUrl = '';
+    for (const cell of cells) {
+      const a = cell.querySelector('a[href*="meetingReport"]');
+      if (a) {
+        const href = a.getAttribute('href');
+        reportUrl = href.startsWith('http') ? href : 'https://wtv.liga.nu' + href;
+        break;
+      }
+    }
+
+    const date = toDate(dateStr);
+    if (!date) continue;
+
+    matches.push({
+      dateStr, timeStr, date,
+      homeTeam, awayTeam, result, note, reportUrl,
+      isHome: homeTeam.includes('Ochtrup'),
+      team:   league.team,
+      label:  league.label
+    });
+  }
+
+  console.log('[' + league.label + '] ' + html.length +
+    ' B | Ochtrup: ' + html.includes('Ochtrup') +
+    ' | gefunden: ' + matches.length);
+
+  return matches;
+}
+
+/* ── Laden ─────────────────────────────────────────────────── */
+async function loadAllData() {
+  const errBanner = document.getElementById('error-banner');
+  const loadBanner = document.getElementById('loading-banner');
+  const refreshBtn = document.getElementById('btn-refresh');
+
+  errBanner.style.display  = 'none';
+  loadBanner.style.display = 'flex';
+  document.getElementById('matches-container').innerHTML = '';
+  document.getElementById('next-match-box').style.display = 'none';
+  document.getElementById('update-info').style.display = 'none';
+  refreshBtn.disabled = true;
+  refreshBtn.classList.add('spinning');
+
+  /* Alle Ligen parallel laden – jede wird sofort angezeigt sobald sie fertig ist */
+  allMatches = [];
+  const errors = [];
+
+  await Promise.allSettled(
+    LEAGUES.map(league =>
+      fetchURL(league.url)
+        .then(html => {
+          leagueHtml[league.team] = html;
+          allMatches = [...allMatches, ...parseLeague(html, league)]
+            .sort((a, b) => a.date - b.date);
+          renderNextMatch();
+          renderMatches();
+        })
+        .catch(e => { errors.push(league.label + ': ' + e.message); })
+    )
+  );
+
+  refreshBtn.disabled = false;
+  refreshBtn.classList.remove('spinning');
+  loadBanner.style.display = 'none';
+
+  if (errors.length) {
+    errBanner.innerHTML =
+      '<strong>⚠ Fehler beim Laden:</strong><br>' + errors.join('<br>');
+    errBanner.style.display = 'block';
+  }
+
+  if (!allMatches.length) {
+    errBanner.innerHTML =
+      '<strong>⚠ Keine Spieldaten gefunden</strong><br>' +
+      'Mögliche Ursache: liga.nu blockiert den CORS-Proxy.<br>' +
+      errors.join('<br>');
+    errBanner.style.display = 'block';
+    document.getElementById('matches-container').innerHTML = '';
+    return;
+  }
+
+  const ui = document.getElementById('update-info');
+  const now = new Date();
+  ui.textContent = 'Zuletzt aktualisiert: ' +
+    now.toLocaleDateString('de-DE') + ' · ' +
+    now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr';
+  ui.style.display = 'block';
+}
+
+/* ── Nächstes Spiel ────────────────────────────────────────── */
+function renderNextMatch() {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+
+  const next = allMatches.find(m => {
+    const d = new Date(m.date); d.setHours(0, 0, 0, 0);
+    return d >= today && showFuture && showTeams[m.team] && (m.isHome ? showHome : showAway);
+  });
+  if (!next) return;
+
+  const opponent = next.isHome ? next.awayTeam : next.homeTeam;
+  const prefix   = next.isHome ? 'Heim gegen ' : 'Auswärts bei ';
+
+  document.getElementById('nm-teams').textContent = prefix + opponent;
+  document.getElementById('nm-date').textContent  =
+    WEEKDAYS[next.date.getDay()] + ' ' + next.dateStr +
+    ' · ' + next.timeStr + ' Uhr · ' + next.label;
+
+  const diff  = Math.round((new Date(next.date).setHours(0,0,0,0) - today) / 86400000);
+  const dEl   = document.getElementById('nm-days');
+  const uEl   = document.getElementById('nm-unit');
+
+  if (diff === 0) {
+    dEl.textContent = 'HEUTE'; dEl.className = 'nm-days today'; uEl.textContent = '';
+  } else {
+    dEl.textContent = diff;    dEl.className = 'nm-days';
+    uEl.textContent = diff === 1 ? 'Tag' : 'Tage';
+  }
+
+  document.getElementById('next-match-box').style.display = 'flex';
+}
+
+/* ── Karten rendern ────────────────────────────────────────── */
+function isPast(date) {
+  const t = new Date(); t.setHours(0, 0, 0, 0);
+  const d = new Date(date); d.setHours(0, 0, 0, 0);
+  return d < t;
+}
+
+function resultCls(result, isHome) {
+  if (result === 'offen' || result === 'zurückgezogen') return 'open';
+  const m = result.match(/^(\d+):(\d+)/);
+  if (!m) return 'open';
+  return (isHome ? +m[1] > +m[2] : +m[2] > +m[1]) ? 'win' : 'loss';
+}
+
+function resultTxt(result) {
+  if (result === 'offen')          return '–';
+  if (result === 'zurückgezogen')  return 'zurückgez.';
+  return result;
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderMatches() {
+  const container = document.getElementById('matches-container');
+
+  const visible = allMatches.filter(m =>
+    showTeams[m.team] &&
+    (isPast(m.date) ? showPast : showFuture) &&
+    (m.isHome ? showHome : showAway)
+  );
+
+  if (!visible.length) {
+    container.innerHTML = '<div class="status-msg">Keine Spiele angezeigt.</div>';
+    return;
+  }
+
+  const hasPast   = visible.some(m =>  isPast(m.date));
+  const hasFuture = visible.some(m => !isPast(m.date));
+  const showDivider = hasPast && hasFuture;
+
+  container.innerHTML = visible.map((m, idx) => {
+    const TEAM_CLS = { classic:'u15-classic','2er':'u15-2er',mixed:'mixed',u8:'u8-klein',u10:'u10-gross',d4:'d4',d30bz:'d30bz',d30kl:'d30kl',d40:'d40',d50:'d50',d60:'d60',h4:'h4',h40bk:'h40bk',h40kl:'h40kl',h50:'h50',h60:'h60',h65kl:'h65kl',h65ml:'h65ml' };
+    const TAG_CLS  = { classic:'tag-classic','2er':'tag-2er',mixed:'tag-mixed',u8:'tag-u8',u10:'tag-u10',d4:'tag-d4',d30bz:'tag-d30bz',d30kl:'tag-d30kl',d40:'tag-d40',d50:'tag-d50',d60:'tag-d60',h4:'tag-h4',h40bk:'tag-h40bk',h40kl:'tag-h40kl',h50:'tag-h50',h60:'tag-h60',h65kl:'tag-h65kl',h65ml:'tag-h65ml' };
+    const teamCls = TEAM_CLS[m.team] || 'u15-classic';
+    const tagCls  = TAG_CLS[m.team]  || 'tag-classic';
+    const past    = isPast(m.date);
+    const extra   = (m.isHome ? ' home-game' : '') + (past ? ' past-game' : '');
+    const tabelleBtn = `<button class="btn-tabelle" onclick="event.stopPropagation();showTable('${m.team}')">Tabelle</button>`;
+    const wd      = WEEKDAYS[m.date.getDay()];
+
+    const homeSpan = `<span class="team${m.isHome ? '' : ' opponent'}">${esc(m.homeTeam)}</span>`;
+    const awaySpan = `<span class="team${m.isHome ? ' opponent' : ''}">${esc(m.awayTeam)}</span>`;
+
+    const divider = (showDivider && !past && (idx === 0 || isPast(visible[idx - 1].date)))
+      ? '<div class="past-divider"></div>'
+      : '';
+
+    const cardClick = m.reportUrl
+      ? `onclick="showReport('${m.team}','${m.reportUrl}',allMatches.find(x=>x.reportUrl==='${m.reportUrl}'))" style="cursor:pointer"`
+      : '';
+
+    return divider + `<div class="card ${teamCls}${extra}" ${cardClick}>
+  <div class="card-tag-row"><span class="tag ${tagCls}">${m.label}</span></div>
+  <div class="card-top">
+    <span class="card-date">${wd} ${m.dateStr}<span class="card-time"> · ${m.timeStr}</span></span>
+    ${tabelleBtn}
+  </div>
+  <div class="card-match">${homeSpan}<span class="vs">vs.</span>${awaySpan}</div>
+  <div class="card-bottom">
+    <span class="note">${m.note ? esc(m.note) : ''}</span>
+    <span class="result ${resultCls(m.result, m.isHome)}">${resultTxt(m.result)}</span>
+  </div>
+</div>`;
+  }).join('\n');
+}
+
+/* ── Steuerung ─────────────────────────────────────────────── */
+function toggleFilter(name) {
+  const map = { showPast: 'btn-vergangen', showFuture: 'btn-aktuell', showHome: 'btn-heim', showAway: 'btn-auswaerts' };
+  if (name === 'showPast')   showPast   = !showPast;
+  if (name === 'showFuture') showFuture = !showFuture;
+  if (name === 'showHome')   showHome   = !showHome;
+  if (name === 'showAway')   showAway   = !showAway;
+  document.getElementById(map[name]).classList.toggle('on',
+    name === 'showPast' ? showPast : name === 'showFuture' ? showFuture : name === 'showHome' ? showHome : showAway
+  );
+  saveState();
+  renderNextMatch();
+  renderMatches();
+}
+
+function toggleTeam(team) {
+  showTeams[team] = !showTeams[team];
+  document.getElementById('btn-' + team).classList.toggle('on', showTeams[team]);
+  saveState();
+  renderNextMatch();
+  renderMatches();
+}
+
+function applyStateToButtons() {
+  document.getElementById('btn-vergangen').classList.toggle('on', showPast);
+  document.getElementById('btn-aktuell').classList.toggle('on', showFuture);
+  document.getElementById('btn-heim').classList.toggle('on', showHome);
+  document.getElementById('btn-auswaerts').classList.toggle('on', showAway);
+  LEAGUES.forEach(l => {
+    document.getElementById('btn-' + l.team).classList.toggle('on', showTeams[l.team]);
+  });
+}
+
+function toggleMannschaften() {
+  const row = document.getElementById('team-row');
+  const btn = document.getElementById('btn-mannschaften');
+  const open = row.classList.toggle('visible');
+  btn.classList.toggle('on', open);
+}
+
+function refreshData() { loadAllData(); }
+
+/* ── Tabellen-Ansicht ──────────────────────────────────────── */
+function parseStandingsTable(html) {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  for (const table of doc.querySelectorAll('table')) {
+    const text = table.textContent;
+    if (text.includes('Rang') && text.includes('Mannschaft')) return table;
+  }
+  return null;
+}
+
+function showTable(team) {
+  const league = LEAGUES.find(l => l.team === team);
+  const html   = leagueHtml[team];
+  if (!html || !league) return;
+
+  const table = parseStandingsTable(html);
+  if (!table) { alert('Tabelle noch nicht verfügbar.'); return; }
+
+  const rows = [...table.querySelectorAll('tr')];
+  let tableHtml = '<table class="standings-table"><thead>';
+
+  for (const row of rows) {
+    const isHeader = row.querySelectorAll('th').length > 0;
+    if (isHeader) {
+      const cells = [...row.querySelectorAll('th')];
+      tableHtml += '<tr>' + cells.map(c => `<th>${esc(c.textContent.trim())}</th>`).join('') + '</tr>';
+      tableHtml += '</thead><tbody>';
+    } else {
+      const cells = [...row.querySelectorAll('td')];
+      if (cells.length < 3) continue;
+      const rowText = row.textContent;
+      const isOchtrup = rowText.includes('Ochtrup');
+      tableHtml += `<tr${isOchtrup ? ' class="ochtrup-row"' : ''}>`;
+      tableHtml += cells.map(c => `<td>${esc(c.textContent.trim())}</td>`).join('');
+      tableHtml += '</tr>';
+    }
+  }
+  tableHtml += '</tbody></table>';
+
+  document.getElementById('detail-title').textContent = league.label + ' – Tabelle';
+  document.getElementById('detail-table-container').innerHTML = tableHtml;
+
+  document.getElementById('matches-container').style.display = 'none';
+  document.getElementById('update-info').style.display = 'none';
+  document.getElementById('detail-view').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+function backToList() {
+  document.getElementById('detail-view').style.display = 'none';
+  document.getElementById('report-view').style.display = 'none';
+  document.getElementById('matches-container').style.display = '';
+  document.getElementById('update-info').style.display = '';
+}
+
+let _reportTeam = '';
+
+async function showReport(team, reportUrl, matchObj) {
+  _reportTeam = team;
+  document.getElementById('matches-container').style.display = 'none';
+  document.getElementById('update-info').style.display = 'none';
+  document.getElementById('detail-view').style.display = 'none';
+  const rv = document.getElementById('report-view');
+  rv.style.display = 'block';
+  document.getElementById('report-content').innerHTML =
+    '<div class="loading-row"><div class="spinner"></div>Spielbericht wird geladen …</div>';
+  window.scrollTo(0, 0);
+
+  try {
+    const html = await fetchURL(reportUrl);
+    document.getElementById('report-content').innerHTML = renderReport(html, matchObj);
+  } catch(e) {
+    document.getElementById('report-content').innerHTML =
+      '<div class="status-msg">Spielbericht konnte nicht geladen werden.</div>';
+  }
+}
+
+function showTableFromReport() {
+  document.getElementById('report-view').style.display = 'none';
+  showTable(_reportTeam);
+}
+
+function renderReport(html, m) {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  let out = '';
+
+  /* ── Header ── */
+  out += `<div class="report-match-header">
+    <div class="report-teams">${esc(m.homeTeam)} vs. ${esc(m.awayTeam)}</div>
+    <div class="report-result">${m.result}</div>
+    <div class="report-date">${WEEKDAYS[m.date.getDay()]} ${m.dateStr} · ${m.timeStr} Uhr · ${m.label}</div>
+  </div>`;
+
+  /* ── Tabellen aus dem HTML extrahieren ── */
+  const allTables = [...doc.querySelectorAll('table')];
+  const matchTables = allTables.filter(t => {
+    const txt = t.textContent;
+    return (txt.includes('Satz') || txt.includes('LK')) && t.rows.length > 1;
+  });
+
+  /* Abschnitts-Labels aus vorangehenden Textelementen */
+  const sectionLabels = ['Einzelspiele', 'Doppelspiele'];
+  let sectionIdx = 0;
+
+  for (const table of matchTables) {
+    const label = sectionLabels[sectionIdx] || '';
+    if (label) out += `<div class="report-section">${label}</div>`;
+    sectionIdx++;
+    out += '<table class="report-table"><thead>';
+
+    /* Vorverarbeitung: Summenzeilen (keine Buchstaben, keine Scores) überspringen */
+    const preRows = [];
+    for (const row of table.rows) {
+      const cells = [...row.cells];
+      if (!cells.length) continue;
+      const isHdr = row.querySelectorAll('th').length > 0;
+      const rTxt  = row.textContent.trim().toLowerCase();
+      const isTot = rTxt.includes('einzel') || rTxt.includes('doppel') || rTxt.includes('gesamt');
+      if (!isHdr && !isTot) {
+        const nonEmpty   = cells.map(c => c.textContent.trim()).filter(t => t);
+        const hasLetters = nonEmpty.some(t => /[a-zA-ZäöüÄÖÜß]/.test(t));
+        const hasScores  = nonEmpty.some(t => /^\d+:\d+$/.test(t));
+        /* Summenzeilen: keine Buchstaben, keine Ergebnisse — oder nur kleine Ganzzahlen */
+        const onlySmallNums = nonEmpty.length > 0 && nonEmpty.every(t => /^\d+$/.test(t) && +t < 20);
+        if (!hasLetters && !hasScores) continue;
+        if (onlySmallNums) continue;
+      }
+      const hasScr = !isHdr && !isTot && cells.some(c => /^\d+:\d+$/.test(c.textContent.trim()));
+      const isOcht = row.textContent.includes('Ochtrup') || row.textContent.includes('Nitsche');
+      preRows.push({ cells, isHdr, isTot, hasScr, isOcht });
+    }
+
+    let inBody = false;
+    let numSatzCols = 0;
+    let numPlayerCols = 0;
+    let totalCols = 0;
+
+    for (const pr of preRows) {
+      let cells = pr.cells;
+      const { isHdr, isTot, isOcht } = pr;
+
+      if (!inBody && !isHdr) {
+        out += '</thead><tbody>';
+        inBody = true;
+      }
+
+      /* Zusammenfassungs-Spalten (Matches, Sätze, Games) vor Satz-Spalten */
+      if (!isTot && cells.length > 2) {
+        if (isHdr) {
+          const satzIdx = cells.findIndex(c => /satz/i.test(c.textContent.trim()));
+          if (satzIdx > 0) {
+            let cnt = 0;
+            for (let i = satzIdx; i < cells.length && /satz/i.test(cells[i].textContent.trim()); i++) cnt++;
+            if (numSatzCols === 0) numSatzCols = cnt;
+            const summaryStart = satzIdx + cnt;
+            if (summaryStart < cells.length) {
+              const summary = cells.splice(summaryStart);
+              cells.splice(satzIdx, 0, ...summary);
+            }
+          }
+        } else {
+          const firstScore = cells.findIndex(c => /^\d+:\d+$/.test(c.textContent.trim()));
+          if (firstScore > 0) {
+            if (numPlayerCols === 0) numPlayerCols = firstScore;
+            if (numSatzCols > 0) {
+              const summaryStart = firstScore + numSatzCols;
+              if (summaryStart < cells.length) {
+                const summary = cells.splice(summaryStart);
+                cells.splice(firstScore, 0, ...summary);
+              }
+            }
+            if (totalCols === 0) totalCols = cells.length;
+          }
+        }
+      }
+
+      if (isHdr) {
+        out += '<tr>' + cells.map(c => {
+          const cs = c.colSpan > 1 ? ` colspan="${c.colSpan}"` : '';
+          const rs = c.rowSpan > 1 ? ` rowspan="${c.rowSpan}"` : '';
+          return `<th${cs}${rs}>${esc(c.textContent.trim())}</th>`;
+        }).join('') + '</tr>';
+
+      } else if (isTot && totalCols > 0 && numPlayerCols > 0) {
+        /* Total-Zeile: Label links, letzte 3 Scores → Matches/Sätze/Games */
+        const lbl      = cells.find(c => !/^\d+:\d+$/.test(c.textContent.trim()))?.textContent.trim() || '';
+        const allScores = cells.filter(c => /^\d+:\d+$/.test(c.textContent.trim())).map(c => c.textContent.trim());
+        const scores   = allScores.slice(-3); /* letzte 3 = Matches, Sätze, Games */
+        const numSummaryCols = totalCols - numPlayerCols - numSatzCols;
+        out += '<tr class="total-row">';
+        out += `<td style="text-align:left">${esc(lbl)}</td>`;
+        for (let i = 1; i < numPlayerCols; i++) out += '<td></td>';
+        for (let i = 0; i < numSummaryCols; i++) {
+          const sc = scores[i] || '';
+          let txt = esc(sc);
+          if (sc) {
+            const [a, b] = sc.split(':').map(Number);
+            const win = m.isHome ? a > b : b > a;
+            txt = `<span class="${win ? 'set-win' : 'set-loss'}">${txt}</span>`;
+          }
+          out += `<td>${txt}</td>`;
+        }
+        for (let i = 0; i < numSatzCols; i++) out += '<td></td>';
+        out += '</tr>';
+
+      } else {
+        const cls = isOcht ? ' class="ochtrup-player"' : '';
+        let colIdx = 0;
+        out += `<tr${cls}>` + cells.map(c => {
+          const origTxt = c.textContent.trim();
+          let txt = esc(origTxt);
+          const cs = c.colSpan > 1 ? ` colspan="${c.colSpan}"` : '';
+          if (colIdx >= numPlayerCols && numPlayerCols > 0 && /^\d+:\d+$/.test(origTxt)) {
+            const [a, b] = origTxt.split(':').map(Number);
+            const win = m.isHome ? a > b : b > a;
+            txt = `<span class="${win ? 'set-win' : 'set-loss'}">${esc(origTxt)}</span>`;
+          }
+          colIdx += c.colSpan;
+          return `<td${cs}>${txt}</td>`;
+        }).join('') + '</tr>';
+      }
+    }
+    if (!inBody) out += '</thead><tbody>';
+    out += '</tbody></table>';
+  }
+
+  if (!matchTables.length) out += '<div class="status-msg">Keine Detaildaten gefunden.</div>';
+  return out;
+}
+
+
+/* ── Start ─────────────────────────────────────────────────── */
+applyStateToButtons();
+loadAllData();
+</script>
+</body>
+</html>
