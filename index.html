@@ -1168,9 +1168,13 @@ function renderReport(html, m) {
 
       if (isHeader) {
         out += '<tr>' + cells.map(c => {
-          const cs = c.colSpan > 1 ? ` colspan="${c.colSpan}"` : '';
+          const txt = c.textContent.trim();
+          const isScoreCol = /satz|matches|sätze|games/i.test(txt);
+          /* Teamnamen-Zellen bekommen colspan=2, damit Spieler-Spalten (Nr + Name) darunter passen */
+          const span = isScoreCol ? (c.colSpan > 1 ? c.colSpan : 1) : Math.max(c.colSpan || 1, 2);
+          const cs = span > 1 ? ` colspan="${span}"` : '';
           const rs = c.rowSpan > 1 ? ` rowspan="${c.rowSpan}"` : '';
-          return `<th${cs}${rs}>${esc(c.textContent.trim())}</th>`;
+          return `<th${cs}${rs}>${esc(txt)}</th>`;
         }).join('') + '</tr>';
 
       } else if (isDoppel && !isTotal && cells.length >= 10) {
