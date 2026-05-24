@@ -1109,35 +1109,48 @@ function renderReport(html, m) {
     const label = sectionLabels[sectionIdx] || '';
     if (label) out += `<div class="report-section">${label}</div>`;
     sectionIdx++;
-    out += '<table class="report-table">';
+    out += '<table class="report-table"><thead>';
 
+    let inBody = false;
     for (const row of table.rows) {
       const cells = [...row.cells];
       if (!cells.length) continue;
       const isHeader = row.querySelectorAll('th').length > 0;
+
+      /* Beim ersten Datensatz einmalig von <thead> zu <tbody> wechseln */
+      if (!inBody && !isHeader) {
+        out += '</thead><tbody>';
+        inBody = true;
+      }
+
       const rowText  = row.textContent.trim().toLowerCase();
       const isTotal  = rowText.startsWith('gesamt') || rowText.startsWith('einzel') || rowText.startsWith('doppel');
       const isOchtrup = row.textContent.includes('Ochtrup') || row.textContent.includes('Nitsche');
 
       if (isHeader) {
-        out += '<thead><tr>' + cells.map(c =>
-          `<th colspan="${c.colSpan > 1 ? c.colSpan : ''}">${esc(c.textContent.trim())}</th>`
-        ).join('') + '</tr></thead><tbody>';
+        out += '<tr>' + cells.map(c => {
+          const cs = c.colSpan > 1 ? ` colspan="${c.colSpan}"` : '';
+          const rs = c.rowSpan > 1 ? ` rowspan="${c.rowSpan}"` : '';
+          return `<th${cs}${rs}>${esc(c.textContent.trim())}</th>`;
+        }).join('') + '</tr>';
       } else {
         const cls = isTotal ? ' class="total-row"' : isOchtrup ? ' class="ochtrup-player"' : '';
-        out += `<tr${cls}>` + cells.map((c, i) => {
+        let colIdx = 0;
+        out += `<tr${cls}>` + cells.map(c => {
           let txt = esc(c.textContent.trim());
-          /* Gewonnene/verlorene Sätze einfärben */
-          if (i >= 2 && /^\d+:\d+$/.test(txt)) {
+          const cs = c.colSpan > 1 ? ` colspan="${c.colSpan}"` : '';
+          /* Gewonnene/verlorene Sätze einfärben — visuellen Spaltenindex verwenden */
+          if (colIdx >= 2 && /^\d+:\d+$/.test(txt)) {
             const [a, b] = txt.split(':').map(Number);
-            const ochtrupLeft = m.isHome;
-            const win = ochtrupLeft ? a > b : b > a;
+            const win = m.isHome ? a > b : b > a;
             txt = `<span class="${win ? 'set-win' : 'set-loss'}">${txt}</span>`;
           }
-          return `<td>${txt}</td>`;
+          colIdx += c.colSpan;
+          return `<td${cs}>${txt}</td>`;
         }).join('') + '</tr>';
       }
     }
+    if (!inBody) out += '</thead><tbody>';
     out += '</tbody></table>';
   }
 
