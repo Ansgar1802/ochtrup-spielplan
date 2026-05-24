@@ -1124,9 +1124,13 @@ function renderReport(html, m) {
       const rTxt  = row.textContent.trim().toLowerCase();
       const isTot = rTxt.includes('einzel') || rTxt.includes('doppel') || rTxt.includes('gesamt');
       if (!isHdr && !isTot) {
-        const hasLetters = cells.some(c => /[a-zA-ZäöüÄÖÜß]/.test(c.textContent));
-        const hasScores  = cells.some(c => /^\d+:\d+$/.test(c.textContent.trim()));
-        if (!hasLetters && !hasScores) continue; /* Summenzeile überspringen */
+        const nonEmpty   = cells.map(c => c.textContent.trim()).filter(t => t);
+        const hasLetters = nonEmpty.some(t => /[a-zA-ZäöüÄÖÜß]/.test(t));
+        const hasScores  = nonEmpty.some(t => /^\d+:\d+$/.test(t));
+        /* Summenzeilen: keine Buchstaben, keine Ergebnisse — oder nur kleine Ganzzahlen */
+        const onlySmallNums = nonEmpty.length > 0 && nonEmpty.every(t => /^\d+$/.test(t) && +t < 20);
+        if (!hasLetters && !hasScores) continue;
+        if (onlySmallNums) continue;
       }
       const hasScr = !isHdr && !isTot && cells.some(c => /^\d+:\d+$/.test(c.textContent.trim()));
       const isOcht = row.textContent.includes('Ochtrup') || row.textContent.includes('Nitsche');
