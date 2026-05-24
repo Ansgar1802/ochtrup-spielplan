@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>TC 1928 Ochtrup – Spielplan 2026</title>
+<title>TC 1928 Ochtrup – Spielplan 2026 [v3]</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1117,7 +1117,9 @@ function renderReport(html, m) {
 
     /* Vorverarbeitung: Summenzeilen (keine Buchstaben, keine Scores) überspringen */
     const preRows = [];
+    console.log('=== Tabelle', sectionIdx - 1, '===');
     for (const row of table.rows) {
+      console.log('ROW:', [...row.cells].map(c => JSON.stringify(c.textContent.trim())).join(' | '));
       const cells = [...row.cells];
       if (!cells.length) continue;
       const isHdr = row.querySelectorAll('th').length > 0;
