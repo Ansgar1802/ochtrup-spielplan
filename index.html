@@ -290,11 +290,10 @@
   .card-time { font-size: 0.75rem; color: #666a85; margin-left: 4px; }
   .card-meta {
     display: flex;
-    align-items: center;
-    gap: 6px;
-    flex: 1;
-    justify-content: flex-end;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+    flex-shrink: 0;
   }
 
   .tag {
@@ -314,8 +313,6 @@
   .tag-u10     { background: rgba(130,40,200,0.4); color: #fff; font-weight: 700; border: 1px solid #8020c0; }
 
   .btn-tabelle {
-    flex: 1;
-    text-align: center;
     background: none;
     border: 1px solid #3a3f5c;
     border-radius: 6px;
@@ -325,11 +322,9 @@
     font-weight: 700;
     letter-spacing: 0.08em;
     cursor: pointer;
-    padding: 3px 10px;
-    margin: 0 10px;
+    padding: 2px 10px;
     transition: all 0.15s;
     white-space: nowrap;
-    align-self: center;
   }
   .btn-tabelle:hover { border-color: #7a7f96; color: #e8eaf0; }
 
@@ -835,8 +830,7 @@ function renderMatches() {
     return divider + `<div class="card ${teamCls}${extra}" ${cardClick}>
   <div class="card-top">
     <span class="card-date">${wd} ${m.dateStr}<span class="card-time"> · ${m.timeStr}</span></span>
-    ${tabelleBtn}
-    <div class="card-meta"><span class="tag ${tagCls}">${m.label}</span></div>
+    <div class="card-meta"><span class="tag ${tagCls}">${m.label}</span>${tabelleBtn}</div>
   </div>
   <div class="card-match">${homeSpan}<span class="vs">vs.</span>${awaySpan}</div>
   <div class="card-bottom">
