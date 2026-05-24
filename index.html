@@ -273,6 +273,10 @@
   .set-win  { color: #7effa8; font-weight: 600; }
   .set-loss { color: #ff7f7f; }
 
+  .card-tag-row {
+    text-align: center;
+    margin-bottom: 7px;
+  }
   .card-top {
     display: flex;
     align-items: center;
@@ -288,13 +292,6 @@
     flex-shrink: 0;
   }
   .card-time { font-size: 0.75rem; color: #666a85; margin-left: 4px; }
-  .card-meta {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 5px;
-    flex-shrink: 0;
-  }
 
   .tag {
     display: inline-block;
@@ -439,7 +436,7 @@
     <button class="btn btn-2er on"     id="btn-2er"     onclick="toggleTeam('2er')">Junioren U15 2er Kreisklasse 1</button>
     <button class="btn btn-mixed on"   id="btn-mixed"   onclick="toggleTeam('mixed')">Mixed U15 2er Kreisliga</button>
     <button class="btn btn-u8 on"      id="btn-u8"      onclick="toggleTeam('u8')">Gemischt U8 Kleinfeld Kreisliga</button>
-    <button class="btn btn-u10 on"     id="btn-u10"     onclick="toggleTeam('u10')">Gemischt U10 Großfeld Kreisklasse 1</button>
+    <button class="btn btn-u10 on"     id="btn-u10"     onclick="toggleTeam('u10')">Gemischt U10 Grossfeld Kreisklasse 1</button>
     <button class="btn btn-refresh" id="btn-refresh" onclick="refreshData()" title="Neu laden">↺</button>
   </div>
 </div>
@@ -493,7 +490,7 @@ const LEAGUES = [
   {
     url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=222',
     team:  'u10',
-    label: 'Gemischt U10 Großfeld Kreisklasse 1'
+    label: 'Gemischt U10 Grossfeld Kreisklasse 1'
   }
 ];
 
@@ -828,9 +825,10 @@ function renderMatches() {
       : '';
 
     return divider + `<div class="card ${teamCls}${extra}" ${cardClick}>
+  <div class="card-tag-row"><span class="tag ${tagCls}">${m.label}</span></div>
   <div class="card-top">
     <span class="card-date">${wd} ${m.dateStr}<span class="card-time"> · ${m.timeStr}</span></span>
-    <div class="card-meta"><span class="tag ${tagCls}">${m.label}</span>${tabelleBtn}</div>
+    ${tabelleBtn}
   </div>
   <div class="card-match">${homeSpan}<span class="vs">vs.</span>${awaySpan}</div>
   <div class="card-bottom">
