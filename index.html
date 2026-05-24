@@ -440,11 +440,11 @@
   </div>
   <button class="btn-mannschaften" id="btn-mannschaften" onclick="toggleMannschaften()">Mannschaften</button>
   <div class="team-row" id="team-row">
-    <button class="btn btn-classic on" id="btn-classic" onclick="toggleTeam('classic')">U15 classic</button>
-    <button class="btn btn-2er on"     id="btn-2er"     onclick="toggleTeam('2er')">U15 2er</button>
-    <button class="btn btn-mixed on"   id="btn-mixed"   onclick="toggleTeam('mixed')">U15 2er Mixed</button>
-    <button class="btn btn-u8 on"      id="btn-u8"      onclick="toggleTeam('u8')">Gemischt U8</button>
-    <button class="btn btn-u10 on"     id="btn-u10"     onclick="toggleTeam('u10')">Gemischt U10</button>
+    <button class="btn btn-classic on" id="btn-classic" onclick="toggleTeam('classic')">Junioren U15 classic Kreisklasse 1</button>
+    <button class="btn btn-2er on"     id="btn-2er"     onclick="toggleTeam('2er')">Junioren U15 2er Kreisklasse 1</button>
+    <button class="btn btn-mixed on"   id="btn-mixed"   onclick="toggleTeam('mixed')">Mixed U15 2er Kreisliga</button>
+    <button class="btn btn-u8 on"      id="btn-u8"      onclick="toggleTeam('u8')">Gemischt U8 Kleinfeld Kreisliga</button>
+    <button class="btn btn-u10 on"     id="btn-u10"     onclick="toggleTeam('u10')">Gemischt U10 Großfeld Kreisklasse 1</button>
     <button class="btn btn-refresh" id="btn-refresh" onclick="refreshData()" title="Neu laden">↺</button>
   </div>
 </div>
@@ -478,27 +478,27 @@ const LEAGUES = [
   {
     url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=249',
     team:  'classic',
-    label: 'U15 classic'
+    label: 'Junioren U15 classic Kreisklasse 1'
   },
   {
     url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=237',
     team:  '2er',
-    label: 'U15 2er'
+    label: 'Junioren U15 2er Kreisklasse 1'
   },
   {
     url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=194',
     team:  'mixed',
-    label: 'Mixed U15'
-  },
-  {
-    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=222',
-    team:  'u8',
-    label: 'Gemischt U8'
+    label: 'Mixed U15 2er Kreisliga'
   },
   {
     url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=201',
+    team:  'u8',
+    label: 'Gemischt U8 Kleinfeld Kreisliga'
+  },
+  {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=222',
     team:  'u10',
-    label: 'Gemischt U10'
+    label: 'Gemischt U10 Großfeld Kreisklasse 1'
   }
 ];
 
