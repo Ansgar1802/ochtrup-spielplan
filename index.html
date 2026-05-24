@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>TC 1928 Ochtrup – Spielplan 2026 [v3]</title>
+<title>TC 1928 Ochtrup – Spielplan 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1105,135 +1105,161 @@ function renderReport(html, m) {
     return (txt.includes('Satz') || txt.includes('LK')) && t.rows.length > 1;
   });
 
-  /* Abschnitts-Labels aus vorangehenden Textelementen */
-  const sectionLabels = ['Einzelspiele', 'Doppelspiele'];
-  let sectionIdx = 0;
+  if (!matchTables.length) {
+    out += '<div class="status-msg">Keine Detaildaten gefunden.</div>';
+    return out;
+  }
 
-  for (const table of matchTables) {
-    const label = sectionLabels[sectionIdx] || '';
-    if (label) out += `<div class="report-section">${label}</div>`;
-    sectionIdx++;
-    out += '<table class="report-table"><thead>';
+  /* liga.nu packt alles in EINE Tabelle; "Einzelspiele"/"Doppelspiele" sind einzellige Trennzeilen */
+  const bigTable = matchTables[0];
+  const sections = [];
+  let curSection = null;
 
-    /* Vorverarbeitung: Summenzeilen (keine Buchstaben, keine Scores) überspringen */
-    const preRows = [];
-    console.log('=== Tabelle', sectionIdx - 1, '===');
-    for (const row of table.rows) {
-      console.log('ROW:', [...row.cells].map(c => JSON.stringify(c.textContent.trim())).join(' | '));
-      const cells = [...row.cells];
-      if (!cells.length) continue;
-      const isHdr = row.querySelectorAll('th').length > 0;
-      const rTxt  = row.textContent.trim().toLowerCase();
-      const isTot = rTxt.includes('einzel') || rTxt.includes('doppel') || rTxt.includes('gesamt');
-      if (!isHdr && !isTot) {
-        const nonEmpty   = cells.map(c => c.textContent.trim()).filter(t => t);
-        const hasLetters = nonEmpty.some(t => /[a-zA-ZäöüÄÖÜß]/.test(t));
-        const hasScores  = nonEmpty.some(t => /^\d+:\d+$/.test(t));
-        /* Summenzeilen: keine Buchstaben, keine Ergebnisse — oder nur kleine Ganzzahlen */
-        const onlySmallNums = nonEmpty.length > 0 && nonEmpty.every(t => /^\d+$/.test(t) && +t < 20);
-        if (!hasLetters && !hasScores) continue;
-        if (onlySmallNums) continue;
+  for (const row of bigTable.rows) {
+    const cells = [...row.cells];
+    if (cells.length === 1) {
+      const txt = cells[0].textContent.trim();
+      if (txt === 'Einzelspiele' || txt === 'Doppelspiele') {
+        curSection = { label: txt, rows: [] };
+        sections.push(curSection);
+        continue;
       }
-      const hasScr = !isHdr && !isTot && cells.some(c => /^\d+:\d+$/.test(c.textContent.trim()));
-      const isOcht = row.textContent.includes('Ochtrup') || row.textContent.includes('Nitsche');
-      preRows.push({ cells, isHdr, isTot, hasScr, isOcht });
+    }
+    if (curSection) curSection.rows.push(row);
+  }
+  if (!sections.length) sections.push({ label: '', rows: [...bigTable.rows] });
+
+  const mkCell = text => ({ textContent: text, colSpan: 1, rowSpan: 1 });
+
+  for (const section of sections) {
+    if (section.label) out += `<div class="report-section">${esc(section.label)}</div>`;
+
+    const hdrRows = section.rows.filter(r => r.querySelectorAll('th').length > 0);
+    const dataRows = section.rows.filter(r => r.querySelectorAll('th').length === 0);
+    const isDoppel = section.label === 'Doppelspiele';
+
+    /* numSatzCols aus Header-Zeile ermitteln */
+    let numSatzCols = 0;
+    if (hdrRows.length) {
+      const hc = [...hdrRows[0].cells];
+      const si = hc.findIndex(c => /satz/i.test(c.textContent.trim()));
+      if (si > 0) {
+        let cnt = 0;
+        while (si + cnt < hc.length && /satz/i.test(hc[si + cnt].textContent.trim())) cnt++;
+        numSatzCols = cnt;
+      }
     }
 
+    /* Datenzeilen vorverarbeiten */
+    const preRows = [];
+    for (const row of dataRows) {
+      const raw = [...row.cells];
+      const isTot = /einzel|doppel|gesamt/i.test(row.textContent.trim()) && raw.length < 8;
+      if (isTot) { preRows.push({ cells: raw, isTot: true, isOcht: false }); continue; }
+
+      /* Kombinierte Doppel-Zeile: 12 Zellen (inkl. 2 Summen-Zellen an Pos. 1 und 4) */
+      if (isDoppel && raw.length >= 10) {
+        const filtered = raw.filter((_, i) => i !== 1 && i !== 4);
+        const splitNl = txt => txt.split('\n').map(s => s.trim()).filter(s => s && s !== '...');
+        const homeSeeds   = splitNl(filtered[0]?.textContent || '');
+        const homePlayers = splitNl(filtered[1]?.textContent || '');
+        const awaySeeds   = splitNl(filtered[2]?.textContent || '');
+        const awayPlayers = splitNl(filtered[3]?.textContent || '');
+        const scoresCells = filtered.slice(4);
+        const numPairs = Math.max(homePlayers.length, awayPlayers.length, 1);
+        const isOcht = row.textContent.includes('Ochtrup') || row.textContent.includes('Nitsche');
+        for (let i = 0; i < numPairs; i++) {
+          const cells = [
+            mkCell(homeSeeds[i] || ''),
+            mkCell(homePlayers[i] || ''),
+            mkCell(awaySeeds[i] || ''),
+            mkCell(awayPlayers[i] || '')
+          ];
+          if (i === 0) scoresCells.forEach(c => cells.push(c));
+          preRows.push({ cells, isTot: false, isOcht });
+        }
+        continue;
+      }
+
+      const isOcht = row.textContent.includes('Ochtrup') || row.textContent.includes('Nitsche');
+      preRows.push({ cells: raw, isTot: false, isOcht });
+    }
+
+    /* Spalten umsortieren: Matches/Sätze/Games vor Satz-Spalten */
+    let numPlayerCols = 0, totalCols = 0;
+    for (const pr of preRows) {
+      if (pr.isTot) continue;
+      const cells = pr.cells;
+      const fi = cells.findIndex(c => /^\d+:\d+$/.test(c.textContent.trim()));
+      if (fi > 0) {
+        if (!numPlayerCols) numPlayerCols = fi;
+        if (numSatzCols > 0) {
+          const si = fi + numSatzCols;
+          if (si < cells.length) { const s = cells.splice(si); cells.splice(fi, 0, ...s); }
+        }
+        if (!totalCols) totalCols = cells.length;
+      }
+    }
+
+    /* Tabelle rendern */
+    out += '<table class="report-table"><thead>';
     let inBody = false;
-    let numSatzCols = 0;
-    let numPlayerCols = 0;
-    let totalCols = 0;
+
+    for (const hdrRow of hdrRows) {
+      const hc = [...hdrRow.cells];
+      const si = hc.findIndex(c => /satz/i.test(c.textContent.trim()));
+      if (si > 0 && numSatzCols > 0) {
+        const ss = si + numSatzCols;
+        if (ss < hc.length) { const s = hc.splice(ss); hc.splice(si, 0, ...s); }
+      }
+      out += '<tr>' + hc.map(c => {
+        const cs = (c.colSpan || 1) > 1 ? ` colspan="${c.colSpan}"` : '';
+        const rs = (c.rowSpan || 1) > 1 ? ` rowspan="${c.rowSpan}"` : '';
+        return `<th${cs}${rs}>${esc(c.textContent.trim())}</th>`;
+      }).join('') + '</tr>';
+    }
 
     for (const pr of preRows) {
-      let cells = pr.cells;
-      const { isHdr, isTot, isOcht } = pr;
+      if (!inBody) { out += '</thead><tbody>'; inBody = true; }
+      const { cells, isTot, isOcht } = pr;
 
-      if (!inBody && !isHdr) {
-        out += '</thead><tbody>';
-        inBody = true;
-      }
-
-      /* Zusammenfassungs-Spalten (Matches, Sätze, Games) vor Satz-Spalten */
-      if (!isTot && cells.length > 2) {
-        if (isHdr) {
-          const satzIdx = cells.findIndex(c => /satz/i.test(c.textContent.trim()));
-          if (satzIdx > 0) {
-            let cnt = 0;
-            for (let i = satzIdx; i < cells.length && /satz/i.test(cells[i].textContent.trim()); i++) cnt++;
-            if (numSatzCols === 0) numSatzCols = cnt;
-            const summaryStart = satzIdx + cnt;
-            if (summaryStart < cells.length) {
-              const summary = cells.splice(summaryStart);
-              cells.splice(satzIdx, 0, ...summary);
-            }
-          }
-        } else {
-          const firstScore = cells.findIndex(c => /^\d+:\d+$/.test(c.textContent.trim()));
-          if (firstScore > 0) {
-            if (numPlayerCols === 0) numPlayerCols = firstScore;
-            if (numSatzCols > 0) {
-              const summaryStart = firstScore + numSatzCols;
-              if (summaryStart < cells.length) {
-                const summary = cells.splice(summaryStart);
-                cells.splice(firstScore, 0, ...summary);
-              }
-            }
-            if (totalCols === 0) totalCols = cells.length;
-          }
-        }
-      }
-
-      if (isHdr) {
-        out += '<tr>' + cells.map(c => {
-          const cs = c.colSpan > 1 ? ` colspan="${c.colSpan}"` : '';
-          const rs = c.rowSpan > 1 ? ` rowspan="${c.rowSpan}"` : '';
-          return `<th${cs}${rs}>${esc(c.textContent.trim())}</th>`;
-        }).join('') + '</tr>';
-
-      } else if (isTot && totalCols > 0 && numPlayerCols > 0) {
-        /* Total-Zeile: Label links, letzte 3 Scores → Matches/Sätze/Games */
-        const lbl      = cells.find(c => !/^\d+:\d+$/.test(c.textContent.trim()))?.textContent.trim() || '';
-        const allScores = cells.filter(c => /^\d+:\d+$/.test(c.textContent.trim())).map(c => c.textContent.trim());
-        const scores   = allScores.slice(-3); /* letzte 3 = Matches, Sätze, Games */
+      if (isTot && totalCols > 0 && numPlayerCols > 0) {
+        const lbl = cells.find(c => !/^\d+:\d+$/.test(c.textContent.trim()))?.textContent.trim() || '';
+        const scores = cells.filter(c => /^\d+:\d+$/.test(c.textContent.trim())).map(c => c.textContent.trim()).slice(-3);
         const numSummaryCols = totalCols - numPlayerCols - numSatzCols;
         out += '<tr class="total-row">';
         out += `<td style="text-align:left">${esc(lbl)}</td>`;
         for (let i = 1; i < numPlayerCols; i++) out += '<td></td>';
         for (let i = 0; i < numSummaryCols; i++) {
           const sc = scores[i] || '';
-          let txt = esc(sc);
-          if (sc) {
-            const [a, b] = sc.split(':').map(Number);
-            const win = m.isHome ? a > b : b > a;
-            txt = `<span class="${win ? 'set-win' : 'set-loss'}">${txt}</span>`;
-          }
-          out += `<td>${txt}</td>`;
+          if (!sc) { out += '<td></td>'; continue; }
+          const [a, b] = sc.split(':').map(Number);
+          const win = m.isHome ? a > b : b > a;
+          out += `<td><span class="${win ? 'set-win' : 'set-loss'}">${esc(sc)}</span></td>`;
         }
         for (let i = 0; i < numSatzCols; i++) out += '<td></td>';
         out += '</tr>';
-
       } else {
         const cls = isOcht ? ' class="ochtrup-player"' : '';
-        let colIdx = 0;
+        let ci = 0;
         out += `<tr${cls}>` + cells.map(c => {
           const origTxt = c.textContent.trim();
           let txt = esc(origTxt);
-          const cs = c.colSpan > 1 ? ` colspan="${c.colSpan}"` : '';
-          if (colIdx >= numPlayerCols && numPlayerCols > 0 && /^\d+:\d+$/.test(origTxt)) {
+          const cs = (c.colSpan || 1) > 1 ? ` colspan="${c.colSpan}"` : '';
+          if (ci >= numPlayerCols && numPlayerCols > 0 && /^\d+:\d+$/.test(origTxt)) {
             const [a, b] = origTxt.split(':').map(Number);
             const win = m.isHome ? a > b : b > a;
             txt = `<span class="${win ? 'set-win' : 'set-loss'}">${esc(origTxt)}</span>`;
           }
-          colIdx += c.colSpan;
+          ci += (c.colSpan || 1);
           return `<td${cs}>${txt}</td>`;
         }).join('') + '</tr>';
       }
     }
+
     if (!inBody) out += '</thead><tbody>';
     out += '</tbody></table>';
   }
-
-  if (!matchTables.length) out += '<div class="status-msg">Keine Detaildaten gefunden.</div>';
   return out;
 }
 
