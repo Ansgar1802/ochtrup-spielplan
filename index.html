@@ -191,6 +191,68 @@
   .standings-table tr.ochtrup-row td { color: #fff; font-weight: 600; }
   .standings-table tr.ochtrup-row td:nth-child(2) { color: #7ab3ff; }
 
+  /* ── Report-View ── */
+  #report-view { display: none; }
+  .report-match-header {
+    background: #1a1d2e;
+    border: 1px solid #252840;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    text-align: center;
+  }
+  .report-teams {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.06em;
+    color: #fff;
+    line-height: 1.2;
+  }
+  .report-result {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    color: #7ab3ff;
+    margin: 4px 0 2px;
+  }
+  .report-date { font-size: 0.78rem; color: #9095b0; }
+  .report-section {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.06em;
+    color: #9095b0;
+    margin: 18px 0 8px;
+  }
+  .report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.72rem;
+  }
+  .report-table th {
+    text-align: center;
+    color: #7a7f96;
+    font-size: 0.63rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 5px 3px;
+    border-bottom: 1px solid #252840;
+    font-weight: 600;
+  }
+  .report-table th:nth-child(1),
+  .report-table th:nth-child(2) { text-align: left; }
+  .report-table td {
+    text-align: center;
+    padding: 7px 3px;
+    border-bottom: 1px solid #1a1d2e;
+    color: #c8cad8;
+    vertical-align: top;
+  }
+  .report-table td:nth-child(1),
+  .report-table td:nth-child(2) { text-align: left; color: #e8eaf0; }
+  .report-table tr.total-row td { color: #fff; font-weight: 700; border-top: 1px solid #3a3f5c; border-bottom: none; }
+  .report-table tr.ochtrup-player td { color: #fff; }
+  .set-win  { color: #7effa8; font-weight: 600; }
+  .set-loss { color: #ff7f7f; }
+
   .card-top {
     display: flex;
     align-items: center;
@@ -378,6 +440,14 @@
     <div class="detail-title" id="detail-title"></div>
   </div>
   <div id="detail-table-container"></div>
+</div>
+
+<div id="report-view">
+  <div class="detail-header">
+    <button class="btn-back" onclick="backToList()">← Zurück</button>
+    <button class="btn-back" id="report-tabelle-btn" onclick="showTableFromReport()" style="margin-left:auto;">Tabelle</button>
+  </div>
+  <div id="report-content"></div>
 </div>
 
 
@@ -738,7 +808,7 @@ function renderMatches() {
       : '';
 
     const cardClick = m.reportUrl
-      ? `onclick="window.open('${m.reportUrl}','_blank')" style="cursor:pointer"`
+      ? `onclick="showReport('${m.team}','${m.reportUrl}',allMatches.find(x=>x.reportUrl==='${m.reportUrl}'))" style="cursor:pointer"`
       : '';
 
     return divider + `<div class="card ${teamCls}${extra}" ${cardClick}>
@@ -841,8 +911,98 @@ function showTable(team) {
 
 function backToList() {
   document.getElementById('detail-view').style.display = 'none';
+  document.getElementById('report-view').style.display = 'none';
   document.getElementById('matches-container').style.display = '';
   document.getElementById('update-info').style.display = '';
+}
+
+let _reportTeam = '';
+
+async function showReport(team, reportUrl, matchObj) {
+  _reportTeam = team;
+  document.getElementById('matches-container').style.display = 'none';
+  document.getElementById('update-info').style.display = 'none';
+  document.getElementById('detail-view').style.display = 'none';
+  const rv = document.getElementById('report-view');
+  rv.style.display = 'block';
+  document.getElementById('report-content').innerHTML =
+    '<div class="loading-row"><div class="spinner"></div>Spielbericht wird geladen …</div>';
+  window.scrollTo(0, 0);
+
+  try {
+    const html = await fetchURL(reportUrl);
+    document.getElementById('report-content').innerHTML = renderReport(html, matchObj);
+  } catch(e) {
+    document.getElementById('report-content').innerHTML =
+      '<div class="status-msg">Spielbericht konnte nicht geladen werden.</div>';
+  }
+}
+
+function showTableFromReport() {
+  document.getElementById('report-view').style.display = 'none';
+  showTable(_reportTeam);
+}
+
+function renderReport(html, m) {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  let out = '';
+
+  /* ── Header ── */
+  out += `<div class="report-match-header">
+    <div class="report-teams">${esc(m.homeTeam)} vs. ${esc(m.awayTeam)}</div>
+    <div class="report-result">${m.result}</div>
+    <div class="report-date">${WEEKDAYS[m.date.getDay()]} ${m.dateStr} · ${m.timeStr} Uhr · ${m.label}</div>
+  </div>`;
+
+  /* ── Tabellen aus dem HTML extrahieren ── */
+  const allTables = [...doc.querySelectorAll('table')];
+  const matchTables = allTables.filter(t => {
+    const txt = t.textContent;
+    return (txt.includes('Satz') || txt.includes('LK')) && t.rows.length > 1;
+  });
+
+  /* Abschnitts-Labels aus vorangehenden Textelementen */
+  const sectionLabels = ['Einzelspiele', 'Doppelspiele'];
+  let sectionIdx = 0;
+
+  for (const table of matchTables) {
+    const label = sectionLabels[sectionIdx] || '';
+    if (label) out += `<div class="report-section">${label}</div>`;
+    sectionIdx++;
+    out += '<table class="report-table">';
+
+    for (const row of table.rows) {
+      const cells = [...row.cells];
+      if (!cells.length) continue;
+      const isHeader = row.querySelectorAll('th').length > 0;
+      const rowText  = row.textContent.trim().toLowerCase();
+      const isTotal  = rowText.startsWith('gesamt') || rowText.startsWith('einzel') || rowText.startsWith('doppel');
+      const isOchtrup = row.textContent.includes('Ochtrup') || row.textContent.includes('Nitsche');
+
+      if (isHeader) {
+        out += '<thead><tr>' + cells.map(c =>
+          `<th colspan="${c.colSpan > 1 ? c.colSpan : ''}">${esc(c.textContent.trim())}</th>`
+        ).join('') + '</tr></thead><tbody>';
+      } else {
+        const cls = isTotal ? ' class="total-row"' : isOchtrup ? ' class="ochtrup-player"' : '';
+        out += `<tr${cls}>` + cells.map((c, i) => {
+          let txt = esc(c.textContent.trim());
+          /* Gewonnene/verlorene Sätze einfärben */
+          if (i >= 2 && /^\d+:\d+$/.test(txt)) {
+            const [a, b] = txt.split(':').map(Number);
+            const ochtrupLeft = m.isHome;
+            const win = ochtrupLeft ? a > b : b > a;
+            txt = `<span class="${win ? 'set-win' : 'set-loss'}">${txt}</span>`;
+          }
+          return `<td>${txt}</td>`;
+        }).join('') + '</tr>';
+      }
+    }
+    out += '</tbody></table>';
+  }
+
+  if (!matchTables.length) out += '<div class="status-msg">Keine Detaildaten gefunden.</div>';
+  return out;
 }
 
 
