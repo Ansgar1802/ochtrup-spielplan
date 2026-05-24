@@ -268,6 +268,7 @@
     letter-spacing: 0.06em;
     color: #9095b0;
     margin: 18px 0 8px;
+    text-align: left;
   }
   .report-table {
     width: 100%;
@@ -294,7 +295,8 @@
     vertical-align: top;
   }
   .report-table td:nth-child(1),
-  .report-table td:nth-child(2) { text-align: left; color: #e8eaf0; }
+  .report-table td:nth-child(2),
+  .report-table td:nth-child(4) { text-align: left; color: #e8eaf0; }
   .report-table tr.total-row td { color: #fff; font-weight: 700; border-top: 1px solid #3a3f5c; border-bottom: none; text-align: center; }
   .report-table tr.ochtrup-player td { color: #fff; }
   .set-win  { color: #7effa8; font-weight: 600; }
@@ -1111,29 +1113,58 @@ function renderReport(html, m) {
     sectionIdx++;
     out += '<table class="report-table"><thead>';
 
+    /* Vorverarbeitung: Doppel-Zeilen (2. Spielerpaar ohne Ergebnis) zusammenführen */
+    const preRows = [];
+    for (const row of table.rows) {
+      const cells = [...row.cells];
+      if (!cells.length) continue;
+      const isHdr  = row.querySelectorAll('th').length > 0;
+      const rTxt   = row.textContent.trim().toLowerCase();
+      const isTot  = rTxt.includes('einzel') || rTxt.includes('doppel') || rTxt.includes('gesamt');
+      const hasScr = !isHdr && !isTot && cells.some(c => /^\d+:\d+$/.test(c.textContent.trim()));
+      const isOcht = row.textContent.includes('Ochtrup') || row.textContent.includes('Nitsche');
+
+      if (!isHdr && !isTot && !hasScr && preRows.length > 0) {
+        const prev = preRows[preRows.length - 1];
+        if (!prev.isHdr && !prev.isTot && prev.hasScr) {
+          /* 2. Spielerzeile beim Doppel: Namen anhängen */
+          const offset = (!/[a-zA-ZäöüÄÖÜß]/.test((prev.cells[0]?.textContent || '').trim())) ? 1 : 0;
+          cells.forEach((c, i) => {
+            const t = c.textContent.trim();
+            if (/[a-zA-ZäöüÄÖÜß]/.test(t)) {
+              const pi = i + offset;
+              if (pi < prev.cells.length) {
+                prev.merged = prev.merged || {};
+                const base = prev.merged[pi] ?? prev.cells[pi].textContent.trim();
+                prev.merged[pi] = (base ? base + ' / ' : '') + t;
+              }
+            }
+          });
+          continue;
+        }
+      }
+      preRows.push({ cells, isHdr, isTot, hasScr, isOcht, merged: {} });
+    }
+
     let inBody = false;
     let numSatzCols = 0;
-    for (const row of table.rows) {
-      let cells = [...row.cells];
-      if (!cells.length) continue;
-      const isHeader = row.querySelectorAll('th').length > 0;
+    let numPlayerCols = 0;
+    let totalCols = 0;
 
-      /* Beim ersten Datensatz einmalig von <thead> zu <tbody> wechseln */
-      if (!inBody && !isHeader) {
+    for (const pr of preRows) {
+      let cells = pr.cells;
+      const { isHdr, isTot, isOcht } = pr;
+
+      if (!inBody && !isHdr) {
         out += '</thead><tbody>';
         inBody = true;
       }
 
-      const rowText  = row.textContent.trim().toLowerCase();
-      const isTotal  = rowText.startsWith('gesamt') || rowText.startsWith('einzel') || rowText.startsWith('doppel');
-      const isOchtrup = row.textContent.includes('Ochtrup') || row.textContent.includes('Nitsche');
-
-      /* Zusammenfassungs-Spalten (Matches, Sätze, Games) vor die Satz-Spalten verschieben */
-      if (!isTotal && cells.length > 2) {
-        if (isHeader) {
+      /* Zusammenfassungs-Spalten (Matches, Sätze, Games) vor Satz-Spalten */
+      if (!isTot && cells.length > 2) {
+        if (isHdr) {
           const satzIdx = cells.findIndex(c => /satz/i.test(c.textContent.trim()));
           if (satzIdx > 0) {
-            /* Anzahl Satz-Spalten zählen */
             let cnt = 0;
             for (let i = satzIdx; i < cells.length && /satz/i.test(cells[i].textContent.trim()); i++) cnt++;
             if (numSatzCols === 0) numSatzCols = cnt;
@@ -1145,33 +1176,60 @@ function renderReport(html, m) {
           }
         } else {
           const firstScore = cells.findIndex(c => /^\d+:\d+$/.test(c.textContent.trim()));
-          if (firstScore > 0 && numSatzCols > 0) {
-            const summaryStart = firstScore + numSatzCols;
-            if (summaryStart < cells.length) {
-              const summary = cells.splice(summaryStart);
-              cells.splice(firstScore, 0, ...summary);
+          if (firstScore > 0) {
+            if (numPlayerCols === 0) numPlayerCols = firstScore;
+            if (numSatzCols > 0) {
+              const summaryStart = firstScore + numSatzCols;
+              if (summaryStart < cells.length) {
+                const summary = cells.splice(summaryStart);
+                cells.splice(firstScore, 0, ...summary);
+              }
             }
+            if (totalCols === 0) totalCols = cells.length;
           }
         }
       }
 
-      if (isHeader) {
+      if (isHdr) {
         out += '<tr>' + cells.map(c => {
           const cs = c.colSpan > 1 ? ` colspan="${c.colSpan}"` : '';
           const rs = c.rowSpan > 1 ? ` rowspan="${c.rowSpan}"` : '';
           return `<th${cs}${rs}>${esc(c.textContent.trim())}</th>`;
         }).join('') + '</tr>';
-      } else {
-        const cls = isTotal ? ' class="total-row"' : isOchtrup ? ' class="ochtrup-player"' : '';
-        let colIdx = 0;
-        out += `<tr${cls}>` + cells.map(c => {
-          let txt = esc(c.textContent.trim());
-          const cs = c.colSpan > 1 ? ` colspan="${c.colSpan}"` : '';
-          /* Satz-Ergebnisse einfärben (nicht die Matches-Spalte) */
-          if (colIdx >= 2 && /^\d+:\d+$/.test(txt)) {
-            const [a, b] = txt.split(':').map(Number);
+
+      } else if (isTot && totalCols > 0 && numPlayerCols > 0) {
+        /* Total-Zeile: Label ganz links, Scores unter Matches/Sätze/Games */
+        const lbl    = cells.find(c => !/^\d+:\d+$/.test(c.textContent.trim()))?.textContent.trim() || '';
+        const scores = cells.filter(c => /^\d+:\d+$/.test(c.textContent.trim())).map(c => c.textContent.trim());
+        const numSummaryCols = totalCols - numPlayerCols - numSatzCols;
+        out += '<tr class="total-row">';
+        out += `<td style="text-align:left">${esc(lbl)}</td>`;
+        for (let i = 1; i < numPlayerCols; i++) out += '<td></td>';
+        for (let i = 0; i < numSummaryCols; i++) {
+          const sc = scores[i] || '';
+          let txt = esc(sc);
+          if (sc) {
+            const [a, b] = sc.split(':').map(Number);
             const win = m.isHome ? a > b : b > a;
             txt = `<span class="${win ? 'set-win' : 'set-loss'}">${txt}</span>`;
+          }
+          out += `<td>${txt}</td>`;
+        }
+        for (let i = 0; i < numSatzCols; i++) out += '<td></td>';
+        out += '</tr>';
+
+      } else {
+        const cls = isOcht ? ' class="ochtrup-player"' : '';
+        let colIdx = 0;
+        out += `<tr${cls}>` + cells.map((c, i) => {
+          const origTxt = c.textContent.trim();
+          const dispTxt = (pr.merged[i] !== undefined) ? pr.merged[i] : origTxt;
+          let txt = esc(dispTxt);
+          const cs = c.colSpan > 1 ? ` colspan="${c.colSpan}"` : '';
+          if (colIdx >= numPlayerCols && numPlayerCols > 0 && /^\d+:\d+$/.test(origTxt)) {
+            const [a, b] = origTxt.split(':').map(Number);
+            const win = m.isHome ? a > b : b > a;
+            txt = `<span class="${win ? 'set-win' : 'set-loss'}">${esc(origTxt)}</span>`;
           }
           colIdx += c.colSpan;
           return `<td${cs}>${txt}</td>`;
