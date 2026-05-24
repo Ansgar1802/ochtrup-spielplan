@@ -325,6 +325,8 @@
   }
   .card-time { font-size: 0.75rem; color: #666a85; margin-left: 4px; }
   .card-countdown { flex: 1; text-align: center; font-size: 0.75rem; color: #fff; font-weight: 700; white-space: nowrap; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  .card-countdown.blink { animation: blink 1s step-end infinite; }
 
   .tag {
     display: inline-block;
@@ -888,23 +890,55 @@ function renderNextMatch() {
 }
 
 /* ── Karten rendern ────────────────────────────────────────── */
+function matchDateTime(date, timeStr) {
+  const parts = (timeStr || '').match(/^(\d{1,2}):(\d{2})$/);
+  const dt = new Date(date);
+  if (parts) dt.setHours(+parts[1], +parts[2], 0, 0);
+  return dt;
+}
+
 function countdownLabel(date, timeStr) {
   const today = new Date(); today.setHours(0, 0, 0, 0);
-  const match = new Date(date); match.setHours(0, 0, 0, 0);
-  const days = Math.round((match - today) / 86400000);
-  if (days > 1) return 'Noch ' + days + ' Tage';
+  const matchDay = new Date(date); matchDay.setHours(0, 0, 0, 0);
+  const days = Math.round((matchDay - today) / 86400000);
+  if (days > 1) return 'In ' + days + ' Tagen';
   if (days === 1) return 'morgen';
-  /* Heute: Uhrzeit vergleichen */
-  const parts = (timeStr || '').match(/^(\d{1,2}):(\d{2})$/);
-  if (!parts) return '';
-  const matchTime = new Date(date);
-  matchTime.setHours(+parts[1], +parts[2], 0, 0);
-  const now = new Date();
-  if (now >= matchTime) return 'läuft';
-  const diffMs = matchTime - now;
-  const h = Math.floor(diffMs / 3600000);
-  const m = Math.floor((diffMs % 3600000) / 60000);
-  return 'in ' + String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+  const mt = matchDateTime(date, timeStr);
+  const diffMs = mt - new Date();
+  if (diffMs > 0) {
+    const h = Math.floor(diffMs / 3600000);
+    const m = Math.floor((diffMs % 3600000) / 60000);
+    const s = Math.floor((diffMs % 60000) / 1000);
+    return 'in ' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  }
+  if (diffMs > -6 * 3600000) return 'läuft';
+  return '';
+}
+
+function updateCountdowns() {
+  document.querySelectorAll('.card-countdown[data-matchtime]').forEach(el => {
+    const mt = new Date(+el.dataset.matchtime);
+    const now = new Date();
+    const diffMs = mt - now;
+    const today = new Date(); today.setHours(0,0,0,0);
+    const matchDay = new Date(mt); matchDay.setHours(0,0,0,0);
+    const days = Math.round((matchDay - today) / 86400000);
+    let txt = '', blink = false;
+    if (days > 1) {
+      txt = 'In ' + days + ' Tagen';
+    } else if (days === 1) {
+      txt = 'morgen';
+    } else if (diffMs > 0) {
+      const h = Math.floor(diffMs / 3600000);
+      const m = Math.floor((diffMs % 3600000) / 60000);
+      const s = Math.floor((diffMs % 60000) / 1000);
+      txt = 'in ' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    } else if (diffMs > -6 * 3600000) {
+      txt = 'läuft'; blink = true;
+    }
+    el.textContent = txt;
+    el.classList.toggle('blink', blink);
+  });
 }
 
 function isPast(date) {
@@ -973,7 +1007,7 @@ function renderMatches() {
   <div class="card-tag-row"><span class="tag ${tagCls}">${m.label}</span></div>
   <div class="card-top">
     <span class="card-date">${wd} ${m.dateStr}<span class="card-time"> · ${m.timeStr}</span></span>
-    ${past ? '' : `<span class="card-countdown">${countdownLabel(m.date, m.timeStr)}</span>`}
+    ${past ? '' : `<span class="card-countdown" data-matchtime="${matchDateTime(m.date, m.timeStr).getTime()}">${countdownLabel(m.date, m.timeStr)}</span>`}
     ${tabelleBtn}
   </div>
   <div class="card-match">${homeSpan}<span class="vs">vs.</span>${awaySpan}</div>
@@ -1263,6 +1297,7 @@ function renderReport(html, m) {
 /* ── Start ─────────────────────────────────────────────────── */
 applyStateToButtons();
 loadAllData();
+setInterval(updateCountdowns, 1000);
 </script>
 </body>
 </html>
