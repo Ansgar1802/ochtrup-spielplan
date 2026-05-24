@@ -1112,8 +1112,9 @@ function renderReport(html, m) {
     out += '<table class="report-table"><thead>';
 
     let inBody = false;
+    let numSatzCols = 0;
     for (const row of table.rows) {
-      const cells = [...row.cells];
+      let cells = [...row.cells];
       if (!cells.length) continue;
       const isHeader = row.querySelectorAll('th').length > 0;
 
@@ -1127,6 +1128,33 @@ function renderReport(html, m) {
       const isTotal  = rowText.startsWith('gesamt') || rowText.startsWith('einzel') || rowText.startsWith('doppel');
       const isOchtrup = row.textContent.includes('Ochtrup') || row.textContent.includes('Nitsche');
 
+      /* Zusammenfassungs-Spalten (Matches, Sätze, Games) vor die Satz-Spalten verschieben */
+      if (!isTotal && cells.length > 2) {
+        if (isHeader) {
+          const satzIdx = cells.findIndex(c => /satz/i.test(c.textContent.trim()));
+          if (satzIdx > 0) {
+            /* Anzahl Satz-Spalten zählen */
+            let cnt = 0;
+            for (let i = satzIdx; i < cells.length && /satz/i.test(cells[i].textContent.trim()); i++) cnt++;
+            if (numSatzCols === 0) numSatzCols = cnt;
+            const summaryStart = satzIdx + cnt;
+            if (summaryStart < cells.length) {
+              const summary = cells.splice(summaryStart);
+              cells.splice(satzIdx, 0, ...summary);
+            }
+          }
+        } else {
+          const firstScore = cells.findIndex(c => /^\d+:\d+$/.test(c.textContent.trim()));
+          if (firstScore > 0 && numSatzCols > 0) {
+            const summaryStart = firstScore + numSatzCols;
+            if (summaryStart < cells.length) {
+              const summary = cells.splice(summaryStart);
+              cells.splice(firstScore, 0, ...summary);
+            }
+          }
+        }
+      }
+
       if (isHeader) {
         out += '<tr>' + cells.map(c => {
           const cs = c.colSpan > 1 ? ` colspan="${c.colSpan}"` : '';
@@ -1139,7 +1167,7 @@ function renderReport(html, m) {
         out += `<tr${cls}>` + cells.map(c => {
           let txt = esc(c.textContent.trim());
           const cs = c.colSpan > 1 ? ` colspan="${c.colSpan}"` : '';
-          /* Gewonnene/verlorene Sätze einfärben — visuellen Spaltenindex verwenden */
+          /* Satz-Ergebnisse einfärben (nicht die Matches-Spalte) */
           if (colIdx >= 2 && /^\d+:\d+$/.test(txt)) {
             const [a, b] = txt.split(':').map(Number);
             const win = m.isHome ? a > b : b > a;
