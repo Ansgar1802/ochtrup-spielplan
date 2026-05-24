@@ -1193,8 +1193,8 @@ function renderReport(html, m) {
           const aName = esc((awayPlayers[i] || '').replace(/\s*\(\d+\)\s*/g, '').trim());
           const cls = isOchtrup ? ' class="ochtrup-player"' : '';
           out += `<tr${cls}>`;
-          out += `<td>${esc(homeSeeds[i] || '')}</td><td>${hName}</td><td></td>`;
-          out += `<td>${esc(awaySeeds[i] || '')}</td><td>${aName}</td><td></td>`;
+          out += `<td>${esc(homeSeeds[i] || '')}</td><td style="text-align:left">${hName}</td><td></td>`;
+          out += `<td>${esc(awaySeeds[i] || '')}</td><td style="text-align:left">${aName}</td><td></td>`;
           if (i === 0) {
             scoresCells.forEach(sc => {
               const t = sc.textContent.trim();
