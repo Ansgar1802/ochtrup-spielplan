@@ -158,6 +158,9 @@
     transition: all 0.15s;
     user-select: none;
   }
+  .mannschaften-wrapper { border-radius: 16px; transition: border-color 0.15s, background 0.15s; }
+  .mannschaften-wrapper.open { background: rgba(15,17,30,0.98); border: 1px solid #3a3f60; padding: 6px; display: flex; flex-direction: column; gap: 6px; }
+  .mannschaften-wrapper.open .btn-mannschaften { border-color: transparent; background: rgba(144,149,176,0.08); }
   .btn-mannschaften::after { content: ' ▼'; font-size: 0.72em; opacity: 0.6; }
   .btn-mannschaften.on::after { content: ' ▲'; opacity: 1; }
   .btn-mannschaften:hover { background: #1a1d2e; color: #9095b0; border-color: #444a68; }
@@ -165,7 +168,7 @@
   .team-row { display: none; }
   .team-row .btn { color: #9095b0; width: 100%; text-align: center; padding: 10px 13px; font-size: 0.88rem; white-space: normal; }
   .team-row .btn.on { color: #fff; }
-  .team-row.visible { display: flex; flex-direction: column; gap: 6px; align-items: stretch; background: rgba(15,17,30,0.98); border: 1px solid #2e3150; border-radius: 14px; padding: 10px; margin-top: 2px; }
+  .team-row.visible { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
   .btn-close-teams { background: transparent; border: 1px solid #2e3150; border-radius: 20px; color: #555a7a; font-size: 0.78rem; font-family: 'DM Sans', sans-serif; font-weight: 600; padding: 7px 0; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; width: 100%; margin-top: 4px; transition: all 0.15s; }
   .btn-close-teams:hover { color: #9095b0; border-color: #444a68; background: #1a1d2e; }
   .btn-select-all  { color: rgba(126,255,168,0.42) !important; border-color: rgba(126,255,168,0.20); }
@@ -539,6 +542,7 @@
     <button class="btn btn-filter on" id="btn-heim"      onclick="toggleFilter('showHome')">Heim</button>
     <button class="btn btn-filter on" id="btn-auswaerts" onclick="toggleFilter('showAway')">Auswärts</button>
   </div>
+  <div class="mannschaften-wrapper" id="mannschaften-wrapper">
   <button class="btn-mannschaften" id="btn-mannschaften" onclick="toggleMannschaften()">Mannschaften</button>
   <div class="team-row" id="team-row">
     <div class="top-btns-row">
@@ -568,6 +572,7 @@
     <button class="btn btn-h65ml on"  id="btn-h65ml"  onclick="toggleTeam('h65ml')">Herren 65 Doppel Münsterlandliga</button>
     <button class="btn btn-refresh" id="btn-refresh" onclick="refreshData()" title="Neu laden">↺</button>
     <button class="btn-close-teams" onclick="toggleMannschaften()">▲ Einklappen</button>
+  </div>
   </div>
 </div>
 
@@ -1168,10 +1173,12 @@ function applyStateToButtons() {
 }
 
 function toggleMannschaften() {
-  const row = document.getElementById('team-row');
-  const btn = document.getElementById('btn-mannschaften');
-  const open = row.classList.toggle('visible');
+  const row     = document.getElementById('team-row');
+  const btn     = document.getElementById('btn-mannschaften');
+  const wrapper = document.getElementById('mannschaften-wrapper');
+  const open    = row.classList.toggle('visible');
   btn.classList.toggle('on', open);
+  wrapper.classList.toggle('open', open);
 }
 
 function refreshData() { loadAllData(); }
