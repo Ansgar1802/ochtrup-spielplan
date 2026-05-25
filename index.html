@@ -932,6 +932,7 @@ async function loadAllData() {
 function renderNextMatch() {
   const today = new Date(); today.setHours(0, 0, 0, 0);
 
+  const box = document.getElementById('next-match-box');
   const noTeams = LEAGUES.every(l => !showTeams[l.team]);
   if (noTeams) {
     document.getElementById('nm-date').textContent   = 'Keine Mannschaften ausgewählt';
@@ -940,7 +941,8 @@ function renderNextMatch() {
     nl.textContent = ''; nl.className = 'nm-league';
     document.getElementById('nm-days').textContent   = '';
     document.getElementById('nm-unit').textContent   = '';
-    document.getElementById('next-match-box').style.display = 'flex';
+    box.classList.remove('home-game');
+    box.style.display = 'flex';
     return;
   }
 
@@ -950,6 +952,7 @@ function renderNextMatch() {
   });
   if (!next) return;
 
+  box.classList.toggle('home-game', next.isHome);
   document.getElementById('nm-date').textContent   =
     WEEKDAYS[next.date.getDay()] + ' ' + next.dateStr + ' · ' + next.timeStr + ' Uhr · ' + (next.isHome ? 'Heimspiel' : 'Auswärts');
   document.getElementById('nm-teams').innerHTML    =
