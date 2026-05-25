@@ -41,9 +41,9 @@
     padding: 14px 16px;
     margin-bottom: 14px;
     display: none;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
     min-height: 106px;
   }
   .nm-label {
@@ -51,7 +51,16 @@
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: #c0c4d8;
-    margin-bottom: 5px;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  .nm-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 12px;
   }
   .nm-teams {
     display: flex;
@@ -61,7 +70,7 @@
     margin-top: 4px;
     line-height: 1.4;
   }
-  .nm-league { font-size: 0.88rem; color: #9095b0; margin-top: 3px; }
+  .nm-league { font-size: 0.95rem; color: #9095b0; margin-top: 4px; }
   .nm-date { font-size: 0.88rem; color: #c8cae0; margin-top: 2px; }
   .nm-right { text-align: right; flex-shrink: 0; }
   .nm-days {
@@ -479,15 +488,17 @@
 
 <!-- Nächstes Spiel -->
 <div id="next-match-box" class="next-match-box">
-  <div>
-    <div class="nm-label">Nächstes Spiel</div>
-    <div class="nm-date"   id="nm-date"></div>
-    <div class="nm-teams"  id="nm-teams"></div>
-    <div class="nm-league" id="nm-league"></div>
-  </div>
-  <div class="nm-right">
-    <div class="nm-days" id="nm-days"></div>
-    <div class="nm-unit" id="nm-unit"></div>
+  <div class="nm-label">Nächstes Spiel</div>
+  <div class="nm-content">
+    <div>
+      <div class="nm-date"   id="nm-date"></div>
+      <div class="nm-teams"  id="nm-teams"></div>
+      <div class="nm-league" id="nm-league"></div>
+    </div>
+    <div class="nm-right">
+      <div class="nm-days" id="nm-days"></div>
+      <div class="nm-unit" id="nm-unit"></div>
+    </div>
   </div>
 </div>
 
@@ -916,15 +927,12 @@ function renderNextMatch() {
   });
   if (!next) return;
 
-  const homeStyle = next.isHome ? 'font-weight:700;color:#fff' : 'font-weight:400;color:#c0c4d8';
-  const awayStyle = next.isHome ? 'font-weight:400;color:#c0c4d8' : 'font-weight:700;color:#fff';
-
   document.getElementById('nm-date').textContent   =
-    WEEKDAYS[next.date.getDay()] + ' ' + next.dateStr + ' · ' + next.timeStr + ' Uhr';
+    WEEKDAYS[next.date.getDay()] + ' ' + next.dateStr + ' · ' + next.timeStr + ' Uhr · ' + (next.isHome ? 'Heimspiel' : 'Auswärts');
   document.getElementById('nm-teams').innerHTML    =
-    `<span style="${homeStyle}">${esc(next.homeTeam)}</span>` +
-    `<span style="font-size:0.75rem;color:#555a7a;font-style:italic;margin:0 5px">vs.</span>` +
-    `<span style="${awayStyle}">${esc(next.awayTeam)}</span>`;
+    `<span style="font-weight:700;color:#fff">${esc(next.homeTeam)}</span>` +
+    `<span style="font-weight:700;color:#fff;margin:0 5px">vs.</span>` +
+    `<span style="font-weight:700;color:#fff">${esc(next.awayTeam)}</span>`;
   document.getElementById('nm-league').textContent = next.label;
 
   const diff  = Math.round((new Date(next.date).setHours(0,0,0,0) - today) / 86400000);
