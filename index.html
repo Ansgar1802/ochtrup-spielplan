@@ -969,9 +969,9 @@ function renderNextMatch() {
     }, 5000);
   }
   document.getElementById('nm-teams').innerHTML    =
-    `<span style="font-weight:700;color:#fff">${esc(next.homeTeam)}</span>` +
-    `<span style="font-weight:700;color:#fff;margin:0 5px">vs.</span>` +
-    `<span style="font-weight:700;color:#fff">${esc(next.awayTeam)}</span>`;
+    `<span style="font-weight:700;color:#fff;text-transform:uppercase">${esc(next.homeTeam)}</span>` +
+    `<span style="font-weight:700;color:#555a7a;margin:0 5px">vs.</span>` +
+    `<span style="font-weight:700;color:#fff;text-transform:uppercase">${esc(next.awayTeam)}</span>`;
   const nmLeague = document.getElementById('nm-league');
   nmLeague.textContent = next.label;
   nmLeague.className = 'nm-league btn-' + next.team + ' on';
@@ -1252,7 +1252,7 @@ function renderReport(html, m) {
 
   /* ── Header ── */
   out += `<div class="report-match-header">
-    <div class="report-teams">${esc(m.homeTeam)} vs. ${esc(m.awayTeam)}</div>
+    <div class="report-teams">${esc(m.homeTeam)} <span style="color:#555a7a">vs.</span> ${esc(m.awayTeam)}</div>
     <div class="report-result">${m.result}</div>
     <div class="report-date">${WEEKDAYS[m.date.getDay()]} ${m.dateStr} · ${m.timeStr} Uhr · ${m.label}</div>
   </div>`;
