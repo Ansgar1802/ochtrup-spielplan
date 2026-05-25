@@ -144,6 +144,8 @@
   .btn-d50.on   { border-color: #dd88ff; background: rgba(170,50,230,0.12); }
   .btn-d60.on   { border-color: #ff8866; background: rgba(220,90,50,0.12); }
   .btn-h4.on    { border-color: #55bbff; background: rgba(20,130,220,0.12); }
+  .btn-h30kl.on { border-color: #dca000; background: rgba(220,160,0,0.12); }
+  .btn-h30k3.on { border-color: #28aae6; background: rgba(40,170,230,0.12); }
   .btn-h40bk.on { border-color: #44ddaa; background: rgba(20,180,130,0.12); }
   .btn-h40kl.on { border-color: #88ee66; background: rgba(70,190,40,0.12); }
   .btn-h50.on   { border-color: #22ddee; background: rgba(10,170,200,0.12); }
@@ -181,6 +183,8 @@
   .card.d50   { background: rgba(170,50,230,0.2);  border-color: rgba(170,50,230,0.25); }
   .card.d60   { background: rgba(220,90,50,0.2);   border-color: rgba(220,90,50,0.25); }
   .card.h4    { background: rgba(20,130,220,0.2);  border-color: rgba(20,130,220,0.25); }
+  .card.h30kl { background: rgba(220,160,0,0.2);   border-color: rgba(220,160,0,0.25); }
+  .card.h30k3 { background: rgba(40,170,230,0.2);  border-color: rgba(40,170,230,0.25); }
   .card.h40bk { background: rgba(20,180,130,0.2);  border-color: rgba(20,180,130,0.25); }
   .card.h40kl { background: rgba(70,190,40,0.2);   border-color: rgba(70,190,40,0.25); }
   .card.h50   { background: rgba(10,170,200,0.2);  border-color: rgba(10,170,200,0.25); }
@@ -354,6 +358,8 @@
   .tag-d50   { background: rgba(170,50,230,0.4);  color: #fff; font-weight: 700; border: 1px solid #9030c0; }
   .tag-d60   { background: rgba(220,90,50,0.4);   color: #fff; font-weight: 700; border: 1px solid #b04020; }
   .tag-h4    { background: rgba(20,130,220,0.4);  color: #fff; font-weight: 700; border: 1px solid #1060b0; }
+  .tag-h30kl { background: rgba(220,160,0,0.4);   color: #fff; font-weight: 700; border: 1px solid #a07800; }
+  .tag-h30k3 { background: rgba(40,170,230,0.4);  color: #fff; font-weight: 700; border: 1px solid #1880b0; }
   .tag-h40bk { background: rgba(20,180,130,0.4);  color: #fff; font-weight: 700; border: 1px solid #10a070; }
   .tag-h40kl { background: rgba(70,190,40,0.4);   color: #fff; font-weight: 700; border: 1px solid #40a020; }
   .tag-h50   { background: rgba(10,170,200,0.4);  color: #fff; font-weight: 700; border: 1px solid #0090b0; }
@@ -498,6 +504,8 @@
     <button class="btn btn-d50 on"    id="btn-d50"    onclick="toggleTeam('d50')">Damen 50 4er Bezirksliga</button>
     <button class="btn btn-d60 on"    id="btn-d60"    onclick="toggleTeam('d60')">Damen 60 Doppel Bezirksliga</button>
     <button class="btn btn-h4 on"     id="btn-h4"     onclick="toggleTeam('h4')">Herren 4er Kreisklasse 1</button>
+    <button class="btn btn-h30kl on"  id="btn-h30kl"  onclick="toggleTeam('h30kl')">Herren 30 4er Kreisliga</button>
+    <button class="btn btn-h30k3 on"  id="btn-h30k3"  onclick="toggleTeam('h30k3')">Herren 30 4er Kreisklasse 3</button>
     <button class="btn btn-h40bk on"  id="btn-h40bk"  onclick="toggleTeam('h40bk')">Herren 40 4er Bezirksklasse</button>
     <button class="btn btn-h40kl on"  id="btn-h40kl"  onclick="toggleTeam('h40kl')">Herren 40 4er Kreisklasse 2</button>
     <button class="btn btn-h50 on"    id="btn-h50"    onclick="toggleTeam('h50')">Herren 50 4er Kreisklasse 1</button>
@@ -595,6 +603,16 @@ const LEAGUES = [
     label: 'Herren 4er Kreisklasse 1'
   },
   {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?championship=MS+2026&group=86',
+    team:  'h30kl',
+    label: 'Herren 30 4er Kreisliga'
+  },
+  {
+    url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?championship=MS+2026&group=89',
+    team:  'h30k3',
+    label: 'Herren 30 4er Kreisklasse 3'
+  },
+  {
     url:   'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/groupPage?targetFed=WTV&championship=MS+2026&group=105',
     team:  'h40bk',
     label: 'Herren 40 4er Bezirksklasse'
@@ -639,11 +657,11 @@ function loadState() {
       showFuture: s.showFuture !== undefined ? s.showFuture : true,
       showHome:   s.showHome   !== undefined ? s.showHome   : true,
       showAway:   s.showAway   !== undefined ? s.showAway   : true,
-      showTeams:  s.showTeams  || { classic: true, '2er': true, mixed: true, u8: true, u10: true, d4: true, d30bz: true, d30kl: true, d40: true, d50: true, d60: true, h4: true, h40bk: true, h40kl: true, h50: true, h60: true, h65kl: true, h65ml: true }
+      showTeams:  s.showTeams  || { classic: true, '2er': true, mixed: true, u8: true, u10: true, d4: true, d30bz: true, d30kl: true, d40: true, d50: true, d60: true, h4: true, h30kl: true, h30k3: true, h40bk: true, h40kl: true, h50: true, h60: true, h65kl: true, h65ml: true }
     };
   } catch(e) {
     return { showPast: false, showFuture: true, showHome: true, showAway: true,
-             showTeams: { classic: true, '2er': true, mixed: true, u8: true, u10: true, d4: true, d30bz: true, d30kl: true, d40: true, d50: true, d60: true, h4: true, h40bk: true, h40kl: true, h50: true, h60: true, h65kl: true, h65ml: true } };
+             showTeams: { classic: true, '2er': true, mixed: true, u8: true, u10: true, d4: true, d30bz: true, d30kl: true, d40: true, d50: true, d60: true, h4: true, h30kl: true, h30k3: true, h40bk: true, h40kl: true, h50: true, h60: true, h65kl: true, h65ml: true } };
   }
 }
 
@@ -989,8 +1007,8 @@ function renderMatches() {
   const showDivider = hasPast && hasFuture;
 
   container.innerHTML = visible.map((m, idx) => {
-    const TEAM_CLS = { classic:'u15-classic','2er':'u15-2er',mixed:'mixed',u8:'u8-klein',u10:'u10-gross',d4:'d4',d30bz:'d30bz',d30kl:'d30kl',d40:'d40',d50:'d50',d60:'d60',h4:'h4',h40bk:'h40bk',h40kl:'h40kl',h50:'h50',h60:'h60',h65kl:'h65kl',h65ml:'h65ml' };
-    const TAG_CLS  = { classic:'tag-classic','2er':'tag-2er',mixed:'tag-mixed',u8:'tag-u8',u10:'tag-u10',d4:'tag-d4',d30bz:'tag-d30bz',d30kl:'tag-d30kl',d40:'tag-d40',d50:'tag-d50',d60:'tag-d60',h4:'tag-h4',h40bk:'tag-h40bk',h40kl:'tag-h40kl',h50:'tag-h50',h60:'tag-h60',h65kl:'tag-h65kl',h65ml:'tag-h65ml' };
+    const TEAM_CLS = { classic:'u15-classic','2er':'u15-2er',mixed:'mixed',u8:'u8-klein',u10:'u10-gross',d4:'d4',d30bz:'d30bz',d30kl:'d30kl',d40:'d40',d50:'d50',d60:'d60',h4:'h4',h30kl:'h30kl',h30k3:'h30k3',h40bk:'h40bk',h40kl:'h40kl',h50:'h50',h60:'h60',h65kl:'h65kl',h65ml:'h65ml' };
+    const TAG_CLS  = { classic:'tag-classic','2er':'tag-2er',mixed:'tag-mixed',u8:'tag-u8',u10:'tag-u10',d4:'tag-d4',d30bz:'tag-d30bz',d30kl:'tag-d30kl',d40:'tag-d40',d50:'tag-d50',d60:'tag-d60',h4:'tag-h4',h30kl:'tag-h30kl',h30k3:'tag-h30k3',h40bk:'tag-h40bk',h40kl:'tag-h40kl',h50:'tag-h50',h60:'tag-h60',h65kl:'tag-h65kl',h65ml:'tag-h65ml' };
     const teamCls = TEAM_CLS[m.team] || 'u15-classic';
     const tagCls  = TAG_CLS[m.team]  || 'tag-classic';
     const past    = isPast(m.date);
