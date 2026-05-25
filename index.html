@@ -134,7 +134,7 @@
   .btn-select-none:hover { background: rgba(220,50,50,0.12) !important; border-color: #ff9090 !important; color: #ff9090 !important; }
   .top-btns-row { display: flex; width: 100%; gap: 6px; }
   .top-btns-row .btn { flex: 1; text-align: center; min-width: 0; padding-top: 17px; padding-bottom: 17px; white-space: normal; line-height: 1.4; }
-  .btn-meine-auswahl { color: #c8a000 !important; border-color: #6a5400; -webkit-touch-callout: none; }
+  .btn-meine-auswahl { color: #c8a000 !important; border-color: #6a5400; -webkit-touch-callout: none; touch-action: none; }
   .btn-meine-auswahl:hover { background: rgba(200,160,0,0.12) !important; border-color: #c8a000 !important; color: #ffe066 !important; }
   .btn-meine-auswahl.on { color: #ffe066 !important; border-color: #c8a000 !important; background: rgba(200,160,0,0.15) !important; font-weight: 700; }
   .btn-classic.on{ border-color: #7ab3ff; background: rgba(30,90,200,0.12); }
@@ -1366,23 +1366,22 @@ function autoSaveMeineAuswahl() {
 }
 
 function toggleMeineAuswahlMode() {
-  meineAuswahlActive = !meineAuswahlActive;
-  document.getElementById('btn-meine-auswahl').classList.toggle('on', meineAuswahlActive);
-
-  if (meineAuswahlActive) {
-    const saved = loadMeineAuswahl();
-    if (saved) {
-      LEAGUES.forEach(l => {
-        const val = saved[l.team] !== undefined ? saved[l.team] : true;
-        showTeams[l.team] = val;
-        document.getElementById('btn-' + l.team).classList.toggle('on', val);
-      });
-      saveState();
-      renderNextMatch();
-      renderMatches();
-    } else {
-      autoSaveMeineAuswahl();
-    }
+  if (!meineAuswahlActive) {
+    meineAuswahlActive = true;
+    document.getElementById('btn-meine-auswahl').classList.add('on');
+  }
+  const saved = loadMeineAuswahl();
+  if (saved) {
+    LEAGUES.forEach(l => {
+      const val = saved[l.team] !== undefined ? saved[l.team] : true;
+      showTeams[l.team] = val;
+      document.getElementById('btn-' + l.team).classList.toggle('on', val);
+    });
+    saveState();
+    renderNextMatch();
+    renderMatches();
+  } else {
+    autoSaveMeineAuswahl();
   }
   clearTimeout(_mannschaftenTimer);
   _startMannschaftenTimer();
