@@ -132,7 +132,8 @@
   .btn-select-all:hover  { background: rgba(30,160,80,0.12) !important; border-color: #7effa8 !important; color: #7effa8 !important; }
   .btn-select-none { color: #ff9090 !important; border-color: #802020; }
   .btn-select-none:hover { background: rgba(220,50,50,0.12) !important; border-color: #ff9090 !important; color: #ff9090 !important; }
-  .btn-select-all, .btn-select-none, .btn-meine-auswahl { width: 100%; }
+  .top-btns-row { display: flex; width: 100%; gap: 6px; }
+  .top-btns-row .btn { flex: 1; text-align: center; min-width: 0; }
   .btn-meine-auswahl { color: #c8a000 !important; border-color: #6a5400; }
   .btn-meine-auswahl:hover { background: rgba(200,160,0,0.12) !important; border-color: #c8a000 !important; color: #ffe066 !important; }
   .btn-meine-auswahl.on { color: #ffe066 !important; border-color: #c8a000 !important; background: rgba(200,160,0,0.15) !important; font-weight: 700; }
@@ -494,9 +495,11 @@
   </div>
   <button class="btn-mannschaften" id="btn-mannschaften" onclick="toggleMannschaften()">Mannschaften</button>
   <div class="team-row" id="team-row">
-    <button class="btn btn-select-all"  onclick="selectAllTeams()">Alle auswählen</button>
-    <button class="btn btn-select-none" onclick="selectNoTeams()">Keine auswählen</button>
-    <button class="btn btn-meine-auswahl" id="btn-meine-auswahl" onclick="toggleMeineAuswahlMode()">Meine Auswahl</button>
+    <div class="top-btns-row">
+      <button class="btn btn-select-all"    onclick="selectAllTeams()">Alle auswählen</button>
+      <button class="btn btn-select-none"   onclick="selectNoTeams()">Keine auswählen</button>
+      <button class="btn btn-meine-auswahl" id="btn-meine-auswahl" onclick="toggleMeineAuswahlMode()">Meine Auswahl</button>
+    </div>
     <button class="btn btn-classic on" id="btn-classic" onclick="toggleTeam('classic')">Junioren U15 classic Kreisklasse 1</button>
     <button class="btn btn-2er on"     id="btn-2er"     onclick="toggleTeam('2er')">Junioren U15 2er Kreisklasse 1</button>
     <button class="btn btn-mixed on"   id="btn-mixed"   onclick="toggleTeam('mixed')">Mixed U15 2er Kreisliga</button>
