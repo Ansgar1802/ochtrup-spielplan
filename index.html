@@ -966,7 +966,7 @@ function renderNextMatch() {
     _homeBlinkTimer = setTimeout(function() {
       const el = document.getElementById('nm-heimspiel');
       if (el) el.classList.remove('blink');
-    }, 10000);
+    }, 5000);
   }
   document.getElementById('nm-teams').innerHTML    =
     `<span style="font-weight:700;color:#fff">${esc(next.homeTeam)}</span>` +
