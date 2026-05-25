@@ -46,12 +46,16 @@
     gap: 0;
     min-height: 135px;
   }
-  .nm-top {
+  .nm-top-row {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     width: 100%;
-    margin-bottom: 6px;
+  }
+  .nm-left-col {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
   }
   .nm-label {
     font-size: 0.75rem;
@@ -64,8 +68,9 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 0;
-    margin-top: 4px;
+    margin-top: 10px;
     line-height: 1.4;
+    width: 100%;
   }
   .nm-league { font-size: 0.95rem; color: #9095b0; margin-top: 4px; }
   .nm-date { font-size: 0.88rem; color: #c8cae0; margin-top: 2px; }
@@ -485,16 +490,18 @@
 
 <!-- Nächstes Spiel -->
 <div id="next-match-box" class="next-match-box">
-  <div class="nm-top">
-    <div class="nm-label">Nächstes Spiel</div>
+  <div class="nm-top-row">
+    <div class="nm-left-col">
+      <div class="nm-label">Nächstes Spiel</div>
+      <div class="nm-date"   id="nm-date"></div>
+      <div class="nm-league" id="nm-league"></div>
+    </div>
     <div class="nm-right">
       <div class="nm-days" id="nm-days"></div>
       <div class="nm-unit" id="nm-unit"></div>
     </div>
   </div>
-  <div class="nm-date"   id="nm-date"></div>
-  <div class="nm-league" id="nm-league"></div>
-  <div class="nm-teams"  id="nm-teams"></div>
+  <div class="nm-teams" id="nm-teams"></div>
 </div>
 
 <!-- Filter-Buttons -->
