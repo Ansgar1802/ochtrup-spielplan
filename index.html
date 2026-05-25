@@ -1392,6 +1392,48 @@ function toggleMeineAuswahlMode() {
   _startMannschaftenTimer();
 }
 
+/* ── Meine Auswahl: Long-Press (1s) zum Löschen ────────────── */
+function clearMeineAuswahl() {
+  localStorage.removeItem('spielplan-meine-auswahl');
+  meineAuswahlActive = false;
+  const btn = document.getElementById('btn-meine-auswahl');
+  btn.classList.remove('on', 'pressing');
+  renderNextMatch();
+  renderMatches();
+}
+
+(function() {
+  const btn = document.getElementById('btn-meine-auswahl');
+  let pressTimer = null;
+  let longPressFired = false;
+
+  function startPress() {
+    longPressFired = false;
+    btn.classList.add('pressing');
+    pressTimer = setTimeout(() => {
+      longPressFired = true;
+      clearMeineAuswahl();
+    }, 1000);
+  }
+
+  function cancelPress() {
+    clearTimeout(pressTimer);
+    pressTimer = null;
+    btn.classList.remove('pressing');
+  }
+
+  btn.addEventListener('mousedown',   startPress);
+  btn.addEventListener('touchstart',  startPress, { passive: true });
+  btn.addEventListener('mouseup',     cancelPress);
+  btn.addEventListener('touchend',    cancelPress);
+  btn.addEventListener('mouseleave',  cancelPress);
+  btn.addEventListener('touchcancel', cancelPress);
+  btn.addEventListener('click', () => {
+    if (!longPressFired) toggleMeineAuswahlMode();
+    longPressFired = false;
+  });
+})();
+
 /* ── Start ─────────────────────────────────────────────────── */
 applyStateToButtons();
 loadAllData();
