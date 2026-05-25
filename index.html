@@ -128,6 +128,10 @@
   .team-row { display: none; }
   .team-row .btn { color: #9095b0; }
   .team-row.visible { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+  .btn-select-all  { color: #7effa8 !important; border-color: #2a9050; }
+  .btn-select-all:hover  { background: rgba(30,160,80,0.12) !important; border-color: #7effa8 !important; color: #7effa8 !important; }
+  .btn-select-none { color: #ff9090 !important; border-color: #802020; }
+  .btn-select-none:hover { background: rgba(220,50,50,0.12) !important; border-color: #ff9090 !important; color: #ff9090 !important; }
   .btn-classic.on{ border-color: #7ab3ff; background: rgba(30,90,200,0.12); }
   .btn-2er.on    { border-color: #7effa8; background: rgba(30,160,80,0.12); }
   .btn-mixed.on  { border-color: #ffe57f; background: rgba(200,170,20,0.12); }
@@ -480,6 +484,8 @@
   </div>
   <button class="btn-mannschaften" id="btn-mannschaften" onclick="toggleMannschaften()">Mannschaften</button>
   <div class="team-row" id="team-row">
+    <button class="btn btn-select-all"  onclick="selectAllTeams()">Alle auswählen</button>
+    <button class="btn btn-select-none" onclick="selectNoTeams()">Keine auswählen</button>
     <button class="btn btn-classic on" id="btn-classic" onclick="toggleTeam('classic')">Junioren U15 classic Kreisklasse 1</button>
     <button class="btn btn-2er on"     id="btn-2er"     onclick="toggleTeam('2er')">Junioren U15 2er Kreisklasse 1</button>
     <button class="btn btn-mixed on"   id="btn-mixed"   onclick="toggleTeam('mixed')">Mixed U15 2er Kreisliga</button>
@@ -1293,6 +1299,31 @@ function renderReport(html, m) {
   return out;
 }
 
+
+/* ── Alle / Keine auswählen ────────────────────────────────── */
+function selectAllTeams() {
+  LEAGUES.forEach(l => {
+    showTeams[l.team] = true;
+    document.getElementById('btn-' + l.team).classList.add('on');
+  });
+  saveState();
+  renderNextMatch();
+  renderMatches();
+  clearTimeout(_mannschaftenTimer);
+  _startMannschaftenTimer();
+}
+
+function selectNoTeams() {
+  LEAGUES.forEach(l => {
+    showTeams[l.team] = false;
+    document.getElementById('btn-' + l.team).classList.remove('on');
+  });
+  saveState();
+  renderNextMatch();
+  renderMatches();
+  clearTimeout(_mannschaftenTimer);
+  _startMannschaftenTimer();
+}
 
 /* ── Start ─────────────────────────────────────────────────── */
 applyStateToButtons();
