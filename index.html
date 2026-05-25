@@ -164,10 +164,12 @@
   .team-row .btn { color: #9095b0; width: 100%; text-align: center; padding: 10px 13px; font-size: 0.88rem; white-space: normal; }
   .team-row .btn.on { color: #fff; }
   .team-row.visible { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
-  .btn-select-all  { color: rgba(126,255,168,0.25) !important; border-color: rgba(126,255,168,0.12); }
+  .btn-select-all  { color: rgba(126,255,168,0.42) !important; border-color: rgba(126,255,168,0.20); }
   .btn-select-all:hover  { background: rgba(30,160,80,0.15) !important; border-color: #7effa8 !important; color: #7effa8 !important; }
-  .btn-select-none { color: rgba(255,144,144,0.25) !important; border-color: rgba(255,144,144,0.12); }
+  .btn-select-all.on  { color: #7effa8 !important; border-color: #2a9050 !important; background: rgba(30,160,80,0.15) !important; font-weight: 700; }
+  .btn-select-none { color: rgba(255,144,144,0.42) !important; border-color: rgba(255,144,144,0.20); }
   .btn-select-none:hover { background: rgba(220,50,50,0.15) !important; border-color: #ff9090 !important; color: #ff9090 !important; }
+  .btn-select-none.on { color: #ff9090 !important; border-color: #802020 !important; background: rgba(220,50,50,0.15) !important; font-weight: 700; }
   .top-btns-row { display: flex; width: 100%; gap: 6px; }
   .top-btns-row .btn { flex: 1; text-align: center; min-width: 0; padding-top: 17px; padding-bottom: 17px; white-space: normal; line-height: 1.4; }
   .btn-meine-auswahl { color: rgba(200,160,0,0.28) !important; border-color: rgba(200,160,0,0.14); -webkit-touch-callout: none; touch-action: none; }
@@ -536,8 +538,8 @@
   <button class="btn-mannschaften" id="btn-mannschaften" onclick="toggleMannschaften()">Mannschaften</button>
   <div class="team-row" id="team-row">
     <div class="top-btns-row">
-      <button class="btn btn-select-all"    onclick="selectAllTeams()">Alle<br>auswählen</button>
-      <button class="btn btn-select-none"   onclick="selectNoTeams()">Keine<br>auswählen</button>
+      <button class="btn btn-select-all"  id="btn-select-all"  onclick="selectAllTeams()">Alle<br>auswählen</button>
+      <button class="btn btn-select-none" id="btn-select-none" onclick="selectNoTeams()">Keine<br>auswählen</button>
       <button class="btn btn-meine-auswahl" id="btn-meine-auswahl">Meine<br>Auswahl</button>
     </div>
     <button class="btn btn-classic on" id="btn-classic" onclick="toggleTeam('classic')">Junioren U15 classic Kreisklasse 1</button>
@@ -705,16 +707,18 @@ function loadState() {
       showFuture: s.showFuture !== undefined ? s.showFuture : true,
       showHome:   s.showHome   !== undefined ? s.showHome   : true,
       showAway:   s.showAway   !== undefined ? s.showAway   : true,
-      showTeams:  s.showTeams  || { classic: true, '2er': true, mixed: true, u8: true, u10: true, d4: true, d30bz: true, d30kl: true, d40: true, d50: true, d60: true, h4: true, h30kl: true, h30k3: true, h40bk: true, h40kl: true, h50: true, h60: true, h65kl: true, h65ml: true }
+      showTeams:  s.showTeams  || { classic: true, '2er': true, mixed: true, u8: true, u10: true, d4: true, d30bz: true, d30kl: true, d40: true, d50: true, d60: true, h4: true, h30kl: true, h30k3: true, h40bk: true, h40kl: true, h50: true, h60: true, h65kl: true, h65ml: true },
+      selectMode: s.selectMode || null
     };
   } catch(e) {
     return { showPast: false, showFuture: true, showHome: true, showAway: true,
-             showTeams: { classic: true, '2er': true, mixed: true, u8: true, u10: true, d4: true, d30bz: true, d30kl: true, d40: true, d50: true, d60: true, h4: true, h30kl: true, h30k3: true, h40bk: true, h40kl: true, h50: true, h60: true, h65kl: true, h65ml: true } };
+             showTeams: { classic: true, '2er': true, mixed: true, u8: true, u10: true, d4: true, d30bz: true, d30kl: true, d40: true, d50: true, d60: true, h4: true, h30kl: true, h30k3: true, h40bk: true, h40kl: true, h50: true, h60: true, h65kl: true, h65ml: true },
+             selectMode: null };
   }
 }
 
 function saveState() {
-  localStorage.setItem('spielplan-state', JSON.stringify({ showPast, showFuture, showHome, showAway, showTeams }));
+  localStorage.setItem('spielplan-state', JSON.stringify({ showPast, showFuture, showHome, showAway, showTeams, selectMode }));
 }
 
 const _state    = loadState();
@@ -723,6 +727,7 @@ let showFuture  = _state.showFuture;
 let showHome    = _state.showHome;
 let showAway    = _state.showAway;
 let showTeams   = _state.showTeams;
+let selectMode  = _state.selectMode;
 const leagueHtml = {};
 
 /* ── Fetch ─────────────────────────────────────────────────── */
@@ -1153,6 +1158,8 @@ function applyStateToButtons() {
   LEAGUES.forEach(l => {
     document.getElementById('btn-' + l.team).classList.toggle('on', showTeams[l.team]);
   });
+  document.getElementById('btn-select-all').classList.toggle('on', selectMode === 'all');
+  document.getElementById('btn-select-none').classList.toggle('on', selectMode === 'none');
 }
 
 function toggleMannschaften() {
@@ -1380,7 +1387,10 @@ function renderReport(html, m) {
 /* ── Alle / Keine auswählen ────────────────────────────────── */
 function selectAllTeams() {
   meineAuswahlActive = false;
+  selectMode = 'all';
   document.getElementById('btn-meine-auswahl').classList.remove('on');
+  document.getElementById('btn-select-all').classList.add('on');
+  document.getElementById('btn-select-none').classList.remove('on');
   LEAGUES.forEach(l => {
     showTeams[l.team] = true;
     document.getElementById('btn-' + l.team).classList.add('on');
@@ -1392,7 +1402,10 @@ function selectAllTeams() {
 
 function selectNoTeams() {
   meineAuswahlActive = false;
+  selectMode = 'none';
   document.getElementById('btn-meine-auswahl').classList.remove('on');
+  document.getElementById('btn-select-none').classList.add('on');
+  document.getElementById('btn-select-all').classList.remove('on');
   LEAGUES.forEach(l => {
     showTeams[l.team] = false;
     document.getElementById('btn-' + l.team).classList.remove('on');
@@ -1418,7 +1431,10 @@ function autoSaveMeineAuswahl() {
 function toggleMeineAuswahlMode() {
   if (!meineAuswahlActive) {
     meineAuswahlActive = true;
+    selectMode = null;
     document.getElementById('btn-meine-auswahl').classList.add('on');
+    document.getElementById('btn-select-all').classList.remove('on');
+    document.getElementById('btn-select-none').classList.remove('on');
   }
   const saved = loadMeineAuswahl();
   if (saved) {
