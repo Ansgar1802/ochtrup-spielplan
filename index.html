@@ -954,7 +954,7 @@ function renderNextMatch() {
 
   box.classList.toggle('home-game', next.isHome);
   const homeAwaySpan = next.isHome
-    ? '<span style="color:#fff;font-weight:700">Heimspiel</span>'
+    ? '<span style="color:#fff;font-weight:700" class="blink">Heimspiel</span>'
     : '<span>Auswärts</span>';
   document.getElementById('nm-date').innerHTML =
     WEEKDAYS[next.date.getDay()] + ' ' + next.dateStr + ' · ' + next.timeStr + ' Uhr · ' + homeAwaySpan;
