@@ -133,7 +133,7 @@
   .btn-select-none { color: #ff9090 !important; border-color: #802020; }
   .btn-select-none:hover { background: rgba(220,50,50,0.12) !important; border-color: #ff9090 !important; color: #ff9090 !important; }
   .top-btns-row { display: flex; width: 100%; gap: 6px; }
-  .top-btns-row .btn { flex: 1; text-align: center; min-width: 0; }
+  .top-btns-row .btn { flex: 1; text-align: center; min-width: 0; padding-top: 17px; padding-bottom: 17px; white-space: normal; line-height: 1.4; }
   .btn-meine-auswahl { color: #c8a000 !important; border-color: #6a5400; }
   .btn-meine-auswahl:hover { background: rgba(200,160,0,0.12) !important; border-color: #c8a000 !important; color: #ffe066 !important; }
   .btn-meine-auswahl.on { color: #ffe066 !important; border-color: #c8a000 !important; background: rgba(200,160,0,0.15) !important; font-weight: 700; }
@@ -496,9 +496,9 @@
   <button class="btn-mannschaften" id="btn-mannschaften" onclick="toggleMannschaften()">Mannschaften</button>
   <div class="team-row" id="team-row">
     <div class="top-btns-row">
-      <button class="btn btn-select-all"    onclick="selectAllTeams()">Alle auswählen</button>
-      <button class="btn btn-select-none"   onclick="selectNoTeams()">Keine auswählen</button>
-      <button class="btn btn-meine-auswahl" id="btn-meine-auswahl" onclick="toggleMeineAuswahlMode()">Meine Auswahl</button>
+      <button class="btn btn-select-all"    onclick="selectAllTeams()">Alle<br>auswählen</button>
+      <button class="btn btn-select-none"   onclick="selectNoTeams()">Keine<br>auswählen</button>
+      <button class="btn btn-meine-auswahl" id="btn-meine-auswahl" onclick="toggleMeineAuswahlMode()">Meine<br>Auswahl</button>
     </div>
     <button class="btn btn-classic on" id="btn-classic" onclick="toggleTeam('classic')">Junioren U15 classic Kreisklasse 1</button>
     <button class="btn btn-2er on"     id="btn-2er"     onclick="toggleTeam('2er')">Junioren U15 2er Kreisklasse 1</button>
