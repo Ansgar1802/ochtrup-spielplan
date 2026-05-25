@@ -1397,6 +1397,7 @@ function toggleMeineAuswahlMode() {
   function startTimer() {
     longPressFired = false;
     pressTimer = setTimeout(function() {
+      if (!meineAuswahlActive) return;
       longPressFired = true;
       localStorage.removeItem('spielplan-meine-auswahl');
       meineAuswahlActive = false;
