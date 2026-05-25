@@ -86,7 +86,7 @@
     gap: 6px;
     align-items: center;
   }
-  .controls-row .btn-filter { flex: 1; text-align: center; }
+  .controls-row .btn-filter { flex: 1; text-align: center; padding-top: 10px; padding-bottom: 10px; }
   .btn {
     padding: 5px 13px;
     border-radius: 20px;
@@ -109,7 +109,7 @@
   .btn-filter.on { border-color: #9095b0; background: rgba(144,149,176,0.08); }
   .btn-mannschaften {
     width: 100%;
-    padding: 6px;
+    padding: 9px;
     border-radius: 20px;
     border: 1px solid #2e3150;
     background: transparent;
@@ -126,8 +126,8 @@
   .btn-mannschaften:hover { background: #1a1d2e; color: #9095b0; border-color: #444a68; }
   .btn-mannschaften.on { color: #fff; font-weight: 700; border-color: #9095b0; background: rgba(144,149,176,0.08); }
   .team-row { display: none; }
-  .team-row .btn { color: #9095b0; }
-  .team-row.visible { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+  .team-row .btn { color: #9095b0; width: 100%; text-align: center; padding: 10px 13px; font-size: 0.82rem; white-space: normal; }
+  .team-row.visible { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
   .btn-select-all  { color: #7effa8 !important; border-color: #2a9050; }
   .btn-select-all:hover  { background: rgba(30,160,80,0.12) !important; border-color: #7effa8 !important; color: #7effa8 !important; }
   .btn-select-none { color: #ff9090 !important; border-color: #802020; }
@@ -892,6 +892,16 @@ async function loadAllData() {
 /* ── Nächstes Spiel ────────────────────────────────────────── */
 function renderNextMatch() {
   const today = new Date(); today.setHours(0, 0, 0, 0);
+
+  const noTeams = LEAGUES.every(l => !showTeams[l.team]);
+  if (noTeams) {
+    document.getElementById('nm-teams').textContent = 'Keine Mannschaften ausgewählt';
+    document.getElementById('nm-date').textContent  = '';
+    document.getElementById('nm-days').textContent  = '';
+    document.getElementById('nm-unit').textContent  = '';
+    document.getElementById('next-match-box').style.display = 'flex';
+    return;
+  }
 
   const next = allMatches.find(m => {
     const d = new Date(m.date); d.setHours(0, 0, 0, 0);
