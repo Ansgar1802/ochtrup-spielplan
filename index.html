@@ -1379,6 +1379,8 @@ function renderReport(html, m) {
 
 /* ── Alle / Keine auswählen ────────────────────────────────── */
 function selectAllTeams() {
+  meineAuswahlActive = false;
+  document.getElementById('btn-meine-auswahl').classList.remove('on');
   LEAGUES.forEach(l => {
     showTeams[l.team] = true;
     document.getElementById('btn-' + l.team).classList.add('on');
@@ -1389,6 +1391,8 @@ function selectAllTeams() {
 }
 
 function selectNoTeams() {
+  meineAuswahlActive = false;
+  document.getElementById('btn-meine-auswahl').classList.remove('on');
   LEAGUES.forEach(l => {
     showTeams[l.team] = false;
     document.getElementById('btn-' + l.team).classList.remove('on');
