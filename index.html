@@ -58,10 +58,17 @@
     gap: 3px;
   }
   .nm-label {
-    font-size: 0.75rem;
+    align-self: center;
+    padding: 6px 18px;
+    border-radius: 20px;
+    border: 1px solid #2e3150;
+    background: transparent;
+    color: #9095b0;
+    font-size: 0.82rem;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: #c0c4d8;
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
   }
   .nm-teams {
     display: flex;
@@ -490,9 +497,9 @@
 
 <!-- Nächstes Spiel -->
 <div id="next-match-box" class="next-match-box">
+  <div class="nm-label">Nächstes Spiel</div>
   <div class="nm-top-row">
     <div class="nm-left-col">
-      <div class="nm-label">Nächstes Spiel</div>
       <div class="nm-date"   id="nm-date"></div>
       <div class="nm-league" id="nm-league"></div>
     </div>
