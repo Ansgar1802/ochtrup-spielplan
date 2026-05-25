@@ -1384,6 +1384,13 @@ function toggleMeineAuswahlMode() {
       localStorage.removeItem('spielplan-meine-auswahl');
       meineAuswahlActive = false;
       btn.classList.remove('on');
+      LEAGUES.forEach(l => {
+        showTeams[l.team] = false;
+        document.getElementById('btn-' + l.team).classList.remove('on');
+      });
+      saveState();
+      renderNextMatch();
+      renderMatches();
     }, 3000);
   }
 
