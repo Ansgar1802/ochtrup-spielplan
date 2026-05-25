@@ -1358,7 +1358,14 @@ function toggleMeineAuswahlMode() {
     renderNextMatch();
     renderMatches();
   } else {
+    LEAGUES.forEach(l => {
+      showTeams[l.team] = false;
+      document.getElementById('btn-' + l.team).classList.remove('on');
+    });
     autoSaveMeineAuswahl();
+    saveState();
+    renderNextMatch();
+    renderMatches();
   }
 }
 
