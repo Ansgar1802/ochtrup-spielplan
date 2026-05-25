@@ -930,6 +930,8 @@ async function loadAllData() {
 }
 
 /* ── Nächstes Spiel ────────────────────────────────────────── */
+let _homeBlinkTimer = null;
+
 function renderNextMatch() {
   const today = new Date(); today.setHours(0, 0, 0, 0);
 
@@ -954,11 +956,18 @@ function renderNextMatch() {
   if (!next) return;
 
   box.classList.toggle('home-game', next.isHome);
+  clearTimeout(_homeBlinkTimer);
   const homeAwaySpan = next.isHome
-    ? '<span style="color:#fff;font-weight:700" class="blink">Heimspiel</span>'
+    ? '<span id="nm-heimspiel" style="color:#fff;font-weight:700" class="blink">Heimspiel</span>'
     : '<span>Auswärts</span>';
   document.getElementById('nm-date').innerHTML =
     WEEKDAYS[next.date.getDay()] + ' ' + next.dateStr + ' · ' + next.timeStr + ' Uhr · ' + homeAwaySpan;
+  if (next.isHome) {
+    _homeBlinkTimer = setTimeout(function() {
+      const el = document.getElementById('nm-heimspiel');
+      if (el) el.classList.remove('blink');
+    }, 10000);
+  }
   document.getElementById('nm-teams').innerHTML    =
     `<span style="font-weight:700;color:#fff">${esc(next.homeTeam)}</span>` +
     `<span style="font-weight:700;color:#fff;margin:0 5px">vs.</span>` +
