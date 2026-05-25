@@ -134,7 +134,7 @@
   .btn-select-none:hover { background: rgba(220,50,50,0.12) !important; border-color: #ff9090 !important; color: #ff9090 !important; }
   .top-btns-row { display: flex; width: 100%; gap: 6px; }
   .top-btns-row .btn { flex: 1; text-align: center; min-width: 0; padding-top: 17px; padding-bottom: 17px; white-space: normal; line-height: 1.4; }
-  .btn-meine-auswahl { color: #c8a000 !important; border-color: #6a5400; }
+  .btn-meine-auswahl { color: #c8a000 !important; border-color: #6a5400; -webkit-touch-callout: none; }
   .btn-meine-auswahl:hover { background: rgba(200,160,0,0.12) !important; border-color: #c8a000 !important; color: #ffe066 !important; }
   .btn-meine-auswahl.on { color: #ffe066 !important; border-color: #c8a000 !important; background: rgba(200,160,0,0.15) !important; font-weight: 700; }
   .btn-classic.on{ border-color: #7ab3ff; background: rgba(30,90,200,0.12); }
@@ -1393,8 +1393,9 @@ function toggleMeineAuswahlMode() {
   const btn = document.getElementById('btn-meine-auswahl');
   let pressTimer = null;
   let longPressFired = false;
+  let isTouch = false;
 
-  function onPressStart(e) {
+  function startTimer() {
     longPressFired = false;
     pressTimer = setTimeout(function() {
       longPressFired = true;
@@ -1404,18 +1405,38 @@ function toggleMeineAuswahlMode() {
     }, 1000);
   }
 
-  function onPressEnd() {
+  function cancelTimer() {
     clearTimeout(pressTimer);
     pressTimer = null;
   }
 
-  btn.addEventListener('mousedown',   onPressStart);
-  btn.addEventListener('touchstart',  onPressStart);
-  btn.addEventListener('mouseup',     onPressEnd);
-  btn.addEventListener('touchend',    onPressEnd);
-  btn.addEventListener('mouseleave',  onPressEnd);
-  btn.addEventListener('touchcancel', onPressEnd);
-  btn.addEventListener('click', function() {
+  /* Touch: preventDefault verhindert iOS-Kontextmenü und synthetische Mouse-Events */
+  btn.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    isTouch = true;
+    startTimer();
+  });
+
+  btn.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    cancelTimer();
+    if (!longPressFired) toggleMeineAuswahlMode();
+    longPressFired = false;
+    setTimeout(function() { isTouch = false; }, 600);
+  });
+
+  btn.addEventListener('touchcancel', function() {
+    cancelTimer();
+    longPressFired = false;
+    setTimeout(function() { isTouch = false; }, 600);
+  });
+
+  /* Maus (Desktop) */
+  btn.addEventListener('mousedown',  function() { if (!isTouch) startTimer(); });
+  btn.addEventListener('mouseup',    function() { if (!isTouch) cancelTimer(); });
+  btn.addEventListener('mouseleave', function() { if (!isTouch) cancelTimer(); });
+  btn.addEventListener('click',      function() {
+    if (isTouch) return;
     if (!longPressFired) toggleMeineAuswahlMode();
     longPressFired = false;
   });
