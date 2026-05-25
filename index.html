@@ -132,14 +132,10 @@
   .btn-select-all:hover  { background: rgba(30,160,80,0.12) !important; border-color: #7effa8 !important; color: #7effa8 !important; }
   .btn-select-none { color: #ff9090 !important; border-color: #802020; }
   .btn-select-none:hover { background: rgba(220,50,50,0.12) !important; border-color: #ff9090 !important; color: #ff9090 !important; }
-  .meine-auswahl-row { display: flex; gap: 6px; width: 100%; align-items: center; }
-  .btn-meine-auswahl { flex: 1; color: #c8a000 !important; border-color: #6a5400; }
+  .btn-select-all, .btn-select-none, .btn-meine-auswahl { width: 100%; }
+  .btn-meine-auswahl { color: #c8a000 !important; border-color: #6a5400; }
   .btn-meine-auswahl:hover { background: rgba(200,160,0,0.12) !important; border-color: #c8a000 !important; color: #ffe066 !important; }
-  .btn-meine-auswahl.has-saved { border-color: #c8a000; }
-  .btn-meine-auswahl:disabled { opacity: 0.35; cursor: default; }
-  .btn-save-auswahl { color: #7a7f96 !important; border-color: #2e3150; white-space: nowrap; }
-  .btn-save-auswahl:hover { background: rgba(144,149,176,0.08) !important; border-color: #444a68 !important; color: #c0c4d8 !important; }
-  .btn-save-auswahl.saved-flash { color: #7effa8 !important; border-color: #2a9050 !important; }
+  .btn-meine-auswahl.on { color: #ffe066 !important; border-color: #c8a000 !important; background: rgba(200,160,0,0.15) !important; font-weight: 700; }
   .btn-classic.on{ border-color: #7ab3ff; background: rgba(30,90,200,0.12); }
   .btn-2er.on    { border-color: #7effa8; background: rgba(30,160,80,0.12); }
   .btn-mixed.on  { border-color: #ffe57f; background: rgba(200,170,20,0.12); }
@@ -500,10 +496,7 @@
   <div class="team-row" id="team-row">
     <button class="btn btn-select-all"  onclick="selectAllTeams()">Alle auswählen</button>
     <button class="btn btn-select-none" onclick="selectNoTeams()">Keine auswählen</button>
-    <div class="meine-auswahl-row">
-      <button class="btn btn-meine-auswahl" id="btn-meine-auswahl" onclick="applyMeineAuswahl()" disabled>Meine Auswahl</button>
-      <button class="btn btn-save-auswahl"  id="btn-save-auswahl"  onclick="saveMeineAuswahl()">↓ Speichern</button>
-    </div>
+    <button class="btn btn-meine-auswahl" id="btn-meine-auswahl" onclick="toggleMeineAuswahlMode()">Meine Auswahl</button>
     <button class="btn btn-classic on" id="btn-classic" onclick="toggleTeam('classic')">Junioren U15 classic Kreisklasse 1</button>
     <button class="btn btn-2er on"     id="btn-2er"     onclick="toggleTeam('2er')">Junioren U15 2er Kreisklasse 1</button>
     <button class="btn btn-mixed on"   id="btn-mixed"   onclick="toggleTeam('mixed')">Mixed U15 2er Kreisliga</button>
@@ -1077,6 +1070,7 @@ function toggleTeam(team) {
   showTeams[team] = !showTeams[team];
   document.getElementById('btn-' + team).classList.toggle('on', showTeams[team]);
   saveState();
+  autoSaveMeineAuswahl();
   renderNextMatch();
   renderMatches();
 }
@@ -1332,6 +1326,8 @@ function renderReport(html, m) {
 
 /* ── Alle / Keine auswählen ────────────────────────────────── */
 function selectAllTeams() {
+  meineAuswahlActive = false;
+  document.getElementById('btn-meine-auswahl').classList.remove('on');
   LEAGUES.forEach(l => {
     showTeams[l.team] = true;
     document.getElementById('btn-' + l.team).classList.add('on');
@@ -1344,6 +1340,8 @@ function selectAllTeams() {
 }
 
 function selectNoTeams() {
+  meineAuswahlActive = false;
+  document.getElementById('btn-meine-auswahl').classList.remove('on');
   LEAGUES.forEach(l => {
     showTeams[l.team] = false;
     document.getElementById('btn-' + l.team).classList.remove('on');
@@ -1356,50 +1354,43 @@ function selectNoTeams() {
 }
 
 /* ── Meine Auswahl ─────────────────────────────────────────── */
+let meineAuswahlActive = false;
+
 function loadMeineAuswahl() {
   try { return JSON.parse(localStorage.getItem('spielplan-meine-auswahl')); }
   catch { return null; }
 }
 
-function updateMeineAuswahlBtn() {
-  const saved = loadMeineAuswahl();
-  const btn = document.getElementById('btn-meine-auswahl');
-  btn.disabled = !saved;
-  btn.classList.toggle('has-saved', !!saved);
-}
-
-function saveMeineAuswahl() {
+function autoSaveMeineAuswahl() {
+  if (!meineAuswahlActive) return;
   localStorage.setItem('spielplan-meine-auswahl', JSON.stringify({ ...showTeams }));
-  updateMeineAuswahlBtn();
-  const saveBtn = document.getElementById('btn-save-auswahl');
-  saveBtn.textContent = '✓ Gespeichert';
-  saveBtn.classList.add('saved-flash');
-  clearTimeout(_mannschaftenTimer);
-  _startMannschaftenTimer();
-  setTimeout(() => {
-    saveBtn.textContent = '↓ Speichern';
-    saveBtn.classList.remove('saved-flash');
-  }, 1500);
 }
 
-function applyMeineAuswahl() {
-  const saved = loadMeineAuswahl();
-  if (!saved) return;
-  LEAGUES.forEach(l => {
-    const val = saved[l.team] !== undefined ? saved[l.team] : true;
-    showTeams[l.team] = val;
-    document.getElementById('btn-' + l.team).classList.toggle('on', val);
-  });
-  saveState();
-  renderNextMatch();
-  renderMatches();
+function toggleMeineAuswahlMode() {
+  meineAuswahlActive = !meineAuswahlActive;
+  document.getElementById('btn-meine-auswahl').classList.toggle('on', meineAuswahlActive);
+
+  if (meineAuswahlActive) {
+    const saved = loadMeineAuswahl();
+    if (saved) {
+      LEAGUES.forEach(l => {
+        const val = saved[l.team] !== undefined ? saved[l.team] : true;
+        showTeams[l.team] = val;
+        document.getElementById('btn-' + l.team).classList.toggle('on', val);
+      });
+      saveState();
+      renderNextMatch();
+      renderMatches();
+    } else {
+      autoSaveMeineAuswahl();
+    }
+  }
   clearTimeout(_mannschaftenTimer);
   _startMannschaftenTimer();
 }
 
 /* ── Start ─────────────────────────────────────────────────── */
 applyStateToButtons();
-updateMeineAuswahlBtn();
 loadAllData();
 setInterval(updateCountdowns, 1000);
 </script>
