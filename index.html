@@ -498,7 +498,7 @@
     <div class="top-btns-row">
       <button class="btn btn-select-all"    onclick="selectAllTeams()">Alle<br>auswählen</button>
       <button class="btn btn-select-none"   onclick="selectNoTeams()">Keine<br>auswählen</button>
-      <button class="btn btn-meine-auswahl" id="btn-meine-auswahl" onclick="toggleMeineAuswahlMode()">Meine<br>Auswahl</button>
+      <button class="btn btn-meine-auswahl" id="btn-meine-auswahl">Meine<br>Auswahl</button>
     </div>
     <button class="btn btn-classic on" id="btn-classic" onclick="toggleTeam('classic')">Junioren U15 classic Kreisklasse 1</button>
     <button class="btn btn-2er on"     id="btn-2er"     onclick="toggleTeam('2er')">Junioren U15 2er Kreisklasse 1</button>
@@ -1329,8 +1329,6 @@ function renderReport(html, m) {
 
 /* ── Alle / Keine auswählen ────────────────────────────────── */
 function selectAllTeams() {
-  meineAuswahlActive = false;
-  document.getElementById('btn-meine-auswahl').classList.remove('on');
   LEAGUES.forEach(l => {
     showTeams[l.team] = true;
     document.getElementById('btn-' + l.team).classList.add('on');
@@ -1343,8 +1341,6 @@ function selectAllTeams() {
 }
 
 function selectNoTeams() {
-  meineAuswahlActive = false;
-  document.getElementById('btn-meine-auswahl').classList.remove('on');
   LEAGUES.forEach(l => {
     showTeams[l.team] = false;
     document.getElementById('btn-' + l.team).classList.remove('on');
@@ -1391,6 +1387,39 @@ function toggleMeineAuswahlMode() {
   clearTimeout(_mannschaftenTimer);
   _startMannschaftenTimer();
 }
+
+/* ── Meine Auswahl: Langdruck (1s) löscht gespeicherte Auswahl */
+(function() {
+  const btn = document.getElementById('btn-meine-auswahl');
+  let pressTimer = null;
+  let longPressFired = false;
+
+  function onPressStart(e) {
+    longPressFired = false;
+    pressTimer = setTimeout(function() {
+      longPressFired = true;
+      localStorage.removeItem('spielplan-meine-auswahl');
+      meineAuswahlActive = false;
+      btn.classList.remove('on');
+    }, 1000);
+  }
+
+  function onPressEnd() {
+    clearTimeout(pressTimer);
+    pressTimer = null;
+  }
+
+  btn.addEventListener('mousedown',   onPressStart);
+  btn.addEventListener('touchstart',  onPressStart);
+  btn.addEventListener('mouseup',     onPressEnd);
+  btn.addEventListener('touchend',    onPressEnd);
+  btn.addEventListener('mouseleave',  onPressEnd);
+  btn.addEventListener('touchcancel', onPressEnd);
+  btn.addEventListener('click', function() {
+    if (!longPressFired) toggleMeineAuswahlMode();
+    longPressFired = false;
+  });
+})();
 
 /* ── Start ─────────────────────────────────────────────────── */
 applyStateToButtons();
