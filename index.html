@@ -809,22 +809,21 @@ function parseLeague(html, league) {
 
   for (const row of doc.querySelectorAll('table tr')) {
     const cells = [...row.querySelectorAll('td')];
-    if (cells.length < 3) continue;
-
     const texts = cells.map(c => c.textContent.trim());
 
-    /* Datum aus JEDER Zeile lesen und vorwärts merken.
-       liga.nu zeigt das Datum oft nur in einer Kopfzeile, die nachfolgenden
-       Spielzeilen haben dann leere Datumszellen. */
+    /* Datum aus JEDER Zeile lesen und vorwärts merken — auch aus kurzen Kopfzeilen
+       mit weniger als 3 Zellen (z.B. bei 4er-Mannschaften auf liga.nu). */
     for (const t of texts) {
       const m = t.match(/(\d{2}\.\d{2}\.\d{4})/);
       if (m) {
         lastDateStr = m[1];
         const tm = t.match(/(\d{2}:\d{2})/);
-        lastTimeStr = tm ? tm[1] : '??:??';
+        lastTimeStr = tm ? tm[1] : (texts.find(t2 => /^\d{2}:\d{2}$/.test(t2)) || '??:??');
         break;
       }
     }
+
+    if (cells.length < 3) continue;
 
     /* Ochtrup in dieser Zeile? */
     if (!texts.some(t => t.includes('Ochtrup'))) continue;
@@ -922,22 +921,29 @@ async function loadAllData() {
   allMatches = [];
   const errors = [];
 
-  await Promise.allSettled(
-    LEAGUES.map(league =>
-      fetchURL(league.url)
-        .then(html => {
-          leagueHtml[league.team] = html;
-          league.rank = extractOchtrupRank(html);
-          const rankEl = document.getElementById('rank-' + league.team);
-          if (rankEl && league.rank) rankEl.textContent = 'Rang ' + league.rank;
-          allMatches = [...allMatches, ...parseLeague(html, league)]
-            .sort((a, b) => a.date - b.date);
-          renderNextMatch();
-          renderMatches();
-        })
-        .catch(e => { errors.push(league.label + ': ' + e.message); })
-    )
-  );
+  async function loadLeague(league, attempt) {
+    try {
+      const html = await fetchURL(league.url);
+      leagueHtml[league.team] = html;
+      league.rank = extractOchtrupRank(html);
+      const rankEl = document.getElementById('rank-' + league.team);
+      if (rankEl && league.rank) rankEl.textContent = 'Rang ' + league.rank;
+      allMatches = [...allMatches, ...parseLeague(html, league)]
+        .sort((a, b) => a.date - b.date);
+      renderNextMatch();
+      renderMatches();
+    } catch(e) {
+      if (attempt < 3) {
+        await new Promise(r => setTimeout(r, 1200 * attempt));
+        return loadLeague(league, attempt + 1);
+      }
+      errors.push(league.label + ': ' + e.message);
+      const rankEl = document.getElementById('rank-' + league.team);
+      if (rankEl) rankEl.textContent = '⚠';
+    }
+  }
+
+  await Promise.allSettled(LEAGUES.map(league => loadLeague(league, 1)));
 
   refreshBtn.disabled = false;
   refreshBtn.classList.remove('spinning');
@@ -961,9 +967,13 @@ async function loadAllData() {
 
   const ui = document.getElementById('update-info');
   const now = new Date();
+  const loaded = LEAGUES.filter(l => leagueHtml[l.team]).length;
+  const missing = LEAGUES.filter(l => !leagueHtml[l.team]).map(l => l.label).join(', ');
   ui.textContent = 'Zuletzt aktualisiert: ' +
     now.toLocaleDateString('de-DE') + ' · ' +
-    now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr';
+    now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) + ' Uhr · ' +
+    loaded + '/' + LEAGUES.length + ' Ligen' +
+    (missing ? ' · Fehlend: ' + missing : '');
   ui.style.display = 'block';
 }
 
@@ -1202,7 +1212,7 @@ function toggleMannschaften() {
   wrapper.classList.toggle('open', open);
 }
 
-function refreshData() { loadAllData(); }
+async function refreshData() { localStorage.removeItem('spielplan-leagues'); await initLeagues(); await loadAllData(); }
 
 /* ── Tabellen-Ansicht ──────────────────────────────────────── */
 function parseStandingsTable(html) {
