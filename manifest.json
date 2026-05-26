@@ -1,0 +1,16 @@
+{
+  "name": "TC 1928 Ochtrup – Spielplan",
+  "short_name": "TC Ochtrup",
+  "description": "Spielplan des TC 1928 Ochtrup – Sommer 2026",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f1117",
+  "theme_color": "#0f1117",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "any",
+      "type": "image/png"
+    }
+  ]
+}
