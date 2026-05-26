@@ -293,6 +293,9 @@
     color: #8aadd4;
     margin: 4px 0 2px;
   }
+  .report-result.win  { color: #78b890; }
+  .report-result.loss { color: #b87070; }
+  .report-result.draw { color: #d4b84a; }
   .report-date { font-size: 0.78rem; color: #9095b0; }
   .report-section {
     font-family: 'Bebas Neue', sans-serif;
@@ -336,6 +339,7 @@
   .report-table tr.club-player td { color: #fff; }
   .set-win  { color: #82c9a0; font-weight: 600; }
   .set-loss { color: #c47c7c; }
+  .set-draw { color: #d4b84a; font-weight: 600; }
 
   .card-tag-row {
     text-align: center;
@@ -402,6 +406,7 @@
   .result { font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .result.win  { color: #78b890; }
   .result.loss { color: #b87070; }
+  .result.draw { color: #d4b84a; }
   .result.open { color: #444a68; font-style: italic; font-weight: 400; font-size: 0.9rem; }
 
   .note {
@@ -1119,6 +1124,7 @@ function resultCls(result, isHome) {
   if (result === 'offen' || result === 'zurückgezogen') return 'open';
   const m = result.match(/^(\d+):(\d+)/);
   if (!m) return 'open';
+  if (+m[1] === +m[2]) return 'draw';
   return (isHome ? +m[1] > +m[2] : +m[2] > +m[1]) ? 'win' : 'loss';
 }
 
@@ -1322,7 +1328,7 @@ function renderReport(html, m) {
   /* ── Header ── */
   out += `<div class="report-match-header">
     <div class="report-teams">${esc(m.homeTeam)} <span style="color:#555a7a">vs.</span> ${esc(m.awayTeam)}</div>
-    <div class="report-result">${m.result}</div>
+    <div class="report-result ${resultCls(m.result, m.isHome)}">${m.result}</div>
     <div class="report-date">${WEEKDAYS[m.date.getDay()]} ${m.dateStr} · ${m.timeStr} Uhr · ${m.label}</div>
   </div>`;
 
@@ -1407,8 +1413,8 @@ function renderReport(html, m) {
               const t = sc.textContent.trim();
               if (/^\d+:\d+$/.test(t)) {
                 const [a, b] = t.split(':').map(Number);
-                const win = m.isHome ? a > b : b > a;
-                out += `<td><span class="${win ? 'set-win' : 'set-loss'}">${esc(t)}</span></td>`;
+                const setCls = a === b ? 'set-draw' : (m.isHome ? a > b : b > a) ? 'set-win' : 'set-loss';
+                out += `<td><span class="${setCls}">${esc(t)}</span></td>`;
               } else {
                 out += `<td>${esc(t)}</td>`;
               }
@@ -1430,8 +1436,8 @@ function renderReport(html, m) {
           let txt = esc(origTxt);
           if (/^\d+:\d+$/.test(origTxt)) {
             const [a, b] = origTxt.split(':').map(Number);
-            const win = m.isHome ? a > b : b > a;
-            txt = `<span class="${win ? 'set-win' : 'set-loss'}">${txt}</span>`;
+            const setCls = a === b ? 'set-draw' : (m.isHome ? a > b : b > a) ? 'set-win' : 'set-loss';
+            txt = `<span class="${setCls}">${txt}</span>`;
           }
           return `<td${cs}>${txt}</td>`;
         }).join('') + '</tr>';
