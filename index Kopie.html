@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>TC 1928 Ochtrup – Spielplan 2026</title>
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="logo2.png">
+<link rel="apple-touch-icon" href="logo.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Spielplan 26">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -174,10 +174,7 @@
   .btn-mannschaften:hover { background: #1a1d2e; color: #9095b0; border-color: #444a68; }
   .btn-mannschaften.on { color: #fff; font-weight: 700; border-color: #9095b0; background: rgba(144,149,176,0.08); }
   .team-row { display: none; }
-  .team-row .btn { color: #9095b0; width: 100%; display: flex; justify-content: space-between; align-items: center; text-align: left; padding: 10px 13px; font-size: 0.88rem; white-space: normal; }
-  .top-btns-row .btn { display: block; text-align: center; justify-content: center; }
-  .team-btn-rank { font-size: 0.75rem; opacity: 0.7; white-space: nowrap; margin-left: 8px; flex-shrink: 0; cursor: pointer; text-decoration: underline dotted; }
-  .team-btn-rank:hover { opacity: 1; }
+  .team-row .btn { color: #9095b0; width: 100%; text-align: center; padding: 10px 13px; font-size: 0.88rem; white-space: normal; }
   .team-row .btn.on { color: #fff; }
   .team-row.visible { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
   .btn-close-teams { background: transparent; border: 1px solid #2e3150; border-radius: 20px; color: #555a7a; font-size: 0.78rem; font-family: 'DM Sans', sans-serif; font-weight: 600; padding: 7px 0; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; width: 100%; margin-top: 4px; transition: all 0.15s; }
@@ -208,11 +205,10 @@
 
   /* ── Cards ── */
   .card {
-    background: #1e2a45;
     border-radius: 12px;
     margin-bottom: 10px;
     padding: 12px 14px;
-    border: 1px solid #1e2235;
+    border: 1px solid transparent;
   }
   /* Karten-Farben werden dynamisch per JS generiert → siehe #dynamic-team-css */
   .card.home-game, #next-match-box.home-game { border-color: #fff !important; border-width: 2px; }
@@ -471,7 +467,7 @@
 
 <div class="header">
   <div class="header-title">
-    <img src="https://raw.githubusercontent.com/a-c-d-c/ochtrup-spielplan-pro/main/logo.png" class="header-logo" alt="TC 1928 Ochtrup Logo">
+    <img src="https://raw.githubusercontent.com/a-c-d-c/ochtrup-spielplan/main/logo.png" class="header-logo" alt="TC 1928 Ochtrup Logo">
     <h1>TC 1928 Ochtrup</h1>
   </div>
   <p>Spielplan · Münsterland · Sommer 2026</p>
@@ -543,37 +539,36 @@
 const CLUB_TEAMS_URL = 'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/clubTeams?club=26831';
 
 const TEAM_PALETTE = [
-  [90, 130, 210],  // Blau
-  [85, 175, 135],  // Smaragdgrün
-  [215, 160, 65],  // Bernstein
-  [220, 110, 90],  // Koralle
-  [140, 110, 215], // Violett
-  [215, 105, 145], // Pink
-  [210, 130, 80],  // Orange
-  [200, 165, 60],  // Gold
-  [180, 85, 120],  // Burgundy
-  [150, 120, 220], // Lavendel
-  [75, 175, 190],  // Türkis
-  [80, 150, 210],  // Himmelblau
-  [205, 160, 55],  // Ocker
-  [110, 175, 140], // Salbei
-  [145, 175, 80],  // Olive
-  [80, 160, 215],  // Azure
-  [120, 105, 210], // Indigo
-  [180, 100, 180], // Pflaume
-  [80, 170, 190],  // Ozean
-  [125, 150, 205], // Graublau
+  [75, 100, 152],  // Schieferblau
+  [78, 128, 102],  // Staubiges Salbei
+  [162, 122, 58],  // Warmes Bernstein
+  [172, 92, 78],   // Gedämpftes Koralle
+  [108, 85, 160],  // Sanftes Violett
+  [168, 85, 110],  // Dusty Rose
+  [165, 98, 68],   // Muted Sienna
+  [152, 125, 52],  // Warmes Messing
+  [140, 65, 90],   // Gedämpftes Burgundy
+  [118, 92, 165],  // Lavendel
+  [58, 125, 135],  // Staubtürkis
+  [62, 110, 150],  // Stahlblau
+  [155, 122, 45],  // Warmes Gold
+  [85, 128, 105],  // Meerwassergrün
+  [110, 128, 65],  // Olive
+  [62, 118, 152],  // Muted Azure
+  [90, 80, 155],   // Muted Indigo
+  [138, 75, 135],  // Gedämpftes Pflaume
+  [60, 126, 142],  // Schiefertürkis
+  [95, 108, 145],  // Pewter Blue
 ];
 
 let LEAGUES = [];
 
 function parseClubTeams(html) {
-  const decoded = html.replace(/&amp;/g, '&');
   const re = /href="([^"]*groupPage[^"]*[?&]group=(\d+)[^"]*)">([^<]+)/g;
   const results = [];
   let m, idx = 0;
-  while ((m = re.exec(decoded)) !== null) {
-    const relHref = m[1];
+  while ((m = re.exec(html)) !== null) {
+    const relHref = m[1].replace(/&amp;/g, '&');
     const group   = m[2];
     const label   = m[3].trim().replace(/\s+Gr\.\s*\d+.*$/i, '').trim();
     const color   = TEAM_PALETTE[idx % TEAM_PALETTE.length];
@@ -589,28 +584,15 @@ function parseClubTeams(html) {
 }
 
 function buildTeamCSS(leagues) {
-  const base = [18, 22, 42];
-  function blend(base, team, a) {
-    return base.map((v,i) => Math.min(255, Math.round(v*(1-a) + team[i]*a)));
-  }
-  function toHex(rgb) { return '#' + rgb.map(x=>x.toString(16).padStart(2,'0')).join(''); }
   return leagues.map(l => {
     const [r,g,b] = l.color;
-    const br = Math.round(r*0.5+130), bg = Math.round(g*0.5+130), bb = Math.round(b*0.5+130);
-    const bright  = '#' + [br,bg,bb].map(x=>Math.min(255,x).toString(16).padStart(2,'0')).join('');
-    const cardBg  = toHex(blend(base, [r,g,b], 0.38));
-    const border  = toHex(blend(base, [r,g,b], 0.72));
-    const tagBg   = toHex(blend(base, [r,g,b], 0.55));
-    return `.btn-${l.team}.on{border-color:${bright};background:${toHex(blend(base,[r,g,b],0.32))};color:#fff;}` +
-           `.card.${l.team}{background:${cardBg};border-color:${border};}` +
-           `.tag-${l.team}{background:${tagBg};color:#fff;font-weight:700;border:1px solid ${border};}`;
+    const br = Math.round(r*0.45+148), bg = Math.round(g*0.45+148), bb = Math.round(b*0.45+148);
+    const bright = '#' + [br,bg,bb].map(x=>Math.min(255,x).toString(16).padStart(2,'0')).join('');
+    const dark   = '#' + [r,g,b].map(x=>Math.max(0,Math.round(x*0.65)).toString(16).padStart(2,'0')).join('');
+    return `.btn-${l.team}.on{border-color:${bright};background:rgba(${r},${g},${b},0.13);}` +
+           `.card.${l.team}{background:rgba(${r},${g},${b},0.13);border-color:rgba(${r},${g},${b},0.20);}` +
+           `.tag-${l.team}{background:rgba(${r},${g},${b},0.22);color:#fff;font-weight:700;border:1px solid ${dark};}`;
   }).join('\n');
-}
-
-function formatTeamLabel(label) {
-  const m = label.match(/^(.*?)\s+((?:Kreis|Bezirks|M\u00fcnsterland|Verbands|Landes)\S*.*)$/i);
-  if (m) return esc(m[1]) + '<br><span style="font-size:0.78rem;opacity:0.8">' + esc(m[2]) + '</span>';
-  return esc(label);
 }
 
 function buildTeamButtons() {
@@ -620,14 +602,8 @@ function buildTeamButtons() {
     const btn = document.createElement('button');
     btn.className = 'btn btn-' + l.team + (showTeams[l.team] !== false ? ' on' : '');
     btn.id        = 'btn-' + l.team;
-    btn.innerHTML = '<span>' + formatTeamLabel(l.label) + '</span><span class="team-btn-rank" id="rank-' + l.team + '"></span>';
-    btn.querySelector('.team-btn-rank').addEventListener('click', () => {
-      if (!l.rank) return;
-      const row = document.getElementById('team-row');
-      if (row && row.classList.contains('visible')) toggleMannschaften();
-      showTable(l.team);
-    });
-    btn.addEventListener('click', e => { if (!e.target.classList.contains('team-btn-rank')) toggleTeam(l.team); });
+    btn.textContent = l.label;
+    btn.addEventListener('click', () => toggleTeam(l.team));
     container.appendChild(btn);
   });
   const refresh = document.createElement('button');
@@ -665,31 +641,7 @@ async function initLeagues() {
   applyLeagues();
 }
 
-function sortLeagues(leagues) {
-  function cat(label) {
-    if (/gemischt.*u8|u8/i.test(label))  return 0;
-    if (/gemischt.*u10|u10/i.test(label)) return 1;
-    if (/junior|mixed|u15/i.test(label))  return 2;
-    if (/damen/i.test(label))             return 3;
-    if (/herren/i.test(label))            return 4;
-    return 5;
-  }
-  function age(label) {
-    const m = label.match(/(?:Damen|Herren|Junioren|Mixed|Gemischt)\s+(?:U)?(\d+)(?!\s*er)/i);
-    return m ? parseInt(m[1]) : 0;
-  }
-  return [...leagues].sort((a, b) => {
-    const dc = cat(a.label) - cat(b.label);
-    if (dc !== 0) return dc;
-    const da = age(a.label) - age(b.label);
-    if (da !== 0) return da;
-    return a.label.localeCompare(b.label);
-  });
-}
-
 function applyLeagues() {
-  LEAGUES = sortLeagues(LEAGUES);
-  LEAGUES.forEach((l, i) => { l.color = TEAM_PALETTE[i % TEAM_PALETTE.length]; });
   document.getElementById('dynamic-team-css').textContent = buildTeamCSS(LEAGUES);
   LEAGUES.forEach(l => { if (showTeams[l.team] === undefined) showTeams[l.team] = true; });
   buildTeamButtons();
@@ -875,18 +827,6 @@ function parseLeague(html, league) {
 }
 
 /* ── Laden ─────────────────────────────────────────────────── */
-function extractOchtrupRank(html) {
-  const table = parseStandingsTable(html);
-  if (!table) return null;
-  for (const row of table.querySelectorAll('tr')) {
-    if (row.textContent.includes('Ochtrup')) {
-      const cells = [...row.querySelectorAll('td')];
-      return cells[1]?.textContent.trim() || null;
-    }
-  }
-  return null;
-}
-
 async function loadAllData() {
   const errBanner = document.getElementById('error-banner');
   const loadBanner = document.getElementById('loading-banner');
@@ -909,9 +849,6 @@ async function loadAllData() {
       fetchURL(league.url)
         .then(html => {
           leagueHtml[league.team] = html;
-          league.rank = extractOchtrupRank(html);
-          const rankEl = document.getElementById('rank-' + league.team);
-          if (rankEl && league.rank) rankEl.textContent = 'Rang ' + league.rank;
           allMatches = [...allMatches, ...parseLeague(html, league)]
             .sort((a, b) => a.date - b.date);
           renderNextMatch();
