@@ -267,8 +267,8 @@
     color: #c8cad8;
   }
   .standings-table td:nth-child(2) { text-align: left; color: #e8eaf0; }
-  .standings-table tr.ochtrup-row td { color: #fff; font-weight: 600; }
-  .standings-table tr.ochtrup-row td:nth-child(2) { color: #8aadd4; }
+  .standings-table tr.club-row td { color: #fff; font-weight: 600; }
+  .standings-table tr.club-row td:nth-child(2) { color: #8aadd4; }
 
   /* ── Report-View ── */
   #report-view { display: none; }
@@ -333,7 +333,7 @@
   .report-table td:nth-child(2),
   .report-table td:nth-child(4) { text-align: left; color: #e8eaf0; }
   .report-table tr.total-row td { color: #fff; font-weight: 700; border-top: 1px solid #3a3f5c; border-bottom: none; text-align: center; }
-  .report-table tr.ochtrup-player td { color: #fff; }
+  .report-table tr.club-player td { color: #fff; }
   .set-win  { color: #82c9a0; font-weight: 600; }
   .set-loss { color: #c47c7c; }
 
@@ -540,7 +540,11 @@
 <script>
 /* ── Konfiguration ─────────────────────────────────────────── */
 /* ── Dynamische Mannschaftsliste ───────────────────────────── */
+const CLUB_NAME      = 'Ochtrup';
 const CLUB_TEAMS_URL = 'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/clubTeams?club=26831';
+const LS_STATE       = 'spielplan-state';
+const LS_AUSWAHL     = 'spielplan-meine-auswahl';
+const LS_LEAGUES     = 'spielplan-leagues';
 
 // Kategorie-Paletten — hell → dunkel (jung → alt)
 const PALETTE_JUGEND = [
@@ -619,7 +623,7 @@ function buildTeamCSS(leagues) {
 }
 
 function formatTeamLabel(label) {
-  const m = label.match(/^(.*?)\s+((?:Kreis|Bezirks|M\u00fcnsterland|Verbands|Landes)\S*.*)$/i);
+  const m = label.match(/^(.*?)\s+((?:Kreis|Bezirks|M\u00fcnsterland|Verbands|Landes|Westfalen|Generali)\S*.*)$/i);
   if (m) return esc(m[1]) + '<br><span style="font-size:0.78rem;opacity:0.8">' + esc(m[2]) + '</span>';
   return esc(label);
 }
@@ -657,7 +661,7 @@ function buildTeamButtons() {
 
 async function initLeagues() {
   try {
-    const cached = JSON.parse(localStorage.getItem('spielplan-leagues') || 'null');
+    const cached = JSON.parse(localStorage.getItem(LS_LEAGUES) || 'null');
     if (cached && cached.ts && Date.now() - cached.ts < 24 * 3600 * 1000 && cached.leagues.length) {
       LEAGUES = cached.leagues;
       applyLeagues();
@@ -668,7 +672,7 @@ async function initLeagues() {
     const html = await fetchURL(CLUB_TEAMS_URL);
     LEAGUES = parseClubTeams(html);
     if (LEAGUES.length) {
-      localStorage.setItem('spielplan-leagues', JSON.stringify({ ts: Date.now(), leagues: LEAGUES }));
+      localStorage.setItem(LS_LEAGUES, JSON.stringify({ ts: Date.now(), leagues: LEAGUES }));
     }
   } catch(e) {
     console.warn('Mannschaftsliste konnte nicht geladen werden:', e.message);
@@ -719,7 +723,7 @@ let allMatches  = [];
 
 function loadState() {
   try {
-    const s = JSON.parse(localStorage.getItem('spielplan-state') || '{}');
+    const s = JSON.parse(localStorage.getItem(LS_STATE) || '{}');
     return {
       showPast:   s.showPast   !== undefined ? s.showPast   : false,
       showFuture: s.showFuture !== undefined ? s.showFuture : true,
@@ -734,7 +738,7 @@ function loadState() {
 }
 
 function saveState() {
-  localStorage.setItem('spielplan-state', JSON.stringify({ showPast, showFuture, showHome, showAway, showTeams, selectMode }));
+  localStorage.setItem(LS_STATE, JSON.stringify({ showPast, showFuture, showHome, showAway, showTeams, selectMode }));
 }
 
 const _state    = loadState();
@@ -830,8 +834,7 @@ function parseLeague(html, league) {
 
     if (cells.length < 3) continue;
 
-    /* Ochtrup in dieser Zeile? */
-    if (!texts.some(t => t.includes('Ochtrup'))) continue;
+    if (!texts.some(t => t.includes(CLUB_NAME))) continue;
 
     /* Zuletzt gesehenes Datum und Uhrzeit verwenden */
     const dateStr = lastDateStr;
@@ -845,7 +848,7 @@ function parseLeague(html, league) {
     const homeTeam = teamTexts[0];
     const awayTeam = teamTexts[1];
 
-    if (!homeTeam.includes('Ochtrup') && !awayTeam.includes('Ochtrup')) continue;
+    if (!homeTeam.includes(CLUB_NAME) && !awayTeam.includes(CLUB_NAME)) continue;
 
     /* Ergebnis: erste Zelle die genau X:Y enthält (keine Sub-Ergebnisse) */
     let result = 'offen';
@@ -883,25 +886,25 @@ function parseLeague(html, league) {
     matches.push({
       dateStr, timeStr, date,
       homeTeam, awayTeam, result, note, reportUrl,
-      isHome: homeTeam.includes('Ochtrup'),
+      isHome: homeTeam.includes(CLUB_NAME),
       team:   league.team,
       label:  league.label
     });
   }
 
   console.log('[' + league.label + '] ' + html.length +
-    ' B | Ochtrup: ' + html.includes('Ochtrup') +
+    ' B | ' + CLUB_NAME + ': ' + html.includes(CLUB_NAME) +
     ' | gefunden: ' + matches.length);
 
   return matches;
 }
 
 /* ── Laden ─────────────────────────────────────────────────── */
-function extractOchtrupRank(html) {
+function extractClubRank(html) {
   const table = parseStandingsTable(html);
   if (!table) return null;
   for (const row of table.querySelectorAll('tr')) {
-    if (row.textContent.includes('Ochtrup')) {
+    if (row.textContent.includes(CLUB_NAME)) {
       const cells = [...row.querySelectorAll('td')];
       return cells[1]?.textContent.trim() || null;
     }
@@ -930,7 +933,7 @@ async function loadAllData() {
     try {
       const html = await fetchURL(league.url);
       leagueHtml[league.team] = html;
-      league.rank = extractOchtrupRank(html);
+      league.rank = extractClubRank(html);
       const rankEl = document.getElementById('rank-' + league.team);
       if (rankEl && league.rank) rankEl.textContent = 'Rang ' + league.rank;
       allMatches = [...allMatches, ...parseLeague(html, league)]
@@ -1228,7 +1231,7 @@ function toggleMannschaften() {
   wrapper.classList.toggle('open', open);
 }
 
-async function refreshData() { localStorage.removeItem('spielplan-leagues'); await initLeagues(); await loadAllData(); }
+async function refreshData() { localStorage.removeItem(LS_LEAGUES); await initLeagues(); await loadAllData(); }
 
 /* ── Tabellen-Ansicht ──────────────────────────────────────── */
 function parseStandingsTable(html) {
@@ -1261,8 +1264,8 @@ function showTable(team) {
       const cells = [...row.querySelectorAll('td')];
       if (cells.length < 3) continue;
       const rowText = row.textContent;
-      const isOchtrup = rowText.includes('Ochtrup');
-      tableHtml += `<tr${isOchtrup ? ' class="ochtrup-row"' : ''}>`;
+      const isClub = rowText.includes(CLUB_NAME);
+      tableHtml += `<tr${isClub ? ' class="club-row"' : ''}>`;
       tableHtml += cells.map(c => `<td>${esc(c.textContent.trim())}</td>`).join('');
       tableHtml += '</tr>';
     }
@@ -1368,7 +1371,7 @@ function renderReport(html, m) {
 
       const lblCell = cells[0]?.textContent.trim() || '';
       const isTotal   = /^(einzel|doppel|gesamt)$/i.test(lblCell);
-      const isOchtrup = row.textContent.includes('Ochtrup') || row.textContent.includes('Nitsche');
+      const isClubPlayer = row.textContent.includes(CLUB_NAME);
 
       if (isHeader) {
         out += '<tr>' + cells.map(c => {
@@ -1395,7 +1398,7 @@ function renderReport(html, m) {
           /* "(Zahl)"-Klammern aus Doppel-Namen entfernen */
           const hName = esc((homePlayers[i] || '').replace(/\s*\(\d+\)\s*/g, '').trim());
           const aName = esc((awayPlayers[i] || '').replace(/\s*\(\d+\)\s*/g, '').trim());
-          const cls = isOchtrup ? ' class="ochtrup-player"' : '';
+          const cls = isClubPlayer ? ' class="club-player"' : '';
           out += `<tr${cls}>`;
           out += `<td>${esc(homeSeeds[i] || '')}</td><td style="text-align:left">${hName}</td><td></td>`;
           out += `<td>${esc(awaySeeds[i] || '')}</td><td style="text-align:left">${aName}</td><td></td>`;
@@ -1415,7 +1418,7 @@ function renderReport(html, m) {
         }
 
       } else {
-        const cls = isTotal ? ' class="total-row"' : isOchtrup ? ' class="ochtrup-player"' : '';
+        const cls = isTotal ? ' class="total-row"' : isClubPlayer ? ' class="club-player"' : '';
         out += `<tr${cls}>` + cells.map(c => {
           const origTxt = c.textContent.trim();
           const cs = c.colSpan > 1 ? ` colspan="${c.colSpan}"` : '';
@@ -1478,13 +1481,13 @@ function selectNoTeams() {
 let meineAuswahlActive = false;
 
 function loadMeineAuswahl() {
-  try { return JSON.parse(localStorage.getItem('spielplan-meine-auswahl')); }
+  try { return JSON.parse(localStorage.getItem(LS_AUSWAHL)); }
   catch { return null; }
 }
 
 function autoSaveMeineAuswahl() {
   if (!meineAuswahlActive) return;
-  localStorage.setItem('spielplan-meine-auswahl', JSON.stringify({ ...showTeams }));
+  localStorage.setItem(LS_AUSWAHL, JSON.stringify({ ...showTeams }));
 }
 
 function toggleMeineAuswahlMode() {
@@ -1529,7 +1532,7 @@ function toggleMeineAuswahlMode() {
     pressTimer = setTimeout(function() {
       if (!meineAuswahlActive) return;
       longPressFired = true;
-      localStorage.removeItem('spielplan-meine-auswahl');
+      localStorage.removeItem(LS_AUSWAHL);
       meineAuswahlActive = false;
       btn.classList.remove('on');
       LEAGUES.forEach(l => {
@@ -1585,6 +1588,7 @@ function toggleMeineAuswahlMode() {
   await loadAllData();
   setInterval(updateCountdowns, 1000);
 })();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 </script>
 </body>
 </html>
