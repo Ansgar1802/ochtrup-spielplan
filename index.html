@@ -542,28 +542,39 @@
 /* ── Dynamische Mannschaftsliste ───────────────────────────── */
 const CLUB_TEAMS_URL = 'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/clubTeams?club=26831';
 
-const TEAM_PALETTE = [
-  [90, 130, 210],  // Blau
-  [85, 175, 135],  // Smaragdgrün
-  [215, 160, 65],  // Bernstein
-  [220, 110, 90],  // Koralle
-  [140, 110, 215], // Violett
-  [215, 105, 145], // Pink
-  [210, 130, 80],  // Orange
-  [200, 165, 60],  // Gold
-  [180, 85, 120],  // Burgundy
-  [150, 120, 220], // Lavendel
-  [75, 175, 190],  // Türkis
-  [80, 150, 210],  // Himmelblau
-  [205, 160, 55],  // Ocker
-  [110, 175, 140], // Salbei
-  [145, 175, 80],  // Olive
-  [80, 160, 215],  // Azure
-  [120, 105, 210], // Indigo
-  [180, 100, 180], // Pflaume
-  [80, 170, 190],  // Ozean
-  [125, 150, 205], // Graublau
+// Kategorie-Paletten — hell → dunkel (jung → alt)
+const PALETTE_JUGEND = [
+  [155, 210, 255], // U8:            sehr helles Blau
+  [105, 175, 248], // U10:           helles Blau
+  [ 65, 138, 228], // U15 classic:   mittleres Blau
+  [ 35, 102, 200], // U15 2er:       Blau
+  [ 18,  70, 172], // Mixed U15:     dunkles Blau
 ];
+const PALETTE_DAMEN = [
+  [255, 178, 205], // Damen 4er:     sehr helles Pink
+  [248, 138, 172], // Damen 30 BZ:   helles Pink
+  [235, 100, 148], // Damen 30 KL:   mittleres Pink
+  [215,  65, 122], // Damen 40:      dunkles Pink
+  [188,  38,  95], // Damen 50:      tiefes Rosé
+  [158,  22,  70], // Damen 60:      dunkles Rosé
+];
+const PALETTE_HERREN = [
+  [130, 230, 148], // Herren 4er:    sehr helles Grün
+  [ 92, 208, 118], // Herren 30 KL:  helles Grün
+  [ 65, 188,  95], // Herren 30 K3:  mittel-hell
+  [ 42, 168,  75], // Herren 40 BK:  mittleres Grün
+  [ 25, 148,  58], // Herren 40 KL:  mittel-dunkel
+  [ 16, 130,  46], // Herren 50 KL:  dunkles Grün
+  [ 10, 112,  36], // Herren 50 D:   dunkler
+  [  6,  94,  28], // Herren 60:     sehr dunkel
+  [  3,  78,  22], // Herren 65 D:   tiefstes Grün
+];
+function teamColor(label, catIdx) {
+  if (/gemischt|junior|mixed|u8|u10|u15/i.test(label)) return PALETTE_JUGEND[catIdx % PALETTE_JUGEND.length];
+  if (/damen/i.test(label))  return PALETTE_DAMEN[catIdx  % PALETTE_DAMEN.length];
+  if (/herren/i.test(label)) return PALETTE_HERREN[catIdx % PALETTE_HERREN.length];
+  return PALETTE_JUGEND[catIdx % PALETTE_JUGEND.length];
+}
 
 let LEAGUES = [];
 
@@ -576,7 +587,7 @@ function parseClubTeams(html) {
     const relHref = m[1];
     const group   = m[2];
     const label   = m[3].trim().replace(/\s+Gr\.\s*\d+.*$/i, '').trim();
-    const color   = TEAM_PALETTE[idx % TEAM_PALETTE.length];
+    const color   = [128, 128, 128]; // wird in applyLeagues überschrieben
     results.push({
       team:  'g' + group,
       label,
@@ -601,7 +612,9 @@ function buildTeamCSS(leagues) {
     const cardBg  = toHex(blend(base, [r,g,b], 0.38));
     const border  = toHex(blend(base, [r,g,b], 0.72));
     const tagBg   = toHex(blend(base, [r,g,b], 0.55));
-    return `.btn-${l.team}.on{border-color:${bright};background:${toHex(blend(base,[r,g,b],0.32))};color:#fff;}` +
+    const dimText = '#' + blend([144,149,176],[r,g,b],0.45).map(x=>x.toString(16).padStart(2,'0')).join('');
+    return `.btn-${l.team}{border-color:rgba(${r},${g},${b},0.28);background:rgba(${r},${g},${b},0.07);color:${dimText};}` +
+           `.btn-${l.team}.on{border-color:${bright};background:${toHex(blend(base,[r,g,b],0.32))};color:#fff;}` +
            `.card.${l.team}{background:${cardBg};border-color:${border};}` +
            `.tag-${l.team}{background:${tagBg};color:#fff;font-weight:700;border:1px solid ${border};}`;
   }).join('\n');
@@ -689,7 +702,12 @@ function sortLeagues(leagues) {
 
 function applyLeagues() {
   LEAGUES = sortLeagues(LEAGUES);
-  LEAGUES.forEach((l, i) => { l.color = TEAM_PALETTE[i % TEAM_PALETTE.length]; });
+  const catIdx = {};
+  LEAGUES.forEach(l => {
+    const cat = /gemischt|junior|mixed|u8|u10|u15/i.test(l.label) ? 'j' : /damen/i.test(l.label) ? 'd' : 'h';
+    catIdx[cat] = (catIdx[cat] || 0);
+    l.color = teamColor(l.label, catIdx[cat]++);
+  });
   document.getElementById('dynamic-team-css').textContent = buildTeamCSS(LEAGUES);
   LEAGUES.forEach(l => { if (showTeams[l.team] === undefined) showTeams[l.team] = true; });
   buildTeamButtons();
