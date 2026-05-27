@@ -1316,7 +1316,13 @@ function toggleMannschaften() {
   const open    = row.classList.toggle('visible');
   btn.classList.toggle('on', open);
   wrapper.classList.toggle('open', open);
-  if (!open) backToList();
+  if (open) {
+    document.getElementById('matches-container').style.display = 'none';
+    document.getElementById('next-match-box').style.display = 'none';
+    document.getElementById('update-info').style.display = 'none';
+  } else {
+    backToList();
+  }
 }
 
 async function refreshData() { localStorage.removeItem(LS_LEAGUES); await initLeagues(); await loadAllData(); }
