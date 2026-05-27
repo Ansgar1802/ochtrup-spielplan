@@ -172,7 +172,7 @@
   .btn-mannschaften::after { content: ' ▼'; font-size: 0.72em; opacity: 0.6; }
   .btn-mannschaften.on::after { content: ' ▲'; opacity: 1; }
   .btn-mannschaften:hover { background: #1a1d2e; color: #9095b0; border-color: #444a68; }
-  .btn-mannschaften.on { color: #fff; font-weight: 700; border-color: #9095b0; background: rgba(144,149,176,0.08); }
+  .btn-mannschaften.on { color: #fff; font-weight: 700; border-color: #9095b0; background: rgba(144,149,176,0.08); animation: blink 1s step-end infinite; }
   .team-row { display: none; }
   .team-row .btn { color: #9095b0; width: 100%; display: flex; justify-content: space-between; align-items: center; text-align: left; padding: 10px 13px; font-size: 0.88rem; white-space: normal; }
   .top-btns-row .btn { display: block; text-align: center; justify-content: center; }
@@ -228,16 +228,19 @@
     margin-bottom: 18px;
   }
   .btn-back {
-    background: none;
-    border: 1px solid #3a3f5c;
-    color: #9095b0;
+    background: rgba(144,149,176,0.1);
+    border: 1px solid #6a6f8c;
+    color: #c8cade;
     border-radius: 8px;
-    padding: 6px 14px;
-    font-size: 0.8rem;
+    padding: 8px 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
     cursor: pointer;
     font-family: inherit;
   }
-  .btn-back:hover { border-color: #7a7f96; color: #e8eaf0; }
+  .btn-back:hover { border-color: #9095b0; color: #fff; background: rgba(144,149,176,0.2); }
+  #report-tabelle-btn { background: rgba(100,140,220,0.15); border-color: #4a6aaa; color: #8aadd4; }
+  #report-tabelle-btn:hover { border-color: #8aadd4; color: #fff; background: rgba(100,140,220,0.28); }
   .detail-title {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 1.4rem;
@@ -1263,6 +1266,7 @@ function toggleMannschaften() {
   const open    = row.classList.toggle('visible');
   btn.classList.toggle('on', open);
   wrapper.classList.toggle('open', open);
+  if (!open) backToList();
 }
 
 async function refreshData() { localStorage.removeItem(LS_LEAGUES); await initLeagues(); await loadAllData(); }
