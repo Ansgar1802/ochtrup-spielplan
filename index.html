@@ -216,7 +216,23 @@
   }
   /* Karten-Farben werden dynamisch per JS generiert → siehe #dynamic-team-css */
   .card.home-game, #next-match-box.home-game { border-color: #fff !important; border-width: 2px; }
-  .card.past-game   { opacity: 0.55; }
+  .card.past-game   { filter: brightness(0.58); }
+  .card.past-game .result {
+    filter: brightness(1.9);
+    font-size: 1.3rem;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.05em;
+    background: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 2px 13px 1px;
+    cursor: pointer;
+    line-height: 1.5;
+  }
+  .card.past-game .result.win  { color: #1a6e3a; }
+  .card.past-game .result.loss { color: #8a2020; }
+  .card.past-game .result.draw { color: #7a5a00; }
+  .card.past-game .result.open { background: transparent; color: #444a68; }
   .past-divider     { height: 32px; }
 
   /* ── Detail-View (Tabelle) ── */
@@ -1216,7 +1232,9 @@ function renderMatches() {
   <div class="card-match">${homeSpan}<span class="vs">vs.</span>${awaySpan}</div>
   <div class="card-bottom">
     <span class="note">${m.note ? esc(m.note) : ''}</span>
-    <span class="result ${resultCls(m.result, m.isHome)}">${resultTxt(m.result)}</span>
+    ${past && m.reportUrl
+      ? `<button class="result ${resultCls(m.result, m.isHome)}" onclick="event.stopPropagation();showReport('${m.team}','${m.reportUrl}',allMatches.find(x=>x.reportUrl==='${m.reportUrl}'))">${resultTxt(m.result)}</button>`
+      : `<span class="result ${resultCls(m.result, m.isHome)}">${resultTxt(m.result)}</span>`}
   </div>
 </div>`;
   }).join('\n');
