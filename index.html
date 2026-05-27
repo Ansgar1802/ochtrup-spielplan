@@ -553,33 +553,41 @@ const LS_LEAGUES     = 'spielplan-leagues';
 
 // Kategorie-Paletten — hell → dunkel (jung → alt)
 const PALETTE_JUGEND = [
-  [155, 210, 255], // U8:            sehr helles Blau
-  [105, 175, 248], // U10:           helles Blau
-  [ 65, 138, 228], // U15 classic:   mittleres Blau
-  [ 35, 102, 200], // U15 2er:       Blau
-  [ 18,  70, 172], // Mixed U15:     dunkles Blau
+  [155, 210, 255], // sehr helles Blau (U8)
+  [128, 193, 252],
+  [102, 175, 248],
+  [ 78, 156, 240],
+  [ 58, 136, 228],
+  [ 40, 115, 212],
+  [ 26,  95, 192],
+  [ 15,  76, 170],
+  [  8,  58, 146],
+  [  3,  42, 122], // tiefstes Blau (U18+)
 ];
 const PALETTE_DAMEN = [
-  [255, 178, 205], // Damen 4er:     sehr helles Pink
-  [248, 138, 172], // Damen 30 BZ:   helles Pink
-  [235, 100, 148], // Damen 30 KL:   mittleres Pink
-  [215,  65, 122], // Damen 40:      dunkles Pink
-  [188,  38,  95], // Damen 50:      tiefes Rosé
-  [158,  22,  70], // Damen 60:      dunkles Rosé
+  [255, 178, 205],
+  [248, 138, 172],
+  [235, 100, 148],
+  [215,  65, 122],
+  [188,  38,  95],
+  [158,  22,  70],
 ];
 const PALETTE_HERREN = [
-  [130, 230, 148], // Herren 4er:    sehr helles Grün
-  [ 92, 208, 118], // Herren 30 KL:  helles Grün
-  [ 65, 188,  95], // Herren 30 K3:  mittel-hell
-  [ 42, 168,  75], // Herren 40 BK:  mittleres Grün
-  [ 25, 148,  58], // Herren 40 KL:  mittel-dunkel
-  [ 16, 130,  46], // Herren 50 KL:  dunkles Grün
-  [ 10, 112,  36], // Herren 50 D:   dunkler
-  [  6,  94,  28], // Herren 60:     sehr dunkel
-  [  3,  78,  22], // Herren 65 D:   tiefstes Grün
+  [130, 230, 148],
+  [ 92, 208, 118],
+  [ 65, 188,  95],
+  [ 42, 168,  75],
+  [ 25, 148,  58],
+  [ 16, 130,  46],
+  [ 10, 112,  36],
+  [  6,  94,  28],
+  [  3,  78,  22],
 ];
+function isJugend(label) {
+  return /\bU\d+|\bgemischt\b|\bjunior|\bmixed\b/i.test(label);
+}
 function teamColor(label, catIdx) {
-  if (/gemischt|junior|mixed|u8|u10|u15/i.test(label)) return PALETTE_JUGEND[catIdx % PALETTE_JUGEND.length];
+  if (isJugend(label))       return PALETTE_JUGEND[catIdx % PALETTE_JUGEND.length];
   if (/damen/i.test(label))  return PALETTE_DAMEN[catIdx  % PALETTE_DAMEN.length];
   if (/herren/i.test(label)) return PALETTE_HERREN[catIdx % PALETTE_HERREN.length];
   return PALETTE_JUGEND[catIdx % PALETTE_JUGEND.length];
@@ -686,21 +694,35 @@ async function initLeagues() {
 }
 
 function sortLeagues(leagues) {
-  function cat(label) {
-    if (/gemischt.*u8|u8/i.test(label))  return 0;
-    if (/gemischt.*u10|u10/i.test(label)) return 1;
-    if (/junior|mixed|u15/i.test(label))  return 2;
-    if (/damen/i.test(label))             return 3;
-    if (/herren/i.test(label))            return 4;
-    return 5;
+  function mainCat(label) {
+    if (isJugend(label))       return 0;
+    if (/damen/i.test(label))  return 1;
+    if (/herren/i.test(label)) return 2;
+    return 3;
+  }
+  function uNum(label) {
+    const m = label.match(/\bU(\d+)/i);
+    return m ? parseInt(m[1]) : 99;
+  }
+  function subCat(label) {
+    if (/gemischt/i.test(label))    return 0;
+    if (/junioren\b/i.test(label))  return 1;
+    if (/juniorinnen/i.test(label)) return 2;
+    if (/mixed/i.test(label))       return 3;
+    return 4;
   }
   function age(label) {
-    const m = label.match(/(?:Damen|Herren|Junioren|Mixed|Gemischt)\s+(?:U)?(\d+)(?!\s*er)/i);
+    const m = label.match(/(?:Damen|Herren)\s+(?:U)?(\d+)(?!\s*er)/i);
     return m ? parseInt(m[1]) : 0;
   }
   return [...leagues].sort((a, b) => {
-    const dc = cat(a.label) - cat(b.label);
+    const dc = mainCat(a.label) - mainCat(b.label);
     if (dc !== 0) return dc;
+    if (mainCat(a.label) === 0) {
+      const du = uNum(a.label) - uNum(b.label);
+      if (du !== 0) return du;
+      return subCat(a.label) - subCat(b.label);
+    }
     const da = age(a.label) - age(b.label);
     if (da !== 0) return da;
     return a.label.localeCompare(b.label);
@@ -709,12 +731,18 @@ function sortLeagues(leagues) {
 
 function applyLeagues() {
   LEAGUES = sortLeagues(LEAGUES);
-  const catIdx = {};
-  LEAGUES.forEach(l => {
-    const cat = /gemischt|junior|mixed|u8|u10|u15/i.test(l.label) ? 'j' : /damen/i.test(l.label) ? 'd' : 'h';
-    catIdx[cat] = (catIdx[cat] || 0);
-    l.color = teamColor(l.label, catIdx[cat]++);
-  });
+  function spreadColors(teams, palette) {
+    const n = teams.length;
+    teams.forEach((l, i) => {
+      const idx = n <= 1 ? 0 : Math.round(i / (n - 1) * (palette.length - 1));
+      l.color = palette[idx];
+    });
+  }
+  spreadColors(LEAGUES.filter(l => isJugend(l.label)),            PALETTE_JUGEND);
+  spreadColors(LEAGUES.filter(l => /damen/i.test(l.label)),       PALETTE_DAMEN);
+  spreadColors(LEAGUES.filter(l => /herren/i.test(l.label)),      PALETTE_HERREN);
+  LEAGUES.filter(l => !isJugend(l.label) && !/damen|herren/i.test(l.label))
+         .forEach(l => l.color = PALETTE_JUGEND[0]);
   document.getElementById('dynamic-team-css').textContent = buildTeamCSS(LEAGUES);
   LEAGUES.forEach(l => { if (showTeams[l.team] === undefined) showTeams[l.team] = true; });
   buildTeamButtons();
