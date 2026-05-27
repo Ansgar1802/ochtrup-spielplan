@@ -74,7 +74,7 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 0;
-    min-height: 135px;
+    min-height: calc(4.4rem + 4.2em + 75px);
   }
   .nm-top-row {
     display: flex;
@@ -109,7 +109,7 @@
     margin-top: 10px;
     line-height: 1.4;
     width: 100%;
-    min-height: 2.8em;
+    min-height: 4.2em;
   }
   .nm-league {
     display: inline-block;
@@ -530,7 +530,7 @@
 <!-- Nächstes Spiel -->
 <div id="next-match-box" class="next-match-box">
   <div class="nm-label">Nächstes Spiel</div>
-  <div class="nm-top-row">
+  <div class="nm-top-row" id="nm-top-row">
     <div class="nm-left-col">
       <div class="nm-date"   id="nm-date"></div>
       <div class="nm-league" id="nm-league"></div>
@@ -1110,6 +1110,8 @@ function renderNextMatch() {
     nl.textContent = ''; nl.className = 'nm-league';
     document.getElementById('nm-days').textContent   = '';
     document.getElementById('nm-unit').textContent   = '';
+    const nmT = document.getElementById('nm-teams');
+    nmT.style.flexDirection = 'column'; nmT.style.justifyContent = 'center'; nmT.style.marginTop = '-3rem';
     box.classList.remove('home-game');
     box.style.display = 'flex';
     return;
@@ -1129,11 +1131,15 @@ function renderNextMatch() {
     nl2.textContent = ''; nl2.className = 'nm-league';
     document.getElementById('nm-days').textContent = '';
     document.getElementById('nm-unit').textContent = '';
+    const nmT2 = document.getElementById('nm-teams');
+    nmT2.style.flexDirection = 'column'; nmT2.style.justifyContent = 'center'; nmT2.style.marginTop = '-3rem';
     box.classList.remove('home-game');
     box.style.display = 'flex';
     return;
   }
 
+  const nmTr = document.getElementById('nm-teams');
+  nmTr.style.flexDirection = ''; nmTr.style.justifyContent = ''; nmTr.style.marginTop = '';
   box.classList.toggle('home-game', next.isHome);
   clearTimeout(_homeBlinkTimer);
   const homeAwaySpan = next.isHome
