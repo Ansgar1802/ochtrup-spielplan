@@ -1117,7 +1117,18 @@ function renderNextMatch() {
     const d = new Date(m.date); d.setHours(0, 0, 0, 0);
     return d >= today && showFuture && showTeams[m.team] && (m.isHome ? showHome : showAway);
   });
-  if (!next) return;
+  if (!next) {
+    document.getElementById('nm-date').innerHTML  = '';
+    document.getElementById('nm-teams').innerHTML =
+      '<span style="font-size:1.05rem;text-align:center;width:100%;display:block">Bei dieser Auswahl gibt es keine aktuellen Spiele</span>';
+    const nl2 = document.getElementById('nm-league');
+    nl2.textContent = ''; nl2.className = 'nm-league';
+    document.getElementById('nm-days').textContent = '';
+    document.getElementById('nm-unit').textContent = '';
+    box.classList.remove('home-game');
+    box.style.display = 'flex';
+    return;
+  }
 
   box.classList.toggle('home-game', next.isHome);
   clearTimeout(_homeBlinkTimer);
