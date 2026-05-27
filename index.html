@@ -1247,12 +1247,8 @@ function renderMatches() {
       ? '<div class="past-divider"></div>'
       : '';
 
-    const cardClick = m.reportUrl
-      ? `onclick="showReport('${m.team}','${m.reportUrl}',allMatches.find(x=>x.reportUrl==='${m.reportUrl}'))" style="cursor:pointer"`
-      : '';
-
-    return divider + `<div class="card ${teamCls}${extra}" ${cardClick}>
-  <div class="card-tag-row"><span class="tag ${tagCls}">${m.label}</span></div>
+    return divider + `<div class="card ${teamCls}${extra}">
+  <div class="card-tag-row"><span class="tag ${tagCls}" onclick="openMannschaften(event)" style="cursor:pointer">${m.label}</span></div>
   <div class="card-top">
     <span class="card-date">${wd} ${m.dateStr}<span class="card-time"> · ${m.timeStr}</span></span>
     ${past ? '' : `<span class="card-countdown" data-matchtime="${matchDateTime(m.date, m.timeStr).getTime()}">${countdownLabel(m.date, m.timeStr)}</span>`}
@@ -1262,7 +1258,7 @@ function renderMatches() {
   <div class="card-bottom">
     <span class="note">${m.note ? esc(m.note) : ''}</span>
     ${past && m.reportUrl
-      ? `<button class="result ${resultCls(m.result, m.isHome)}" onclick="event.stopPropagation();showReport('${m.team}','${m.reportUrl}',allMatches.find(x=>x.reportUrl==='${m.reportUrl}'))">${resultTxt(m.result)}</button>`
+      ? `<button class="result ${resultCls(m.result, m.isHome)}" onclick="showReport('${m.team}','${m.reportUrl}',allMatches.find(x=>x.reportUrl==='${m.reportUrl}'))">${resultTxt(m.result)}</button>`
       : `<span class="result ${resultCls(m.result, m.isHome)}">${resultTxt(m.result)}</span>`}
   </div>
 </div>`;
@@ -1304,6 +1300,13 @@ function applyStateToButtons() {
   });
   document.getElementById('btn-select-all').classList.toggle('on', selectMode === 'all');
   document.getElementById('btn-select-none').classList.toggle('on', selectMode === 'none');
+}
+
+function openMannschaften(e) {
+  if (e) e.stopPropagation();
+  const row = document.getElementById('team-row');
+  if (!row.classList.contains('visible')) toggleMannschaften();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function toggleMannschaften() {
