@@ -23,8 +23,29 @@
     margin: 0 auto;
   }
 
-  .header { text-align: center; margin-bottom: 20px; }
+  .header { text-align: center; margin-bottom: 20px; position: relative; }
   .header-title { display: flex; align-items: center; justify-content: center; gap: 12px; }
+  .btn-info {
+    position: absolute; top: 0; right: 0;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1px solid #3a3f60;
+    background: rgba(144,149,176,0.08);
+    color: #9095b0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-style: italic;
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: Georgia, serif;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .btn-info:hover { border-color: #9095b0; color: #fff; }
+  #info-view { display: none; }
+  .info-content { color: #c8cade; font-size: 0.9rem; line-height: 1.7; padding-top: 8px; }
+  .info-content h2 { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.06em; color: #fff; margin: 18px 0 6px; }
+  .info-content p  { margin: 0 0 10px; }
+  .info-content a  { color: #8aadd4; }
   .header-logo { height: 42px; width: auto; }
   .header h1 {
     font-family: 'Bebas Neue', sans-serif;
@@ -37,6 +58,7 @@
     color: #7a7f96;
     font-size: 0.75rem;
     margin-top: 5px;
+    margin-bottom: 0;
     letter-spacing: 0.05em;
     text-transform: uppercase;
   }
@@ -494,6 +516,7 @@
 <body>
 
 <div class="header">
+  <button class="btn-info" onclick="showInfo()" title="Info">i</button>
   <div class="header-title">
     <img src="https://raw.githubusercontent.com/a-c-d-c/ochtrup-spielplan-pro/main/logo.png" class="header-logo" alt="TC 1928 Ochtrup Logo">
     <h1>TC 1928 Ochtrup</h1>
@@ -518,7 +541,7 @@
 </div>
 
 <!-- Filter-Buttons -->
-<div class="controls">
+<div class="controls" id="controls-bar">
   <div class="controls-row">
     <button class="btn btn-filter"    id="btn-vergangen" onclick="toggleFilter('showPast')">Vergangen</button>
     <button class="btn btn-filter on" id="btn-aktuell"   onclick="toggleFilter('showFuture')">Aktuell</button>
@@ -560,6 +583,12 @@
   <div id="report-content"></div>
 </div>
 
+<div id="info-view">
+  <div class="detail-header">
+    <button class="btn-back" onclick="backToList()">← Zurück</button>
+  </div>
+  <div class="info-content" id="info-content"></div>
+</div>
 
 <script>
 /* ── Konfiguration ─────────────────────────────────────────── */
@@ -1340,8 +1369,37 @@ function showTable(team) {
 function backToList() {
   document.getElementById('detail-view').style.display = 'none';
   document.getElementById('report-view').style.display = 'none';
+  document.getElementById('info-view').style.display = 'none';
   document.getElementById('matches-container').style.display = '';
   document.getElementById('update-info').style.display = '';
+  document.getElementById('controls-bar').style.display = '';
+  document.getElementById('next-match-box').style.display = '';
+  document.getElementById('error-banner').style.display = '';
+  document.getElementById('loading-banner').style.display = '';
+}
+
+async function showInfo() {
+  if (document.getElementById('info-view').style.display === 'block') { backToList(); return; }
+  document.getElementById('matches-container').style.display = 'none';
+  document.getElementById('update-info').style.display = 'none';
+  document.getElementById('detail-view').style.display = 'none';
+  document.getElementById('report-view').style.display = 'none';
+  document.getElementById('controls-bar').style.display = 'none';
+  document.getElementById('next-match-box').style.display = 'none';
+  document.getElementById('error-banner').style.display = 'none';
+  document.getElementById('loading-banner').style.display = 'none';
+  document.getElementById('info-view').style.display = 'block';
+  window.scrollTo(0, 0);
+  const el = document.getElementById('info-content');
+  try {
+    const res = await fetch('./info.html');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const html = await res.text();
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    el.innerHTML = doc.body ? doc.body.innerHTML : html;
+  } catch(e) {
+    el.innerHTML = '<p style="color:#b87070">Info-Seite konnte nicht geladen werden.</p>';
+  }
 }
 
 let _reportTeam = '';
