@@ -1120,7 +1120,9 @@ function renderNextMatch() {
   if (!next) {
     document.getElementById('nm-date').innerHTML  = '';
     document.getElementById('nm-teams').innerHTML =
-      '<span style="font-size:1.05rem;text-align:center;width:100%;display:block">Bei dieser Auswahl gibt es keine aktuellen Spiele</span>';
+      '<span style="font-size:1.05rem;text-align:center;width:100%;display:block">Bei dieser Auswahl gibt es keine aktuellen Spiele' +
+      (!showFuture ? '<br><span style="font-size:0.85rem;opacity:0.6">(Button „AKTUELL" nicht aktiv)</span>' : '') +
+      '</span>';
     const nl2 = document.getElementById('nm-league');
     nl2.textContent = ''; nl2.className = 'nm-league';
     document.getElementById('nm-days').textContent = '';
