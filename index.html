@@ -123,6 +123,7 @@
     margin-top: 8px;
     white-space: nowrap;
   }
+  .nm-league:empty { display: none; }
   .nm-date { font-size: 0.88rem; color: #c8cae0; margin-top: 2px; }
   .nm-right { text-align: right; flex-shrink: 0; }
   .nm-days {
@@ -1101,8 +1102,8 @@ function renderNextMatch() {
   const box = document.getElementById('next-match-box');
   const noTeams = LEAGUES.every(l => !showTeams[l.team]);
   if (noTeams) {
-    document.getElementById('nm-date').textContent   = 'Keine Mannschaften ausgewählt';
-    document.getElementById('nm-teams').innerHTML    = '';
+    document.getElementById('nm-date').innerHTML     = '';
+    document.getElementById('nm-teams').innerHTML    = '<span style="font-size:1.05rem;text-align:center;width:100%;display:block">Keine Mannschaften ausgewählt</span>';
     const nl = document.getElementById('nm-league');
     nl.textContent = ''; nl.className = 'nm-league';
     document.getElementById('nm-days').textContent   = '';
