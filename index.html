@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>TC 1928 Ochtrup – Spielplan 2026</title>
+<title>TV Feldmark Dorsten – Spielplan 2026</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="logo2.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -572,10 +572,10 @@
   <button class="btn-settings" onclick="showSettings()" title="Einstellungen">⚙</button>
   <button class="btn-info" onclick="showInfo()" title="Info">i</button>
   <div class="header-title">
-    <img src="logo.png" class="header-logo" alt="TC 1928 Ochtrup Logo" onerror="this.style.display='none'">
-    <h1>TC 1928 Ochtrup</h1>
+    <img src="logo.png" class="header-logo" alt="TV Feldmark Dorsten Logo" onerror="this.style.display='none'">
+    <h1>TV Feldmark Dorsten</h1>
   </div>
-  <p>Spielplan · Münsterland · Sommer 2026</p>
+  <p>Spielplan · Ruhrgebiet · Sommer 2026</p>
 </div>
 
 <!-- Nächstes Spiel -->
@@ -663,12 +663,12 @@
 <script>
 /* ── Konfiguration ─────────────────────────────────────────── */
 /* ── Dynamische Mannschaftsliste ───────────────────────────── */
-const CLUB_NAME      = 'Ochtrup';
-const CLUB_TEAMS_URL = 'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/clubTeams?club=26831';
-const LS_STATE       = 'spielplan-state';
-const LS_AUSWAHL     = 'spielplan-meine-auswahl';
-const LS_LEAGUES     = 'spielplan-leagues';
-const LS_THEME       = 'spielplan-theme';
+const CLUB_NAME      = 'Feldmark';
+const CLUB_TEAMS_URL = 'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/clubTeams?club=25977';
+const LS_STATE       = 'feldmark-state';
+const LS_AUSWAHL     = 'feldmark-meine-auswahl';
+const LS_LEAGUES     = 'feldmark-leagues';
+const LS_THEME       = 'feldmark-theme';
 
 const LIGHT_THEME_CSS = `
   body { background: #f0f2f8; }
@@ -980,8 +980,13 @@ const WEEKDAYS = ['So.','Mo.','Di.','Mi.','Do.','Fr.','Sa.'];
 let allMatches  = [];
 
 function loadState() {
+  const raw = localStorage.getItem(LS_STATE);
+  if (raw === null) {
+    // Erster Start: AKTUELL + HEIM + AUSWÄRTS aktiv, alle Mannschaften, MEINE AUSWAHL leer
+    return { showPast: false, showFuture: true, showHome: true, showAway: true, showTeams: {}, selectMode: 'all' };
+  }
   try {
-    const s = JSON.parse(localStorage.getItem(LS_STATE) || '{}');
+    const s = JSON.parse(raw);
     return {
       showPast:   s.showPast   !== undefined ? s.showPast   : false,
       showFuture: s.showFuture !== undefined ? s.showFuture : true,
@@ -991,7 +996,7 @@ function loadState() {
       selectMode: s.selectMode || null
     };
   } catch(e) {
-    return { showPast: false, showFuture: true, showHome: true, showAway: true, showTeams: {}, selectMode: null };
+    return { showPast: false, showFuture: true, showHome: true, showAway: true, showTeams: {}, selectMode: 'all' };
   }
 }
 
@@ -1915,6 +1920,59 @@ setTheme(localStorage.getItem(LS_THEME) || 'light');
   setInterval(updateCountdowns, 1000);
 })();
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+
+/* ── Homescreen-Icon: Vereinsname wenn kein logo2.png vorhanden ── */
+(function() {
+  const img = new Image();
+  img.onerror = function() {
+    document.fonts.ready.then(function() {
+      const S = 512;
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = S;
+      const ctx = canvas.getContext('2d');
+
+      // Abgerundeter Hintergrund
+      const r = S * 0.18;
+      ctx.beginPath();
+      ctx.moveTo(r, 0); ctx.lineTo(S - r, 0);
+      ctx.quadraticCurveTo(S, 0, S, r);
+      ctx.lineTo(S, S - r);
+      ctx.quadraticCurveTo(S, S, S - r, S);
+      ctx.lineTo(r, S);
+      ctx.quadraticCurveTo(0, S, 0, S - r);
+      ctx.lineTo(0, r);
+      ctx.quadraticCurveTo(0, 0, r, 0);
+      ctx.closePath();
+      ctx.fillStyle = '#1a1d2e';
+      ctx.fill();
+
+      // Jedes Wort = eigene Zeile
+      const name = (document.querySelector('.header h1')?.textContent || '').trim();
+      const lines = name.split(' ');
+      const maxW = S * 0.82;
+
+      // Schriftgröße: breitestes Wort füllt maxW, Zeilen passen in 82 % der Höhe
+      const maxFsByHeight = Math.floor(S * 0.82 / (lines.length * 1.2));
+      let fs = Math.min(160, maxFsByHeight);
+      while (fs >= 20) {
+        ctx.font = `700 ${fs}px 'Bebas Neue', sans-serif`;
+        if (Math.max(...lines.map(l => ctx.measureText(l).width)) <= maxW) break;
+        fs -= 2;
+      }
+
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const lineH = fs * 1.2;
+      const startY = (S - lines.length * lineH) / 2 + lineH / 2;
+      lines.forEach((l, i) => ctx.fillText(l, S / 2, startY + i * lineH));
+
+      const link = document.querySelector('link[rel="apple-touch-icon"]');
+      if (link) link.href = canvas.toDataURL('image/png');
+    });
+  };
+  img.src = 'logo2.png';
+})();
 </script>
 </body>
 </html>
