@@ -531,10 +531,10 @@
     -webkit-overflow-scrolling: touch;
     z-index: 10;
     background: #0f1117;
-    padding: 20px 16px 40px;
+    padding: 20px max(16px, calc((100% - 608px) / 2)) 40px;
   }
   /* Report-View: Flex-Struktur für zuverlässiges iOS-Scroll */
-  #report-view { overflow: hidden; flex-direction: column; padding: 20px 16px 0; }
+  #report-view { overflow: hidden; flex-direction: column; padding: 20px max(16px, calc((100% - 608px) / 2)) 0; }
   #report-scroll {
     flex: 1;
     min-height: 0;
