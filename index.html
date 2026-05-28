@@ -1484,7 +1484,6 @@ function toggleFilter(name) {
 }
 
 function toggleTeam(team) {
-  backToList();
   showTeams[team] = !showTeams[team];
   document.getElementById('btn-' + team).classList.toggle('on', showTeams[team]);
   saveState();
