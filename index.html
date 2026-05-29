@@ -1842,7 +1842,7 @@ function renderNextMatch() {
     if (ms0 > 0) {
       const h0 = Math.floor(ms0/3600000), m0 = Math.floor((ms0%3600000)/60000), s0 = Math.floor((ms0%60000)/1000);
       dEl.textContent = String(h0).padStart(2,'0')+':'+String(m0).padStart(2,'0')+':'+String(s0).padStart(2,'0');
-    } else { dEl.textContent = 'läuft'; delete dEl.dataset.nmMatchtime; }
+    } else { dEl.textContent = 'läuft'; dEl.classList.add('blink'); delete dEl.dataset.nmMatchtime; }
   } else {
     delete dEl.dataset.nmMatchtime;
     dEl.textContent = diff;    dEl.className = 'nm-days';
@@ -1895,6 +1895,7 @@ function updateCountdowns() {
       nmDays.textContent = String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
     } else {
       nmDays.textContent = 'läuft';
+      nmDays.classList.add('blink');
       delete nmDays.dataset.nmMatchtime;
     }
   }
