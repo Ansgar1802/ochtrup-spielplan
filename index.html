@@ -497,12 +497,14 @@
   .standings-table td {
     text-align: center;
     padding: 8px 4px;
-    border-bottom: 1px solid #1a1d2e;
     color: #c8cad8;
   }
   .standings-table td:nth-child(2) { text-align: left; color: #e8eaf0; }
+  .standings-table tbody tr:nth-child(odd)  { background: rgba(255,255,255,0.05); }
+  .standings-table tbody tr:nth-child(even) { background: transparent; }
   .standings-table tr.club-row td { color: #fff; font-weight: 600; }
   .standings-table tr.club-row td:nth-child(2) { color: #8aadd4; }
+  @media (min-width: 481px) { .standings-table { width: 100%; } }
 
   /* ── Detail-Schedule ── */
   #detail-schedule-container { margin-top: 28px; }
@@ -516,6 +518,7 @@
     font-size: 0.83rem;
   }
   .detail-schedule-row:last-child { border-bottom: none; }
+  .detail-schedule-row:nth-child(even) { background: rgba(255,255,255,0.05); border-radius: 4px; }
   .detail-schedule-date { color: #9095b0; white-space: nowrap; flex-shrink: 0; min-width: 88px; }
   .detail-schedule-group-label {
     font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
@@ -528,7 +531,6 @@
   .detail-schedule-opp     { font-weight: 400; color: #9095b0; }
   .detail-schedule-neutral { font-weight: 400; color: #c8cde4; }
   .detail-schedule-vs      { color: #9095b0; font-size: 0.75rem; margin: 0 4px; flex-shrink: 0; }
-  .detail-schedule-row.club-match { background: rgba(255,255,255,0.04); border-radius: 5px; margin: 0 -6px; padding-left: 6px; padding-right: 6px; }
   .detail-schedule-result { flex-shrink: 0; font-weight: 700; font-size: 0.9rem; }
   .detail-schedule-result.win     { color: #28a856; }
   .detail-schedule-result.loss    { color: #e03838; }
@@ -2105,8 +2107,7 @@ function showTable(team) {
         resultEl = `<span class="detail-schedule-result neutral">${esc(txt)}</span>`;
       }
     }
-    const rowCls = m.isClubMatch ? ' club-match' : '';
-    schedHtml += `<div class="detail-schedule-row${rowCls}">` +
+    schedHtml += `<div class="detail-schedule-row">` +
       `<span class="detail-schedule-date">${wd} ${m.dateStr}<br><span style="font-size:0.78rem">${m.timeStr}</span></span>` +
       `<span class="detail-schedule-teams">` +
         `<span class="${homeCls}">${esc(m.homeTeam)}</span>` +
