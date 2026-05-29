@@ -185,7 +185,7 @@
   }
   .btn.on    { color: #fff; font-weight: 700; }
 
-  .btn-filter.on { border-color: #9095b0; background: rgba(144,149,176,0.08); }
+  .btn-filter.on  { border-color: #9095b0; background: rgba(144,149,176,0.08); }
   .btn-mannschaften {
     width: 100%;
     padding: 9px;
@@ -213,6 +213,7 @@
   .top-btns-row .btn { display: block; text-align: center; justify-content: center; }
   .team-btn-rank { font-size: 0.75rem; opacity: 0.7; white-space: nowrap; margin-left: 8px; flex-shrink: 0; cursor: pointer; text-decoration: underline dotted; }
   .team-row .btn.on { color: #fff; }
+  #team-btns-container { display: flex; flex-direction: column; gap: 8px; }
   .team-row.visible { display: flex; flex-direction: column; gap: 6px; align-items: stretch; background: rgba(15,17,30,0.98); border: 1px solid #3a3f60; border-top: none; border-radius: 0 0 16px 16px; padding: 6px; margin-bottom: 16px; }
   .btn-close-teams { background: transparent; border: 1px solid #2e3150; border-radius: 20px; color: #555a7a; font-size: 0.78rem; font-family: 'DM Sans', sans-serif; font-weight: 600; padding: 7px 0; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; width: 100%; margin-top: 4px; transition: all 0.15s; }
   .btn-select-all  { color: rgba(110,185,145,0.45) !important; border-color: rgba(110,185,145,0.22); }
@@ -464,6 +465,7 @@
     }
   }
   .info-theme-row { margin-left: auto; display: flex; gap: 8px; }
+  #btn-info-back { color: #ffffff !important; }
   #info-donate {
     margin: 48px 0 0;
     padding: 18px 16px 14px;
@@ -471,6 +473,7 @@
     border: 1px solid rgba(0, 112, 186, 0.30);
     border-radius: 10px;
     text-align: center;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.35);
   }
   #donate-custom-input-info {
     flex: 1;
@@ -890,10 +893,11 @@
 
 <div id="info-view">
   <div class="detail-header">
-    <button class="btn-back" onclick="backToList()">← Zurück</button>
+    <button class="btn btn-filter on" id="btn-info-back" onclick="backToList()">Zurück</button>
     <div class="info-theme-row">
       <button class="btn btn-filter" id="btn-info-theme-dark"  onclick="setTheme('dark')">Dunkel</button>
       <button class="btn btn-filter" id="btn-info-theme-light" onclick="setTheme('light')">Hell</button>
+      <button class="btn btn-filter" id="btn-info-theme-roland-garros" onclick="setTheme('roland-garros')">Roland Garros</button>
     </div>
   </div>
   <div class="info-content" id="info-content"></div>
@@ -957,7 +961,6 @@ const LIGHT_THEME_CSS = `
   .btn-meine-auswahl.on { color: #1a1d2e !important; font-weight: 700 !important; border-color: #5060a0 !important; background: #c8cde4 !important; }
   #info-view { background: #f0f2f8; }
   .btn-info { border-color: #5a6090; color: #3a3f60; background: rgba(60,70,140,0.08); }
-  #info-view .btn-back { color: #1a1d2e; border-color: #5a6090; background: rgba(60,70,140,0.08); }
   .info-content { color: #1a1d2e; }
   .info-content h2 { color: #0f1020; }
   #donate-banner { background: rgba(0,48,135,0.06); border-color: rgba(0,112,186,0.25); }
@@ -972,6 +975,65 @@ const LIGHT_THEME_CSS = `
   #pwa-hint-banner { background: rgba(0,112,186,0.08); border-color: rgba(0,112,186,0.22); color: #2a3060; }
   .pwa-hint-link { color: #0070ba; }
   .pwa-hint-close { color: #6a7090; }
+`;
+
+const ROLAND_GARROS_CSS = `
+  html, body { background: #C84B11; }
+  .header { background: #C84B11; }
+  #controls-slider { background: #C84B11; }
+  body { color: #ffffff; }
+  .header h1 { color: #ffffff; }
+  .header p { color: rgba(255,255,255,0.7); }
+  .next-match-box { background: #1B5233; border-color: #ffffff; }
+  .nm-label { color: rgba(255,255,255,0.75) !important; border-color: rgba(255,255,255,0.4) !important; }
+  .nm-league { background: #1B5233 !important; color: #ffffff !important; border-color: rgba(255,255,255,0.5) !important; }
+  .nm-date { color: rgba(255,255,255,0.8) !important; }
+  .nm-days { color: #ffffff !important; }
+  .nm-unit { color: rgba(255,255,255,0.7) !important; }
+  .next-match-box.no-match { background: #1B5233; border-color: #ffffff; color: #ffffff; }
+  .next-match-box.no-match .nm-label { color: #ffffff !important; font-weight: 700; }
+  .card, .next-match-box { background: #1B5233 !important; border-color: #ffffff !important; }
+  .card.home-game, #next-match-box.home-game { border-color: #ffffff !important; border-width: 2px; }
+  .card-tag-row .tag { background: #1B5233 !important; border-color: rgba(255,255,255,0.5) !important; color: #ffffff !important; }
+  .btn { color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.5); background: #1B5233; }
+  .btn.on { color: #ffffff; border-color: #ffffff; }
+  .btn-filter { background: #1B5233; border-color: rgba(255,255,255,0.5); color: rgba(255,255,255,0.7); }
+  .btn-filter.on { color: #ffffff; font-weight: 700; border-color: #ffffff; background: #1B5233; }
+  .btn-mannschaften { background: #1B5233; color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.5); }
+  .btn-mannschaften.on { color: #ffffff; font-weight: 700; border-color: #ffffff; background: #1B5233; animation: blink 1s step-end infinite; }
+  .mannschaften-wrapper.open { background: rgba(0,0,0,0.12); border-color: rgba(255,255,255,0.4); }
+  .mannschaften-wrapper.open .btn-mannschaften { border-color: rgba(255,255,255,0.5); background: #1B5233; color: #ffffff; }
+  .team-row.visible { background: rgba(0,0,0,0.08); border-color: rgba(255,255,255,0.3); }
+  #team-btns-container .btn { color: rgba(255,255,255,0.4); background: #1B5233; border-color: rgba(255,255,255,0.3); }
+  #team-btns-container .btn.on { color: #ffffff; background: #1B5233; border-color: #ffffff; font-weight: 700; }
+  .btn-close-teams { background: #1B5233; border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.4); }
+  .btn-select-all  { color: rgba(255,255,255,0.4) !important; border-color: rgba(255,255,255,0.3) !important; background: #1B5233 !important; }
+  .btn-select-all.on  { color: #ffffff !important; font-weight: 700 !important; border-color: #ffffff !important; background: #1B5233 !important; }
+  .btn-select-none { color: rgba(255,255,255,0.4) !important; border-color: rgba(255,255,255,0.3) !important; background: #1B5233 !important; }
+  .btn-select-none.on { color: #ffffff !important; font-weight: 700 !important; border-color: #ffffff !important; background: #1B5233 !important; }
+  .btn-meine-auswahl { color: rgba(255,255,255,0.4) !important; border-color: rgba(255,255,255,0.3) !important; background: #1B5233 !important; }
+  .btn-meine-auswahl.on { color: #ffffff !important; font-weight: 700 !important; border-color: #ffffff !important; background: #1B5233 !important; }
+  #info-view { background: #C84B11; }
+  .btn-info { border-color: rgba(255,255,255,0.5); color: #ffffff; background: rgba(255,255,255,0.1); }
+  #info-donate .btn-donate-main { background: #1B5233; color: #ffffff; border: 1px solid rgba(255,255,255,0.5); }
+  .info-content { color: #ffffff; }
+  .info-content h2 { color: #ffffff; }
+  .info-content a { color: rgba(255,255,255,0.85); }
+  #donate-banner { background: rgba(0,0,0,0.15); border-color: rgba(255,255,255,0.2); }
+  .donate-text { color: #ffffff; }
+  .btn-donate-later { color: rgba(255,255,255,0.6); }
+  .btn-amount { color: rgba(255,255,255,0.8); }
+  .btn-amount.on { color: #ffffff; border-color: #ffffff; background: rgba(255,255,255,0.15); }
+  #donate-custom-input { background: rgba(255,255,255,0.15); color: #ffffff; border-color: rgba(255,255,255,0.4); }
+  .donate-custom-euro { color: rgba(255,255,255,0.7); }
+  #info-donate { background: #C84B11; border-color: rgba(255,255,255,0.35); }
+  #info-donate .btn-amount { background: transparent; border-color: rgba(255,255,255,0.4); color: rgba(255,255,255,0.8); }
+  #info-donate .btn-amount.on { background: rgba(255,255,255,0.15); border-color: #ffffff; color: #ffffff; }
+  #info-donate .donate-custom-euro { color: rgba(255,255,255,0.7); }
+  #donate-custom-input-info { background: rgba(255,255,255,0.12); color: #ffffff; border-color: rgba(255,255,255,0.4); }
+  #pwa-hint-banner { background: rgba(0,0,0,0.12); border-color: rgba(255,255,255,0.2); color: #ffffff; }
+  .pwa-hint-link { color: rgba(255,255,255,0.9); }
+  .pwa-hint-close { color: rgba(255,255,255,0.7); }
 `;
 
 let _scrollY = 0;
@@ -1099,13 +1161,16 @@ function updateDonateBtnInfo() {
 }
 
 function setTheme(theme) {
-  const isLight = theme === 'light';
-  document.getElementById('theme-override-css').textContent = isLight ? LIGHT_THEME_CSS : '';
-  document.querySelector('meta[name="theme-color"]').content = isLight ? '#f0f2f8' : '#0f1117';
+  const css = theme === 'light' ? LIGHT_THEME_CSS : theme === 'roland-garros' ? ROLAND_GARROS_CSS : '';
+  document.getElementById('theme-override-css').textContent = css;
+  const metaColor = theme === 'light' ? '#f0f2f8' : theme === 'roland-garros' ? '#C84B11' : '#0f1117';
+  document.querySelector('meta[name="theme-color"]').content = metaColor;
   const btnDark  = document.getElementById('btn-info-theme-dark');
   const btnLight = document.getElementById('btn-info-theme-light');
-  if (btnDark)  btnDark.classList.toggle('on',  !isLight);
-  if (btnLight) btnLight.classList.toggle('on',  isLight);
+  const btnRG    = document.getElementById('btn-info-theme-roland-garros');
+  if (btnDark)  btnDark.classList.toggle('on',  theme === 'dark');
+  if (btnLight) btnLight.classList.toggle('on',  theme === 'light');
+  if (btnRG)    btnRG.classList.toggle('on',     theme === 'roland-garros');
   localStorage.setItem(LS_THEME, theme);
 }
 
