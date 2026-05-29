@@ -555,6 +555,7 @@
     letter-spacing: 0.06em;
     color: #fff;
     line-height: 1.2;
+    white-space: nowrap;
   }
   .report-result {
     font-family: 'Bebas Neue', sans-serif;
@@ -2184,9 +2185,20 @@ async function showReport(team, reportUrl, matchObj) {
   try {
     const html = await fetchURL(reportUrl);
     document.getElementById('report-content').innerHTML = renderReport(html, matchObj);
+    fitReportTeams();
   } catch(e) {
     document.getElementById('report-content').innerHTML =
       '<div class="status-msg">Spielbericht konnte nicht geladen werden.</div>';
+  }
+}
+
+function fitReportTeams() {
+  const el = document.querySelector('#report-content .report-teams');
+  if (!el) return;
+  let size = parseFloat(getComputedStyle(el).fontSize);
+  while (el.scrollWidth > el.offsetWidth && size > 10) {
+    size -= 0.5;
+    el.style.fontSize = size + 'px';
   }
 }
 
