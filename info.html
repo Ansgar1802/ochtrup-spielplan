@@ -3,40 +3,119 @@
 <body>
 
 <style>
-  #info-content h3 { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #9095b0; margin: 18px 0 4px; }
-  #info-content ol { margin: 0; padding-left: 1.2em; }
-  #info-content li { margin-bottom: 4px; }
+  .accordion-item { border-bottom: 1px solid rgba(144,149,176,0.18); }
+  .accordion-item:first-of-type { border-top: 1px solid rgba(144,149,176,0.18); }
+  .accordion-btn {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 14px 2px;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+  }
+  .accordion-arrow {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    opacity: 0.5;
+    font-size: 0.7rem;
+    margin-left: 12px;
+    flex-shrink: 0;
+  }
+  .accordion-btn.open .accordion-arrow { transform: rotate(180deg); }
+  .accordion-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+  }
+  .accordion-body.open { max-height: 1000px; }
+  .accordion-body-inner { padding: 0 0 18px; }
+  .accordion-body p { margin: 0 0 10px; }
+  .accordion-body h3 {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    opacity: 0.6;
+    margin: 16px 0 6px;
+  }
+  .accordion-body ol { margin: 0; padding-left: 1.3em; }
+  .accordion-body li { margin-bottom: 5px; }
+  .acc-feature-list { list-style: none; padding: 0; margin: 0; }
+  .acc-feature-list li { margin-bottom: 10px; }
+  .acc-feature-label { font-weight: 700; }
 </style>
 
-<h2>Über diese App</h2>
-<p>Aktuelle Spielplandaten des TC 1928 Ochtrup – direkt vom Verband.<br>
-Tipp: App zum Homescreen hinzufügen für schnellen Zugriff.</p>
+<div class="accordion-item">
+  <button class="accordion-btn" data-target="acc-ueber" onclick="toggleAccordion('acc-ueber')">
+    Über diese App
+    <span class="accordion-arrow">▼</span>
+  </button>
+  <div class="accordion-body" id="acc-ueber">
+    <div class="accordion-body-inner">
+      <p>Aktuelle Spielplandaten des TC 1928 Ochtrup – direkt vom Verband.</p>
+      <p>Tipp: App zum Homescreen hinzufügen für schnellen Zugriff ohne Browser.</p>
+    </div>
+  </div>
+</div>
 
-<h2>Anwendungsbeispiele</h2>
+<div class="accordion-item">
+  <button class="accordion-btn" data-target="acc-funktionen" onclick="toggleAccordion('acc-funktionen')">
+    Funktionen
+    <span class="accordion-arrow">▼</span>
+  </button>
+  <div class="accordion-body" id="acc-funktionen">
+    <div class="accordion-body-inner">
+      <ul class="acc-feature-list">
+        <li><span class="acc-feature-label">Nächstes Spiel</span> – Karte oben mit automatischem Countdown zum nächsten Heimspiel der ausgewählten Mannschaften.</li>
+        <li><span class="acc-feature-label">Spielplan</span> – Vollständige Übersicht aller Spieltermine. Tippe auf eine Karte für Details.</li>
+        <li><span class="acc-feature-label">Aktuell / Vergangen</span> – Zwischen kommenden und bereits gespielten Partien wechseln.</li>
+        <li><span class="acc-feature-label">Heim / Auswärts</span> – Spiele nach Spielort filtern.</li>
+        <li><span class="acc-feature-label">Mannschaftsauswahl</span> – Einzelne Mannschaften oder alle auf einmal auswählen. „Meine Auswahl" wird gespeichert.</li>
+        <li><span class="acc-feature-label">Spieldetails</span> – Tippe auf ein Ergebnis für den Spielbericht oder auf „Tabelle" für die Ligatabelle.</li>
+        <li><span class="acc-feature-label">Design</span> – Dunkel / Hell wechseln – auch hier oben rechts.</li>
+      </ul>
+    </div>
+  </div>
+</div>
 
-<h3>Nächste Heimspiele meiner Mannschaften</h3>
-<ol>
-  <li>Tippe auf <strong>Mannschaften</strong> → <strong>Meine Auswahl</strong></li>
-  <li>Wähle deine Mannschaften aus</li>
-  <li>Schließe das Menü mit <strong>Mannschaften</strong></li>
-  <li>Aktiviere <strong>Aktuell</strong> und <strong>Heim</strong></li>
-</ol>
-
-<h3>Nächste Spiele aller Mannschaften</h3>
-<ol>
-  <li>Tippe auf <strong>Mannschaften</strong> → <strong>Alle auswählen</strong></li>
-  <li>Schließe das Menü mit <strong>Mannschaften</strong></li>
-  <li>Aktiviere <strong>Aktuell</strong>, <strong>Heim</strong> und <strong>Auswärts</strong></li>
-</ol>
-
-<h3>Ergebnisse vergangener Spiele</h3>
-<ol>
-  <li>Tippe auf <strong>Mannschaften</strong> → <strong>Meine Auswahl</strong></li>
-  <li>Wähle deine Mannschaften aus</li>
-  <li>Schließe das Menü mit <strong>Mannschaften</strong></li>
-  <li>Aktiviere <strong>Vergangen</strong>, <strong>Heim</strong> und <strong>Auswärts</strong></li>
-  <li>Tippe auf ein <strong>Ergebnis</strong> für den Spielbericht oder auf <strong>Tabelle</strong> für die Tabelle</li>
-</ol>
+<div class="accordion-item">
+  <button class="accordion-btn" data-target="acc-beispiele" onclick="toggleAccordion('acc-beispiele')">
+    Anwendungsbeispiele
+    <span class="accordion-arrow">▼</span>
+  </button>
+  <div class="accordion-body" id="acc-beispiele">
+    <div class="accordion-body-inner">
+      <h3>Nächste Heimspiele meiner Mannschaften</h3>
+      <ol>
+        <li>Tippe auf <strong>Mannschaften</strong> → <strong>Meine Auswahl</strong></li>
+        <li>Wähle deine Mannschaften aus</li>
+        <li>Schließe das Menü mit <strong>Mannschaften</strong></li>
+        <li>Aktiviere <strong>Aktuell</strong> und <strong>Heim</strong></li>
+      </ol>
+      <h3>Nächste Spiele aller Mannschaften</h3>
+      <ol>
+        <li>Tippe auf <strong>Mannschaften</strong> → <strong>Alle auswählen</strong></li>
+        <li>Schließe das Menü mit <strong>Mannschaften</strong></li>
+        <li>Aktiviere <strong>Aktuell</strong>, <strong>Heim</strong> und <strong>Auswärts</strong></li>
+      </ol>
+      <h3>Ergebnisse vergangener Spiele</h3>
+      <ol>
+        <li>Tippe auf <strong>Mannschaften</strong> → <strong>Meine Auswahl</strong></li>
+        <li>Wähle deine Mannschaften aus</li>
+        <li>Schließe das Menü mit <strong>Mannschaften</strong></li>
+        <li>Aktiviere <strong>Vergangen</strong>, <strong>Heim</strong> und <strong>Auswärts</strong></li>
+        <li>Tippe auf ein <strong>Ergebnis</strong> für den Spielbericht oder auf <strong>Tabelle</strong> für die Tabelle</li>
+      </ol>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
