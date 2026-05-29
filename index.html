@@ -293,7 +293,15 @@
   }
   #main-content { transition: opacity 3s ease; }
   #matches-container { transition: opacity 2s ease; }
+  #controls-slider { overflow: hidden; margin-bottom: 16px; }
+  #controls-inner {
+    display: flex;
+    transform: translateX(-100%);
+    transition: transform 0.45s cubic-bezier(0.4,0,0.2,1);
+  }
   #pwa-hint-banner {
+    flex: 0 0 100%;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -302,11 +310,11 @@
     border: 1px solid rgba(0, 112, 186, 0.40);
     border-radius: 10px;
     padding: 13px 16px;
-    margin-bottom: 14px;
     font-size: 0.92rem;
     font-weight: 600;
     color: #e0e4f4;
   }
+  #controls-bar { flex: 0 0 100%; box-sizing: border-box; margin-bottom: 0; }
   .pwa-hint-link {
     background: none; border: none;
     color: #8aadd4; font-weight: 700;
@@ -802,12 +810,6 @@
 
 <div id="main-content">
 
-<!-- Homescreen-Hinweis (nur im Browser auf Mobilgeräten) -->
-<div id="pwa-hint-banner" style="display:none">
-  <span>Als App zum Homescreen hinzufügen – <button class="pwa-hint-link" onclick="showInfo('acc-homescreen')">Anleitung unter Info</button></span>
-  <button class="pwa-hint-close" onclick="dismissPwaHint()" title="Schließen">✕</button>
-</div>
-
 <!-- Nächstes Spiel -->
 <div id="next-match-box" class="next-match-box">
   <div class="nm-label">Nächstes Spiel</div>
@@ -824,24 +826,32 @@
   <div class="nm-teams" id="nm-teams"></div>
 </div>
 
-<!-- Filter-Buttons -->
-<div class="controls" id="controls-bar">
-  <div class="controls-row">
-    <button class="btn btn-filter"    id="btn-vergangen" onclick="toggleFilter('showPast')">Vorbei</button>
-    <button class="btn btn-filter on" id="btn-aktuell"   onclick="toggleFilter('showFuture')">Aktuell</button>
-    <button class="btn btn-filter on" id="btn-heim"      onclick="toggleFilter('showHome')">Heim</button>
-    <button class="btn btn-filter on" id="btn-auswaerts" onclick="toggleFilter('showAway')">Auswärts</button>
-  </div>
-  <div class="mannschaften-wrapper" id="mannschaften-wrapper">
-  <button class="btn-mannschaften" id="btn-mannschaften" onclick="toggleMannschaften()">Mannschaften</button>
-  <div class="team-row" id="team-row">
-    <div class="top-btns-row">
-      <button class="btn btn-select-all"  id="btn-select-all"  onclick="selectAllTeams()">Alle<br>auswählen</button>
-      <button class="btn btn-select-none" id="btn-select-none" onclick="selectNoTeams()">Keine<br>auswählen</button>
-      <button class="btn btn-meine-auswahl" id="btn-meine-auswahl">Meine<br>Auswahl</button>
+<!-- Controls-Slider: Hint-Banner + Filter-Buttons -->
+<div id="controls-slider">
+  <div id="controls-inner">
+    <div id="pwa-hint-banner">
+      <span>Als App zum Homescreen hinzufügen – <button class="pwa-hint-link" onclick="showInfo('acc-homescreen')">Anleitung unter Info</button></span>
+      <button class="pwa-hint-close" onclick="dismissPwaHint()" title="Schließen">✕</button>
     </div>
-    <div id="team-btns-container"></div>
-  </div>
+    <div class="controls" id="controls-bar">
+      <div class="controls-row">
+        <button class="btn btn-filter"    id="btn-vergangen" onclick="toggleFilter('showPast')">Vorbei</button>
+        <button class="btn btn-filter on" id="btn-aktuell"   onclick="toggleFilter('showFuture')">Aktuell</button>
+        <button class="btn btn-filter on" id="btn-heim"      onclick="toggleFilter('showHome')">Heim</button>
+        <button class="btn btn-filter on" id="btn-auswaerts" onclick="toggleFilter('showAway')">Auswärts</button>
+      </div>
+      <div class="mannschaften-wrapper" id="mannschaften-wrapper">
+      <button class="btn-mannschaften" id="btn-mannschaften" onclick="toggleMannschaften()">Mannschaften</button>
+      <div class="team-row" id="team-row">
+        <div class="top-btns-row">
+          <button class="btn btn-select-all"  id="btn-select-all"  onclick="selectAllTeams()">Alle<br>auswählen</button>
+          <button class="btn btn-select-none" id="btn-select-none" onclick="selectNoTeams()">Keine<br>auswählen</button>
+          <button class="btn btn-meine-auswahl" id="btn-meine-auswahl">Meine<br>Auswahl</button>
+        </div>
+        <div id="team-btns-container"></div>
+      </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1366,19 +1376,16 @@ const DONATE_TEXTS = [
   }
 })();
 
+let _pwaHintPending = false;
 (function() {
   const isStandalone = window.navigator.standalone === true ||
                        window.matchMedia('(display-mode: standalone)').matches;
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if (isMobile && !isStandalone) {
-    const b = document.getElementById('pwa-hint-banner');
-    if (b) b.style.display = 'flex';
-  }
+  if (isMobile && !isStandalone) _pwaHintPending = true;
 })();
 
 function dismissPwaHint() {
-  const b = document.getElementById('pwa-hint-banner');
-  if (b) b.style.display = 'none';
+  document.getElementById('controls-inner').style.transform = 'translateX(-100%)';
 }
 
 const _state    = loadState();
@@ -1632,7 +1639,7 @@ async function loadAllData() {
   mc.innerHTML = '';
   mc.style.opacity = '0';
   mc.style.pointerEvents = 'none';
-  document.getElementById('controls-bar').style.pointerEvents = 'none';
+  document.getElementById('controls-slider').style.pointerEvents = 'none';
   document.getElementById('update-info').style.display = 'none';
 
   /* Ladeindikator im Nächstes-Spiel-Container anzeigen */
@@ -1724,13 +1731,21 @@ async function loadAllData() {
   ui.style.display = 'block';
 
   mc.style.pointerEvents = '';
-  document.getElementById('controls-bar').style.pointerEvents = '';
+  document.getElementById('controls-slider').style.pointerEvents = '';
   nmBox.style.transition = 'opacity 2s ease';
   nmBox.style.opacity = '0';
   renderNextMatch();
   renderMatches();
   requestAnimationFrame(() => {
-    requestAnimationFrame(() => { mc.style.opacity = '1'; nmBox.style.opacity = '1'; });
+    requestAnimationFrame(() => {
+      mc.style.opacity = '1'; nmBox.style.opacity = '1';
+      if (_pwaHintPending) {
+        _pwaHintPending = false;
+        mc.addEventListener('transitionend', () => {
+          document.getElementById('controls-inner').style.transform = 'translateX(0)';
+        }, { once: true });
+      }
+    });
   });
 }
 
@@ -2138,7 +2153,7 @@ function backToList() {
   document.getElementById('info-view').style.display = 'none';
   document.getElementById('matches-container').style.display = '';
   document.getElementById('update-info').style.display = '';
-  document.getElementById('controls-bar').style.display = '';
+  document.getElementById('controls-slider').style.display = '';
   unlockBodyScroll();
   renderNextMatch();
 }
@@ -2149,7 +2164,7 @@ async function showInfo(openAccordion) {
   document.getElementById('update-info').style.display = 'none';
   document.getElementById('detail-view').style.display = 'none';
   document.getElementById('report-view').style.display = 'none';
-  document.getElementById('controls-bar').style.display = 'none';
+  document.getElementById('controls-slider').style.display = 'none';
   document.getElementById('next-match-box').style.display = 'none';
   document.getElementById('error-banner').style.display = 'none';
   document.getElementById('loading-banner').style.display = 'none';
