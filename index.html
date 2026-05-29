@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <title>TC 1928 Ochtrup – Spielplan 2026</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="logo2.png">
@@ -10,23 +10,28 @@
 <meta name="apple-mobile-web-app-title" content="Spielplan 26">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0f1117">
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="expires" content="0">
+<meta http-equiv="pragma" content="no-cache">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+  html { background: #0f1117; }
   body {
     background: #0f1117;
     font-family: 'DM Sans', sans-serif;
     color: #e8eaf0;
-    padding: 24px 16px 48px;
+    padding: 0 16px 48px;
     max-width: 640px;
     margin: 0 auto;
   }
 
-  .header { text-align: center; margin-bottom: 20px; position: relative; }
-  .header-title { display: flex; align-items: center; justify-content: center; gap: 12px; }
+  .header { text-align: center; margin-bottom: 0; padding-top: env(safe-area-inset-top); padding-bottom: 20px; position: sticky; top: 0; z-index: 5; background: #0f1117; }
+  @media (hover: hover) and (pointer: fine) { .header { padding-top: 18px; } }
+  .header-title { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 0 36px; }
   .btn-info {
-    position: absolute; top: 0; right: 0;
+    position: absolute; top: env(safe-area-inset-top); right: 0;
     width: 28px; height: 28px;
     border-radius: 50%;
     border: 1px solid #3a3f60;
@@ -48,7 +53,7 @@
   .header-logo { height: 42px; width: auto; }
   .header h1 {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     letter-spacing: 0.08em;
     color: #fff;
     line-height: 1;
@@ -198,7 +203,7 @@
     user-select: none;
   }
   .mannschaften-wrapper { border-radius: 16px; transition: border-color 0.15s, background 0.15s; }
-  .mannschaften-wrapper.open { background: rgba(15,17,30,0.98); border: 1px solid #3a3f60; padding: 6px; display: flex; flex-direction: column; gap: 6px; }
+  .mannschaften-wrapper.open { background: rgba(15,17,30,0.98); border: 1px solid #3a3f60; border-bottom: none; border-radius: 16px 16px 0 0; padding: 6px; display: flex; flex-direction: column; gap: 6px; }
   .mannschaften-wrapper.open .btn-mannschaften { border-color: transparent; background: rgba(144,149,176,0.08); }
   .btn-mannschaften::after { content: ' ▼'; font-size: 0.72em; opacity: 0.6; }
   .btn-mannschaften.on::after { content: ' ▲'; opacity: 1; }
@@ -208,7 +213,7 @@
   .top-btns-row .btn { display: block; text-align: center; justify-content: center; }
   .team-btn-rank { font-size: 0.75rem; opacity: 0.7; white-space: nowrap; margin-left: 8px; flex-shrink: 0; cursor: pointer; text-decoration: underline dotted; }
   .team-row .btn.on { color: #fff; }
-  .team-row.visible { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+  .team-row.visible { display: flex; flex-direction: column; gap: 6px; align-items: stretch; background: rgba(15,17,30,0.98); border: 1px solid #3a3f60; border-top: none; border-radius: 0 0 16px 16px; padding: 6px; margin-bottom: 16px; }
   .btn-close-teams { background: transparent; border: 1px solid #2e3150; border-radius: 20px; color: #555a7a; font-size: 0.78rem; font-family: 'DM Sans', sans-serif; font-weight: 600; padding: 7px 0; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; width: 100%; margin-top: 4px; transition: all 0.15s; }
   .btn-select-all  { color: rgba(110,185,145,0.45) !important; border-color: rgba(110,185,145,0.22); }
   .btn-select-all.on  { color: #82c9a0 !important; border-color: #4a9068 !important; background: rgba(80,150,110,0.15) !important; font-weight: 700; }
@@ -293,7 +298,7 @@
   }
   #main-content { transition: opacity 3s ease; }
   #matches-container { transition: opacity 2s ease; }
-  #controls-slider { overflow: hidden; margin-bottom: 16px; }
+  #controls-slider { overflow: hidden; margin-bottom: 16px; position: sticky; top: var(--header-h, 90px); z-index: 4; background: #0f1117; }
   #controls-inner {
     display: flex;
     transform: translateX(-100%);
@@ -758,10 +763,10 @@
     -webkit-overflow-scrolling: touch;
     z-index: 10;
     background: #0f1117;
-    padding: 20px max(16px, calc((100% - 608px) / 2)) 40px;
+    padding: calc(env(safe-area-inset-top) + 20px) max(16px, calc((100% - 608px) / 2)) 40px;
   }
   /* Report-View: Flex-Struktur für zuverlässiges iOS-Scroll */
-  #report-view { overflow: hidden; flex-direction: column; padding: 20px max(16px, calc((100% - 608px) / 2)) 0; }
+  #report-view { overflow: hidden; flex-direction: column; padding: calc(env(safe-area-inset-top) + 20px) max(16px, calc((100% - 608px) / 2)) 0; }
   #report-scroll {
     flex: 1;
     min-height: 0;
@@ -842,17 +847,18 @@
       </div>
       <div class="mannschaften-wrapper" id="mannschaften-wrapper">
       <button class="btn-mannschaften" id="btn-mannschaften" onclick="toggleMannschaften()">Mannschaften</button>
-      <div class="team-row" id="team-row">
-        <div class="top-btns-row">
-          <button class="btn btn-select-all"  id="btn-select-all"  onclick="selectAllTeams()">Alle<br>auswählen</button>
-          <button class="btn btn-select-none" id="btn-select-none" onclick="selectNoTeams()">Keine<br>auswählen</button>
-          <button class="btn btn-meine-auswahl" id="btn-meine-auswahl">Meine<br>Auswahl</button>
-        </div>
-        <div id="team-btns-container"></div>
-      </div>
       </div>
     </div>
   </div>
+</div>
+
+<div class="team-row" id="team-row">
+  <div class="top-btns-row">
+    <button class="btn btn-select-all"  id="btn-select-all"  onclick="selectAllTeams()">Alle<br>auswählen</button>
+    <button class="btn btn-select-none" id="btn-select-none" onclick="selectNoTeams()">Keine<br>auswählen</button>
+    <button class="btn btn-meine-auswahl" id="btn-meine-auswahl">Meine<br>Auswahl</button>
+  </div>
+  <div id="team-btns-container"></div>
 </div>
 
 <div id="error-banner"    class="error-msg"  style="display:none"></div>
@@ -923,7 +929,9 @@ const LS_THEME       = 'spielplan-theme';
 const LS_STARTS      = 'spielplan-starts';
 
 const LIGHT_THEME_CSS = `
-  body { background: #f0f2f8; }
+  html, body { background: #f0f2f8; }
+  .header { background: #f0f2f8; }
+  #controls-slider { background: #f0f2f8; }
   .header h1 { color: #1a1d2e; }
   .header p { color: #5a5f7a; }
   .nm-label { color: #fff; }
@@ -937,6 +945,7 @@ const LIGHT_THEME_CSS = `
   .btn-mannschaften.on { color: #1a1d2e; font-weight: 700; border-color: #5060a0; background: #c8cde4; animation: blink 1s step-end infinite; }
   .mannschaften-wrapper.open { background: #eef0f8; border-color: #b0b5cc; }
   .mannschaften-wrapper.open .btn-mannschaften { border-color: transparent; background: rgba(60,70,140,0.07); color: #1a1d2e; }
+  .team-row.visible { background: #eef0f8; border-color: #b0b5cc; }
   .team-row .btn { color: #3a3f60; }
   .btn-close-teams { border-color: #b0b5cc; color: #3a3f60; }
   .btn-select-all  { color: #3a3f60 !important; border-color: #b0b5cc !important; background: transparent !important; }
@@ -1092,10 +1101,10 @@ function setTheme(theme) {
   const isLight = theme === 'light';
   document.getElementById('theme-override-css').textContent = isLight ? LIGHT_THEME_CSS : '';
   document.querySelector('meta[name="theme-color"]').content = isLight ? '#f0f2f8' : '#0f1117';
-  const btnInfoDark  = document.getElementById('btn-info-theme-dark');
-  const btnInfoLight = document.getElementById('btn-info-theme-light');
-  if (btnInfoDark)  btnInfoDark.classList.toggle('on', !isLight);
-  if (btnInfoLight) btnInfoLight.classList.toggle('on',  isLight);
+  const btnDark  = document.getElementById('btn-info-theme-dark');
+  const btnLight = document.getElementById('btn-info-theme-light');
+  if (btnDark)  btnDark.classList.toggle('on',  !isLight);
+  if (btnLight) btnLight.classList.toggle('on',  isLight);
   localStorage.setItem(LS_THEME, theme);
 }
 
@@ -1387,6 +1396,16 @@ let _pwaHintPending = false;
 function dismissPwaHint() {
   document.getElementById('controls-inner').style.transform = 'translateX(-100%)';
 }
+
+(function() {
+  let _swipeStartX = 0;
+  const banner = document.getElementById('pwa-hint-banner');
+  if (!banner) return;
+  banner.addEventListener('touchstart', e => { _swipeStartX = e.touches[0].clientX; }, { passive: true });
+  banner.addEventListener('touchend',   e => {
+    if (e.changedTouches[0].clientX - _swipeStartX < -40) dismissPwaHint();
+  }, { passive: true });
+})();
 
 const _state    = loadState();
 let showPast    = _state.showPast;
@@ -2500,7 +2519,17 @@ function toggleMeineAuswahlMode() {
 })();
 
 /* ── Start ─────────────────────────────────────────────────── */
+function updateHeaderH() {
+  const h = document.querySelector('.header');
+  if (!h) return;
+  const mb = parseFloat(window.getComputedStyle(h).marginBottom) || 0;
+  document.documentElement.style.setProperty('--header-h', (h.offsetHeight + mb) + 'px');
+}
+
 setTheme(localStorage.getItem(LS_THEME) || 'light');
+updateHeaderH();
+document.fonts.ready.then(updateHeaderH);
+window.addEventListener('resize', updateHeaderH);
 (async function startup() {
   await initLeagues();
   await loadAllData();
