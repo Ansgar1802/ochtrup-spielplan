@@ -2018,6 +2018,7 @@ function applyStateToButtons() {
   });
   document.getElementById('btn-select-all').classList.toggle('on', selectMode === 'all');
   document.getElementById('btn-select-none').classList.toggle('on', selectMode === 'none');
+  document.getElementById('btn-meine-auswahl').classList.toggle('on', selectMode === 'meine');
 }
 
 function openMannschaften(e) {
@@ -2375,7 +2376,7 @@ function selectNoTeams() {
 }
 
 /* ── Meine Auswahl ─────────────────────────────────────────── */
-let meineAuswahlActive = false;
+let meineAuswahlActive = (selectMode === 'meine');
 
 function loadMeineAuswahl() {
   try { return JSON.parse(localStorage.getItem(LS_AUSWAHL)); }
@@ -2390,7 +2391,7 @@ function autoSaveMeineAuswahl() {
 function toggleMeineAuswahlMode() {
   if (!meineAuswahlActive) {
     meineAuswahlActive = true;
-    selectMode = null;
+    selectMode = 'meine';
     document.getElementById('btn-meine-auswahl').classList.add('on');
     document.getElementById('btn-select-all').classList.remove('on');
     document.getElementById('btn-select-none').classList.remove('on');
