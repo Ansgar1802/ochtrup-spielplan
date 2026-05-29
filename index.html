@@ -103,12 +103,20 @@
   .nm-teams {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 0;
+    flex-wrap: nowrap;
+    gap: 10px;
     margin-top: 10px;
     line-height: 1.4;
     width: 100%;
     min-height: 4.2em;
+  }
+  .nm-match-teams {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    row-gap: 2px;
   }
   .nm-league {
     display: inline-block;
@@ -614,8 +622,8 @@
   @media (max-width: 480px) {
     .card-match-teams .team:not(.opponent) { width: 100%; }
     .card-match-teams .vs { display: none; }
-    #nm-teams > span:first-child { width: 100%; }
-    #nm-teams > span:nth-child(2) { display: none; }
+    .nm-match-teams span:first-child { width: 100%; }
+    .nm-match-teams span:nth-child(2) { display: none; }
   }
 
   .result { font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; flex-shrink: 0; }
@@ -1657,10 +1665,13 @@ function renderNextMatch() {
   }
   const nmOwnStyle = 'font-weight:700;color:#fff;text-transform:uppercase';
   const nmOppStyle = 'font-weight:400;color:#c0c4d8;text-transform:uppercase';
-  document.getElementById('nm-teams').innerHTML    =
+  document.getElementById('nm-teams').innerHTML =
+    `<div class="nm-match-teams">` +
     `<span style="${next.isHome ? nmOwnStyle : nmOppStyle}">${esc(next.homeTeam)}</span>` +
     `<span style="font-size:0.85rem;color:#c8cde4;font-weight:600;margin:0 5px">vs.</span>` +
-    `<span style="${next.isHome ? nmOppStyle : nmOwnStyle}">${esc(next.awayTeam)}</span>`;
+    `<span style="${next.isHome ? nmOppStyle : nmOwnStyle}">${esc(next.awayTeam)}</span>` +
+    `</div>` +
+    `<button class="btn-tabelle" onclick="event.stopPropagation();showTable('${next.team}')">Tabelle</button>`;
   const nmLeague = document.getElementById('nm-league');
   nmLeague.textContent = next.label;
   nmLeague.className = 'nm-league btn-' + next.team + ' on';
@@ -1785,7 +1796,14 @@ function esc(s) {
 function renderMatches() {
   const container = document.getElementById('matches-container');
 
+  const today0 = new Date(); today0.setHours(0, 0, 0, 0);
+  const nextMatch = showFuture ? allMatches.find(m => {
+    const d = new Date(m.date); d.setHours(0, 0, 0, 0);
+    return d >= today0 && showTeams[m.team] && (m.isHome ? showHome : showAway);
+  }) : null;
+
   const visible = allMatches.filter(m =>
+    m !== nextMatch &&
     showTeams[m.team] &&
     (isPast(m.date) ? showPast : showFuture) &&
     (m.isHome ? showHome : showAway)
