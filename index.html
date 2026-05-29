@@ -219,7 +219,8 @@
   .btn-select-all.on  { color: #82c9a0 !important; border-color: #4a9068 !important; background: rgba(80,150,110,0.15) !important; font-weight: 700; }
   .btn-select-none { color: rgba(195,115,115,0.45) !important; border-color: rgba(195,115,115,0.22); }
   .btn-select-none.on { color: #c47c7c !important; border-color: #8a4545 !important; background: rgba(175,80,80,0.14) !important; font-weight: 700; }
-  .top-btns-row { display: flex; width: 100%; gap: 6px; }
+  .top-btns-row { display: none; width: 100%; gap: 6px; }
+  .mannschaften-wrapper.open .top-btns-row { display: flex; }
   .top-btns-row .btn { flex: 1; text-align: center; min-width: 0; padding-top: 17px; padding-bottom: 17px; white-space: normal; line-height: 1.4; }
   .btn-meine-auswahl { color: rgba(190,155,70,0.45) !important; border-color: rgba(190,155,70,0.22); -webkit-touch-callout: none; touch-action: none; }
   .btn-meine-auswahl.on { color: #d4b054 !important; border-color: #a07830 !important; background: rgba(170,130,50,0.18) !important; font-weight: 700; }
@@ -846,18 +847,18 @@
         <button class="btn btn-filter on" id="btn-auswaerts" onclick="toggleFilter('showAway')">Auswärts</button>
       </div>
       <div class="mannschaften-wrapper" id="mannschaften-wrapper">
-      <button class="btn-mannschaften" id="btn-mannschaften" onclick="toggleMannschaften()">Mannschaften</button>
+        <button class="btn-mannschaften" id="btn-mannschaften" onclick="toggleMannschaften()">Mannschaften</button>
+        <div class="top-btns-row">
+          <button class="btn btn-select-all"  id="btn-select-all"  onclick="selectAllTeams()">Alle<br>auswählen</button>
+          <button class="btn btn-select-none" id="btn-select-none" onclick="selectNoTeams()">Keine<br>auswählen</button>
+          <button class="btn btn-meine-auswahl" id="btn-meine-auswahl">Meine<br>Auswahl</button>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <div class="team-row" id="team-row">
-  <div class="top-btns-row">
-    <button class="btn btn-select-all"  id="btn-select-all"  onclick="selectAllTeams()">Alle<br>auswählen</button>
-    <button class="btn btn-select-none" id="btn-select-none" onclick="selectNoTeams()">Keine<br>auswählen</button>
-    <button class="btn btn-meine-auswahl" id="btn-meine-auswahl">Meine<br>Auswahl</button>
-  </div>
   <div id="team-btns-container"></div>
 </div>
 
