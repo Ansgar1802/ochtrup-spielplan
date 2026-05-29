@@ -924,7 +924,7 @@ const CLUB_NAME      = 'Ochtrup';
 const CLUB_TEAMS_URL = 'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/clubTeams?club=26831';
 const LS_STATE       = 'spielplan-state';
 const LS_AUSWAHL     = 'spielplan-meine-auswahl';
-const LS_LEAGUES     = 'spielplan-leagues';
+const LS_LEAGUES     = 'spielplan-leagues-v5';
 const LS_THEME       = 'spielplan-theme';
 const LS_STARTS      = 'spielplan-starts';
 
@@ -1170,19 +1170,22 @@ let LEAGUES = [];
 
 function parseClubTeams(html) {
   const decoded = html.replace(/&amp;/g, '&');
-  const re = /href="([^"]*groupPage[^"]*[?&]group=(\d+)[^"]*)">([^<]+)/g;
   const results = [];
   const seenGroups = new Set();
+  /* Jede Zeile: Mannschaftsname aus teamPortrait-Link + Gruppen-URL + Spielklasse aus groupPage-Link */
+  const rowRe = /title="Mannschaftsportrait"[^>]*>([^<]+)<\/a>[\s\S]*?href="([^"]*groupPage[^"]*[?&]group=(\d+)[^"]*)">([^<]+)/g;
   let m;
-  while ((m = re.exec(decoded)) !== null) {
-    const relHref = m[1];
-    const group   = m[2];
-    if (seenGroups.has(group)) continue; // Duplikate überspringen
+  while ((m = rowRe.exec(decoded)) !== null) {
+    const label    = m[1].trim();
+    const relHref  = m[2];
+    const group    = m[3];
+    const leagueLabel = m[4].trim().replace(/\s+Gr\.\s*\d+.*$/i, '').trim();
+    const liPart      = leagueLabel.match(/((?:Kreis|Bezirks|Münsterland|Verbands|Landes|Westfalen|Generali)\S*.*)/i);
+    const sublabel    = liPart ? liPart[1].trim() : leagueLabel;
+    if (seenGroups.has(group)) continue;
     seenGroups.add(group);
-    const label = m[3].trim().replace(/\s+Gr\.\s*\d+.*$/i, '').trim();
-    /* Absolute hrefs (andere Subdomain wie tvn.liga.nu) direkt verwenden */
     const url = relHref.startsWith('http') ? relHref : 'https://wtv.liga.nu' + relHref;
-    results.push({ team: 'g' + group, label, url, color: [128, 128, 128] });
+    results.push({ team: 'g' + group, label, sublabel, leagueLabel, url, color: [128, 128, 128] });
   }
   return results;
 }
@@ -1225,7 +1228,7 @@ function buildTeamButtons() {
     const btn = document.createElement('button');
     btn.className = 'btn btn-' + l.team + (showTeams[l.team] !== false ? ' on' : '');
     btn.id        = 'btn-' + l.team;
-    btn.innerHTML = '<span>' + formatTeamLabel(l.label) + '</span><span class="team-btn-rank" id="rank-' + l.team + '"></span>';
+    btn.innerHTML = '<span>' + esc(l.label) + (l.sublabel ? '<br><span style="font-size:0.78rem;opacity:0.8">' + esc(l.sublabel) + '</span>' : '') + '</span><span class="team-btn-rank" id="rank-' + l.team + '"></span>';
     btn.querySelector('.team-btn-rank').addEventListener('click', () => {
       if (!l.rank) return;
       const row = document.getElementById('team-row');
@@ -1553,7 +1556,7 @@ function parseLeague(html, league) {
       homeTeam, awayTeam, result, note, reportUrl,
       isHome: homeTeam.includes(CLUB_NAME),
       team:   league.team,
-      label:  league.label
+      label:  league.leagueLabel || league.label
     });
   }
 
@@ -1626,7 +1629,7 @@ function parseLeagueAll(html, league) {
       homeTeam, awayTeam, result, reportUrl,
       isHome: isClubHome,
       isClubMatch: isClubHome || isClubAway,
-      team: league.team, label: league.label
+      team: league.team, label: league.leagueLabel || league.label
     });
   }
   return matches;
@@ -1968,7 +1971,7 @@ function renderMatches() {
       : '';
 
     return divider + `<div class="card ${teamCls}${extra}">
-  <div class="card-tag-row"><span class="tag ${tagCls}" onclick="openMannschaften(event)" style="cursor:pointer">${m.label}</span></div>
+  <div class="card-tag-row"><span class="tag ${tagCls}">${m.label}</span></div>
   <div class="card-top">
     <span class="card-date">${wd} ${m.dateStr}<span class="card-time"> · ${m.timeStr}</span></span>
     ${past ? '' : `<span class="card-countdown" data-matchtime="${matchDateTime(m.date, m.timeStr).getTime()}">${countdownLabel(m.date, m.timeStr)}</span>`}
