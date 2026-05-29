@@ -420,11 +420,38 @@
     .btn-donate-later:hover { border-color: #9095b0; color: #c8cde4; background: rgba(144,149,176,0.08); }
     .btn-amount:hover { border-color: #0070ba; color: #c8cde4; }
   }
-  .detail-title {
+  .detail-title { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .detail-title-label {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.4rem;
+    font-size: 1.1rem;
     letter-spacing: 0.06em;
     color: #fff;
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .detail-title-sub {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #9095b0;
+    margin-top: 2px;
+  }
+  .detail-title-suffix { display: none; }
+  @media (min-width: 481px) {
+    .detail-title { flex-direction: row; align-items: baseline; }
+    .detail-title-label { font-size: 1.3rem; flex: 1; min-width: 0; }
+    .detail-title-sub { display: none; }
+    .detail-title-suffix {
+      display: inline;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: 0.06em;
+      color: #9095b0;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
   }
   .info-theme-row { margin-left: auto; display: flex; gap: 8px; }
   #info-donate {
@@ -477,6 +504,39 @@
   .standings-table tr.club-row td { color: #fff; font-weight: 600; }
   .standings-table tr.club-row td:nth-child(2) { color: #8aadd4; }
 
+  /* ── Detail-Schedule ── */
+  #detail-schedule-container { margin-top: 28px; }
+  .detail-schedule-title {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #7a7f96; margin-bottom: 8px;
+  }
+  .detail-schedule-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 0; border-bottom: 1px solid rgba(144,149,176,0.12);
+    font-size: 0.83rem;
+  }
+  .detail-schedule-row:last-child { border-bottom: none; }
+  .detail-schedule-date { color: #9095b0; white-space: nowrap; flex-shrink: 0; min-width: 88px; }
+  .detail-schedule-group-label {
+    font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; color: #7a7f96;
+    margin: 20px 0 4px; padding-top: 14px; border-top: 1px solid rgba(144,149,176,0.18);
+  }
+  .detail-schedule-title + .detail-schedule-group-label { margin-top: 6px; padding-top: 0; border-top: none; }
+  .detail-schedule-teams { flex: 1; min-width: 0; display: flex; align-items: center; flex-wrap: wrap; row-gap: 1px; line-height: 1.35; }
+  .detail-schedule-own     { font-weight: 700; color: #e8eaf0; }
+  .detail-schedule-opp     { font-weight: 400; color: #9095b0; }
+  .detail-schedule-neutral { font-weight: 400; color: #c8cde4; }
+  .detail-schedule-vs      { color: #9095b0; font-size: 0.75rem; margin: 0 4px; flex-shrink: 0; }
+  .detail-schedule-row.club-match { background: rgba(255,255,255,0.04); border-radius: 5px; margin: 0 -6px; padding-left: 6px; padding-right: 6px; }
+  .detail-schedule-result { flex-shrink: 0; font-weight: 700; font-size: 0.9rem; }
+  .detail-schedule-result.win     { color: #28a856; }
+  .detail-schedule-result.loss    { color: #e03838; }
+  .detail-schedule-result.draw    { color: #d4a000; }
+  .detail-schedule-result.open    { color: #555a7a; font-style: italic; font-weight: 400; }
+  .detail-schedule-result.neutral { color: #9095b0; font-weight: 400; }
+  button.detail-schedule-result { background: none; border: none; cursor: pointer; padding: 0; font-family: inherit; }
+
   /* ── Report-View ── */
   #report-view { display: none; }
   .report-match-header {
@@ -500,9 +560,9 @@
     color: #8aadd4;
     margin: 4px 0 2px;
   }
-  .report-result.win  { color: #78b890; }
-  .report-result.loss { color: #b87070; }
-  .report-result.draw { color: #d4b84a; }
+  .report-result.win  { color: #28a856; }
+  .report-result.loss { color: #e03838; }
+  .report-result.draw { color: #d4a000; }
   .report-date { font-size: 0.78rem; color: #9095b0; }
   .report-section {
     font-family: 'Bebas Neue', sans-serif;
@@ -545,9 +605,9 @@
   .report-table td:nth-child(4) { text-align: left; color: #e8eaf0; }
   .report-table tr.total-row td { color: #fff; font-weight: 700; border-top: 1px solid #3a3f5c; border-bottom: none; text-align: center; }
   .report-table tr.club-player td { color: #fff; }
-  .set-win  { color: #82c9a0; font-weight: 600; }
-  .set-loss { color: #c47c7c; }
-  .set-draw { color: #d4b84a; font-weight: 600; }
+  .set-win  { color: #28a856; font-weight: 600; }
+  .set-loss { color: #e03838; }
+  .set-draw { color: #d4a000; font-weight: 600; }
 
   .card-tag-row {
     text-align: center;
@@ -624,6 +684,8 @@
     .card-match-teams .vs { display: none; }
     .nm-match-teams span:first-child { width: 100%; }
     .nm-match-teams span:nth-child(2) { display: none; }
+    .detail-schedule-teams span:first-child { width: 100%; }
+    .detail-schedule-vs { display: none; }
   }
 
   .result { font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; flex-shrink: 0; }
@@ -809,6 +871,7 @@
     <div class="detail-title" id="detail-title"></div>
   </div>
   <div id="detail-table-container"></div>
+  <div id="detail-schedule-container"></div>
 </div>
 
 <div id="report-view">
@@ -1498,6 +1561,74 @@ function parseLeague(html, league) {
   return matches;
 }
 
+function parseLeagueAll(html, league) {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const matches = [];
+  let lastDateStr = '';
+  let lastTimeStr = '??:??';
+
+  for (const row of doc.querySelectorAll('table tr')) {
+    const cells = [...row.querySelectorAll('td')];
+    const texts = cells.map(c => c.textContent.trim());
+
+    for (const t of texts) {
+      const m = t.match(/(\d{2}\.\d{2}\.\d{4})/);
+      if (m) {
+        lastDateStr = m[1];
+        const tm = t.match(/(\d{2}:\d{2})/);
+        lastTimeStr = tm ? tm[1] : (texts.find(t2 => /^\d{2}:\d{2}$/.test(t2)) || '??:??');
+        break;
+      }
+    }
+
+    if (cells.length < 3) continue;
+    const dateStr = lastDateStr;
+    const timeStr = lastTimeStr;
+    if (!dateStr) continue;
+
+    const teamTexts = texts.filter(looksLikeTeam);
+    if (teamTexts.length < 2) continue;
+
+    const homeTeam = teamTexts[0];
+    const awayTeam = teamTexts[1];
+
+    let result = 'offen';
+    for (const t of texts) {
+      if (/^\d+:\d+$/.test(t)) { result = t; break; }
+    }
+    if (result === 'offen') {
+      for (const t of texts) {
+        if (t.toLowerCase().includes('zurückgezogen')) { result = 'zurückgezogen'; break; }
+      }
+    }
+    if (result === 'zurückgezogen') continue;
+
+    let reportUrl = '';
+    for (const cell of cells) {
+      const a = cell.querySelector('a[href*="meetingReport"]');
+      if (a) {
+        const href = a.getAttribute('href');
+        reportUrl = href.startsWith('http') ? href : 'https://wtv.liga.nu' + href;
+        break;
+      }
+    }
+
+    const date = toDate(dateStr);
+    if (!date) continue;
+
+    const isClubHome = homeTeam.includes(CLUB_NAME);
+    const isClubAway = awayTeam.includes(CLUB_NAME);
+    matches.push({
+      dateStr, timeStr, date,
+      homeTeam, awayTeam, result, reportUrl,
+      isHome: isClubHome,
+      isClubMatch: isClubHome || isClubAway,
+      team: league.team, label: league.label
+    });
+  }
+  return matches;
+}
+
 /* ── Laden ─────────────────────────────────────────────────── */
 function extractClubRank(html) {
   const table = parseStandingsTable(html);
@@ -1944,8 +2075,48 @@ function showTable(team) {
   }
   tableHtml += '</tbody></table>';
 
-  document.getElementById('detail-title').textContent = league.label + ' – Tabelle';
+  document.getElementById('detail-title').innerHTML =
+    `<span class="detail-title-label">${esc(league.label)}</span>` +
+    `<span class="detail-title-sub">Tabelle · Spielplan</span>` +
+    `<span class="detail-title-suffix"> – Tabelle · Spielplan</span>`;
   document.getElementById('detail-table-container').innerHTML = tableHtml;
+
+  // Alle Spiele der Gruppe (kompletter Gruppenspielplan)
+  const allGroupMatches = parseLeagueAll(html, league);
+  let schedHtml = '<div class="detail-schedule-title">Spielplan der Gruppe</div>';
+  for (const m of allGroupMatches) {
+    const past = isPast(m.date);
+    const wd   = WEEKDAYS[m.date.getDay()];
+    const homeCls = m.isClubMatch ? (m.isHome  ? 'detail-schedule-own' : 'detail-schedule-opp') : 'detail-schedule-neutral';
+    const awayCls = m.isClubMatch ? (!m.isHome ? 'detail-schedule-own' : 'detail-schedule-opp') : 'detail-schedule-neutral';
+    let resultEl = '';
+    if (past) {
+      const txt = resultTxt(m.result);
+      if (m.isClubMatch) {
+        const cls = resultCls(m.result, m.isHome);
+        if (m.reportUrl) {
+          const safeUrl  = m.reportUrl.replace(/'/g, "\\'");
+          const safeTeam = m.team.replace(/'/g, "\\'");
+          resultEl = `<button class="detail-schedule-result ${cls}" onclick="showReport('${safeTeam}','${safeUrl}',allMatches.find(x=>x.reportUrl==='${safeUrl}'))">${esc(txt)}</button>`;
+        } else {
+          resultEl = `<span class="detail-schedule-result ${cls}">${esc(txt)}</span>`;
+        }
+      } else {
+        resultEl = `<span class="detail-schedule-result neutral">${esc(txt)}</span>`;
+      }
+    }
+    const rowCls = m.isClubMatch ? ' club-match' : '';
+    schedHtml += `<div class="detail-schedule-row${rowCls}">` +
+      `<span class="detail-schedule-date">${wd} ${m.dateStr}<br><span style="font-size:0.78rem">${m.timeStr}</span></span>` +
+      `<span class="detail-schedule-teams">` +
+        `<span class="${homeCls}">${esc(m.homeTeam)}</span>` +
+        `<span class="detail-schedule-vs">vs.</span>` +
+        `<span class="${awayCls}">${esc(m.awayTeam)}</span>` +
+      `</span>` +
+      resultEl +
+      `</div>`;
+  }
+  document.getElementById('detail-schedule-container').innerHTML = schedHtml;
 
   document.getElementById('matches-container').style.display = 'none';
   document.getElementById('update-info').style.display = 'none';
