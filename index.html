@@ -228,7 +228,7 @@
     background: #1e2a45;
     border-radius: 12px;
     margin-bottom: 10px;
-    padding: 12px 14px;
+    padding: 14px 16px;
     border: 1px solid #1e2235;
   }
   /* Karten-Farben werden dynamisch per JS generiert → siehe #dynamic-team-css */
@@ -516,13 +516,13 @@
 
   .card-tag-row {
     text-align: center;
-    margin-bottom: 7px;
+    margin-bottom: 10px;
   }
   .card-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     gap: 8px;
   }
   .card-date {
@@ -570,31 +570,30 @@
   .card-match {
     display: flex;
     align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .card-match-teams {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
     flex-wrap: wrap;
     row-gap: 2px;
   }
   .team          { font-size: 0.92rem; font-weight: 700; color: #fff; line-height: 1.3; }
   .team.opponent { font-weight: 400; color: #c0c4d8; }
   .vs { font-size: 0.75rem; color: #c0c4d8; font-weight: 400; margin: 0 6px; flex-shrink: 0; }
+  @media (max-width: 480px) {
+    .card-match-teams .team:not(.opponent) { width: 100%; }
+    .card-match-teams .vs { margin-left: 0; }
+  }
 
-  .result { font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .result { font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; flex-shrink: 0; }
   .result.win  { color: #78b890; }
   .result.loss { color: #b87070; }
   .result.draw { color: #d4b84a; }
   .result.open { color: #444a68; font-style: italic; font-weight: 400; font-size: 0.9rem; }
-
-  .note {
-    font-size: 0.7rem;
-    color: #555a7a;
-    font-style: italic;
-  }
-
-  .card-bottom {
-    display: flex;
-    justify-content: flex-end;
-    align-items: flex-end;
-    margin-top: 6px;
-  }
 
   /* ── Status ── */
   .status-msg {
@@ -1770,12 +1769,7 @@ function renderMatches() {
     ${past ? '' : `<span class="card-countdown" data-matchtime="${matchDateTime(m.date, m.timeStr).getTime()}">${countdownLabel(m.date, m.timeStr)}</span>`}
     ${tabelleBtn}
   </div>
-  <div class="card-match">${homeSpan}<span class="vs">vs.</span>${awaySpan}</div>
-  <div class="card-bottom">
-    ${past && m.reportUrl
-      ? `<button class="result ${resultCls(m.result, m.isHome)}" onclick="showReport('${m.team}','${m.reportUrl}',allMatches.find(x=>x.reportUrl==='${m.reportUrl}'))">${resultTxt(m.result)}</button>`
-      : `<span class="result ${resultCls(m.result, m.isHome)}">${resultTxt(m.result)}</span>`}
-  </div>
+  <div class="card-match"><div class="card-match-teams">${homeSpan}<span class="vs">vs.</span>${awaySpan}</div>${past ? (m.reportUrl ? `<button class="result ${resultCls(m.result, m.isHome)}" onclick="showReport('${m.team}','${m.reportUrl}',allMatches.find(x=>x.reportUrl==='${m.reportUrl}'))">${resultTxt(m.result)}</button>` : `<span class="result ${resultCls(m.result, m.isHome)}">${resultTxt(m.result)}</span>`) : ''}</div>
 </div>`;
   }).join('\n');
 }
