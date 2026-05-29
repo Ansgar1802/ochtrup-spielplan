@@ -416,11 +416,6 @@
     border-radius: 8px;
     transition: all 0.15s;
   }
-  @media (hover: hover) {
-    .btn-donate-main:hover { background: #ffb020; }
-    .btn-donate-later:hover { border-color: #9095b0; color: #c8cde4; background: rgba(144,149,176,0.08); }
-    .btn-amount:hover { border-color: #0070ba; color: #c8cde4; }
-  }
   .detail-title { flex: 1; min-width: 0; display: flex; flex-direction: column; }
   .detail-title-label {
     font-family: 'Bebas Neue', sans-serif;
@@ -768,19 +763,7 @@
     padding-bottom: 40px;
   }
 
-  @media (hover: hover) {
-    .btn-info:hover { border-color: #9095b0; color: #fff; }
-    .btn:hover { background: #1a1d2e; color: #9095b0; border-color: #444a68; }
-    .btn-mannschaften:hover { background: #1a1d2e; color: #9095b0; border-color: #444a68; }
-    .team-btn-rank:hover { opacity: 1; }
-    .btn-close-teams:hover { color: #9095b0; border-color: #444a68; background: #1a1d2e; }
-    .btn-select-all:hover  { background: rgba(80,150,110,0.15) !important; border-color: #82c9a0 !important; color: #82c9a0 !important; }
-    .btn-select-none:hover { background: rgba(175,80,80,0.14) !important; border-color: #c47c7c !important; color: #c47c7c !important; }
-    .btn-meine-auswahl:hover { background: rgba(170,130,50,0.15) !important; border-color: #c4a042 !important; color: #d4b054 !important; }
-    .btn-back:hover { border-color: #9095b0; color: #fff; background: rgba(144,149,176,0.2); }
-    #report-tabelle-btn:hover { border-color: #8aadd4; color: #fff; background: rgba(100,140,220,0.28); }
-    .btn-tabelle:hover { background: rgba(255,255,255,0.28); border-color: rgba(255,255,255,0.6); color: #fff; }
-  }
+
 </style>
 <style id="theme-override-css"></style>
 <style id="dynamic-team-css"></style>
@@ -957,17 +940,6 @@ const LIGHT_THEME_CSS = `
   #info-view .btn-back { color: #1a1d2e; border-color: #5a6090; background: rgba(60,70,140,0.08); }
   .info-content { color: #1a1d2e; }
   .info-content h2 { color: #0f1020; }
-  @media (hover: hover) {
-    .btn-filter:hover { background: #e0e4f0; color: #1a1d2e; border-color: #7a7f9a; }
-    .btn-mannschaften:hover { background: #e0e4f0; color: #1a1d2e; border-color: #7a7f9a; }
-    .team-row .btn:hover { background: #e0e4f0; color: #1a1d2e; border-color: #7a7f9a; }
-    .btn-close-teams:hover { color: #1a1d2e; border-color: #7a7f9a; background: #e0e4f0; }
-    .btn-select-all:hover  { background: #e0e4f0 !important; color: #1a1d2e !important; border-color: #7a7f9a !important; }
-    .btn-select-none:hover { background: #e0e4f0 !important; color: #1a1d2e !important; border-color: #7a7f9a !important; }
-    .btn-meine-auswahl:hover { background: #e0e4f0 !important; color: #1a1d2e !important; border-color: #7a7f9a !important; }
-    .btn-info:hover { border-color: #3a4080; color: #1a1d2e; background: rgba(60,70,140,0.18); }
-    #info-view .btn-back:hover { color: #0f1020; border-color: #3a4080; background: rgba(60,70,140,0.18); }
-  }
   #donate-banner { background: rgba(0,48,135,0.06); border-color: rgba(0,112,186,0.25); }
   .donate-text { color: #3a4060; }
   .btn-donate-later { color: #707a9a; }
@@ -1210,7 +1182,6 @@ function buildTeamCSS(leagues) {
     const onBg   = toHex(blend(base,[r,g,b],0.32));
     return `.btn-${l.team}{border-color:${btnBdr};background:${btnBg};color:${dimText};}` +
            `.btn-${l.team}.on{border-color:${bright};background:${onBg};color:#fff;}` +
-           `@media(hover:hover){.team-row .btn-${l.team}:hover{border-color:${btnBdr};background:${btnBg};color:${dimText};}.team-row .btn-${l.team}.on:hover{border-color:${bright};background:${onBg};color:#fff;}}` +
            `.card.${l.team},.next-match-box.${l.team}{background:${cardBg};border-color:${border};}` +
            `.tag-${l.team}{background:${tagBg};color:#fff;font-weight:700;border:1px solid ${border};}`;
   }).join('\n');
@@ -2458,13 +2429,16 @@ function toggleMeineAuswahlMode() {
     pressTimer = setTimeout(function() {
       if (!meineAuswahlActive) return;
       longPressFired = true;
-      localStorage.removeItem(LS_AUSWAHL);
-      meineAuswahlActive = false;
-      btn.classList.remove('on');
+      meineAuswahlActive = true;
+      selectMode = null;
+      btn.classList.add('on');
+      document.getElementById('btn-select-all').classList.remove('on');
+      document.getElementById('btn-select-none').classList.remove('on');
       LEAGUES.forEach(l => {
         showTeams[l.team] = false;
         document.getElementById('btn-' + l.team).classList.remove('on');
       });
+      localStorage.setItem(LS_AUSWAHL, JSON.stringify({ ...showTeams }));
       saveState();
       renderNextMatch();
       renderMatches();
