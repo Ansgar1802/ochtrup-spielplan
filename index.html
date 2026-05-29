@@ -292,6 +292,7 @@
     transition: opacity 3s ease, max-height 3s ease, padding 3s ease, margin 3s ease, border-width 3s ease;
   }
   #main-content { transition: opacity 3s ease; }
+  #matches-container { transition: opacity 2s ease; }
   #pwa-hint-banner {
     display: flex;
     align-items: center;
@@ -924,7 +925,7 @@ const CLUB_NAME      = 'Ochtrup';
 const CLUB_TEAMS_URL = 'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/clubTeams?club=26831';
 const LS_STATE       = 'spielplan-state';
 const LS_AUSWAHL     = 'spielplan-meine-auswahl';
-const LS_LEAGUES     = 'spielplan-leagues-v5';
+const LS_LEAGUES     = 'spielplan-leagues-v6';
 const LS_THEME       = 'spielplan-theme';
 const LS_STARTS      = 'spielplan-starts';
 
@@ -1176,7 +1177,7 @@ function parseClubTeams(html) {
   const rowRe = /title="Mannschaftsportrait"[^>]*>([^<]+)<\/a>[\s\S]*?href="([^"]*groupPage[^"]*[?&]group=(\d+)[^"]*)">([^<]+)/g;
   let m;
   while ((m = rowRe.exec(decoded)) !== null) {
-    const label    = m[1].trim();
+    const label    = m[1].trim().replace(/grüner ball/gi, 'Gr. Ball');
     const relHref  = m[2];
     const group    = m[3];
     const leagueLabel = m[4].trim().replace(/\s+Gr\.\s*\d+.*$/i, '').trim();
@@ -1654,10 +1655,32 @@ async function loadAllData() {
   const refreshBtn = document.getElementById('btn-refresh');
 
   errBanner.style.display  = 'none';
-  loadBanner.style.display = 'flex';
-  document.getElementById('matches-container').innerHTML = '';
-  document.getElementById('next-match-box').style.display = 'none';
+  loadBanner.style.display = 'none';
+  const mc    = document.getElementById('matches-container');
+  const nmBox = document.getElementById('next-match-box');
+  mc.innerHTML = '';
+  mc.style.opacity = '0';
+  mc.style.pointerEvents = 'none';
+  document.getElementById('controls-bar').style.pointerEvents = 'none';
   document.getElementById('update-info').style.display = 'none';
+
+  /* Ladeindikator im Nächstes-Spiel-Container anzeigen */
+  LEAGUES.forEach(l => nmBox.classList.remove(l.team));
+  nmBox.classList.remove('home-game');
+  nmBox.classList.add('no-match');
+  nmBox.style.transition = '';
+  nmBox.style.display = 'flex';
+  nmBox.style.opacity = '1';
+  document.getElementById('nm-league').textContent = '';
+  document.getElementById('nm-league').className   = 'nm-league';
+  document.getElementById('nm-date').innerHTML     = '';
+  document.getElementById('nm-days').textContent   = '';
+  document.getElementById('nm-unit').textContent   = '';
+  const nmTeams = document.getElementById('nm-teams');
+  nmTeams.style.flexDirection  = 'column';
+  nmTeams.style.justifyContent = 'center';
+  nmTeams.style.marginTop      = '-3rem';
+  nmTeams.innerHTML = '<div class="loading-row" style="justify-content:center"><div class="spinner"></div>Spieldaten werden geladen …</div>';
   refreshBtn.disabled = true;
   refreshBtn.classList.add('spinning');
 
@@ -1674,8 +1697,6 @@ async function loadAllData() {
       if (rankEl && league.rank) rankEl.textContent = 'Rang ' + league.rank;
       allMatches = [...allMatches, ...parseLeague(html, league)]
         .sort((a, b) => a.date - b.date);
-      renderNextMatch();
-      renderMatches();
     } catch(e) {
       if (attempt < 3) {
         await new Promise(r => setTimeout(r, 1200 * attempt));
@@ -1702,7 +1723,6 @@ async function loadAllData() {
 
   refreshBtn.disabled = false;
   refreshBtn.classList.remove('spinning');
-  loadBanner.style.display = 'none';
 
   if (errors.length) {
     errBanner.innerHTML =
@@ -1717,6 +1737,7 @@ async function loadAllData() {
       errors.join('<br>');
     errBanner.style.display = 'block';
     document.getElementById('matches-container').innerHTML = '';
+    renderNextMatch();
     return;
   }
 
@@ -1730,6 +1751,16 @@ async function loadAllData() {
     loaded + '/' + LEAGUES.length + ' Ligen' +
     (missing ? ' · Fehlend: ' + missing : '');
   ui.style.display = 'block';
+
+  mc.style.pointerEvents = '';
+  document.getElementById('controls-bar').style.pointerEvents = '';
+  nmBox.style.transition = 'opacity 2s ease';
+  nmBox.style.opacity = '0';
+  renderNextMatch();
+  renderMatches();
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => { mc.style.opacity = '1'; nmBox.style.opacity = '1'; });
+  });
 }
 
 /* ── Nächstes Spiel ────────────────────────────────────────── */
