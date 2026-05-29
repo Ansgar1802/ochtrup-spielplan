@@ -133,7 +133,7 @@
     line-height: 1;
     color: #8aadd4;
   }
-  .nm-days.today { font-size: 1.5rem; color: #78b890; }
+  .nm-days.today { font-size: 1.8rem; color: #fff; font-weight: 700; }
   .nm-unit {
     font-size: 0.62rem;
     text-transform: uppercase;
@@ -284,6 +284,33 @@
     transition: opacity 3s ease, max-height 3s ease, padding 3s ease, margin 3s ease, border-width 3s ease;
   }
   #main-content { transition: opacity 3s ease; }
+  #pwa-hint-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: rgba(0, 112, 186, 0.18);
+    border: 1px solid rgba(0, 112, 186, 0.40);
+    border-radius: 10px;
+    padding: 13px 16px;
+    margin-bottom: 14px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #e0e4f4;
+  }
+  .pwa-hint-link {
+    background: none; border: none;
+    color: #8aadd4; font-weight: 700;
+    cursor: pointer; padding: 0;
+    font-size: inherit; font-family: inherit;
+    text-decoration: underline;
+  }
+  .pwa-hint-close {
+    background: none; border: none;
+    color: #9095b0; cursor: pointer;
+    font-size: 1.1rem; padding: 0;
+    flex-shrink: 0; line-height: 1;
+  }
   .donate-logo-row { margin-bottom: 12px; text-align: center; }
   .donate-logo-pill {
     display: inline-flex;
@@ -587,6 +614,8 @@
   @media (max-width: 480px) {
     .card-match-teams .team:not(.opponent) { width: 100%; }
     .card-match-teams .vs { display: none; }
+    #nm-teams > span:first-child { width: 100%; }
+    #nm-teams > span:nth-child(2) { display: none; }
   }
 
   .result { font-size: 1.05rem; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; flex-shrink: 0; }
@@ -715,6 +744,12 @@
 </div>
 
 <div id="main-content">
+
+<!-- Homescreen-Hinweis (nur im Browser auf Mobilgeräten) -->
+<div id="pwa-hint-banner" style="display:none">
+  <span>Als App zum Homescreen hinzufügen – <button class="pwa-hint-link" onclick="showInfo('acc-homescreen')">Anleitung unter Info</button></span>
+  <button class="pwa-hint-close" onclick="dismissPwaHint()" title="Schließen">✕</button>
+</div>
 
 <!-- Nächstes Spiel -->
 <div id="next-match-box" class="next-match-box">
@@ -867,6 +902,9 @@ const LIGHT_THEME_CSS = `
   .donate-custom-euro { color: #5a6090; }
   #info-donate { background: rgba(0,48,135,0.06); border-color: rgba(0,112,186,0.25); }
   #donate-custom-input-info { background: rgba(255,255,255,0.7); color: #1a1d2e; border-color: rgba(0,112,186,0.4); }
+  #pwa-hint-banner { background: rgba(0,112,186,0.08); border-color: rgba(0,112,186,0.22); color: #2a3060; }
+  .pwa-hint-link { color: #0070ba; }
+  .pwa-hint-close { color: #6a7090; }
 `;
 
 let _scrollY = 0;
@@ -1092,13 +1130,11 @@ function buildTeamCSS(leagues) {
     const btnBg  = `rgba(${r},${g},${b},0.07)`;
     const btnBdr = `rgba(${r},${g},${b},0.28)`;
     const onBg   = toHex(blend(base,[r,g,b],0.32));
-    const isHerren = /herren/i.test(l.label) && !/generali/i.test(l.label);
     return `.btn-${l.team}{border-color:${btnBdr};background:${btnBg};color:${dimText};}` +
            `.btn-${l.team}.on{border-color:${bright};background:${onBg};color:#fff;}` +
            `@media(hover:hover){.team-row .btn-${l.team}:hover{border-color:${btnBdr};background:${btnBg};color:${dimText};}.team-row .btn-${l.team}.on:hover{border-color:${bright};background:${onBg};color:#fff;}}` +
            `.card.${l.team},.next-match-box.${l.team}{background:${cardBg};border-color:${border};}` +
-           `.tag-${l.team}{background:${tagBg};color:#fff;font-weight:700;border:1px solid ${border};}` +
-           (isHerren ? `#next-match-box.${l.team} .nm-days.today{color:#c8cde4;}` : '');
+           `.tag-${l.team}{background:${tagBg};color:#fff;font-weight:700;border:1px solid ${border};}`;
   }).join('\n');
 }
 
@@ -1280,6 +1316,21 @@ const DONATE_TEXTS = [
     if (el) el.innerHTML = DONATE_TEXTS[idx].replace(/\n/g, '<br>');
   }
 })();
+
+(function() {
+  const isStandalone = window.navigator.standalone === true ||
+                       window.matchMedia('(display-mode: standalone)').matches;
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile && !isStandalone) {
+    const b = document.getElementById('pwa-hint-banner');
+    if (b) b.style.display = 'flex';
+  }
+})();
+
+function dismissPwaHint() {
+  const b = document.getElementById('pwa-hint-banner');
+  if (b) b.style.display = 'none';
+}
 
 const _state    = loadState();
 let showPast    = _state.showPast;
@@ -1604,10 +1655,12 @@ function renderNextMatch() {
       if (el) el.classList.remove('blink');
     }, 5000);
   }
+  const nmOwnStyle = 'font-weight:700;color:#fff;text-transform:uppercase';
+  const nmOppStyle = 'font-weight:400;color:#c0c4d8;text-transform:uppercase';
   document.getElementById('nm-teams').innerHTML    =
-    `<span style="font-weight:700;color:#fff;text-transform:uppercase">${esc(next.homeTeam)}</span>` +
+    `<span style="${next.isHome ? nmOwnStyle : nmOppStyle}">${esc(next.homeTeam)}</span>` +
     `<span style="font-size:0.85rem;color:#c8cde4;font-weight:600;margin:0 5px">vs.</span>` +
-    `<span style="font-weight:700;color:#fff;text-transform:uppercase">${esc(next.awayTeam)}</span>`;
+    `<span style="${next.isHome ? nmOppStyle : nmOwnStyle}">${esc(next.awayTeam)}</span>`;
   const nmLeague = document.getElementById('nm-league');
   nmLeague.textContent = next.label;
   nmLeague.className = 'nm-league btn-' + next.team + ' on';
@@ -1893,7 +1946,7 @@ function backToList() {
   renderNextMatch();
 }
 
-async function showInfo() {
+async function showInfo(openAccordion) {
   if (document.getElementById('info-view').style.display === 'block') { backToList(); return; }
   document.getElementById('matches-container').style.display = 'none';
   document.getElementById('update-info').style.display = 'none';
@@ -1918,6 +1971,7 @@ async function showInfo() {
     const html = await res.text();
     const m = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
     el.innerHTML = m ? m[1] : html;
+    if (openAccordion) toggleAccordion(openAccordion);
   } catch(e) {
     el.innerHTML = '<p style="color:#b87070">Info-Seite konnte nicht geladen werden.</p>';
   }
