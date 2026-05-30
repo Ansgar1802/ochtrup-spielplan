@@ -2821,29 +2821,14 @@ function applyMeineFavoriten() {
   renderMatches();
 }
 
-/* ── Alle Mannschaften: Langdruck (3s) → alle abwählen */
+/* ── Alle Mannschaften: Klick → alle auswählen */
 (function() {
   const btn = document.getElementById('btn-alle-mannschaften');
-  let pressTimer = null;
-  let longPressFired = false;
   let isTouch = false;
-
-  function startTimer() {
-    longPressFired = false;
-    pressTimer = setTimeout(function() {
-      longPressFired = true;
-      deselectAllTeams();
-    }, 3000);
-  }
-  function cancelTimer() { clearTimeout(pressTimer); pressTimer = null; }
-
-  btn.addEventListener('touchstart', function(e) { e.preventDefault(); isTouch = true; startTimer(); });
-  btn.addEventListener('touchend',   function(e) { e.preventDefault(); cancelTimer(); if (!longPressFired) selectAllTeams(); longPressFired = false; setTimeout(function() { isTouch = false; }, 600); });
-  btn.addEventListener('touchcancel',function() { cancelTimer(); longPressFired = false; setTimeout(function() { isTouch = false; }, 600); });
-  btn.addEventListener('mousedown',  function() { if (!isTouch) startTimer(); });
-  btn.addEventListener('mouseup',    function() { if (!isTouch) cancelTimer(); });
-  btn.addEventListener('mouseleave', function() { if (!isTouch) cancelTimer(); });
-  btn.addEventListener('click',      function() { if (isTouch) return; if (!longPressFired) selectAllTeams(); longPressFired = false; });
+  btn.addEventListener('touchstart', function(e) { e.preventDefault(); isTouch = true; }, { passive: false });
+  btn.addEventListener('touchend',   function(e) { e.preventDefault(); selectAllTeams(); setTimeout(function() { isTouch = false; }, 600); });
+  btn.addEventListener('touchcancel',function() { setTimeout(function() { isTouch = false; }, 600); });
+  btn.addEventListener('click',      function() { if (!isTouch) selectAllTeams(); });
 })();
 
 /* ── Meine Favoriten: Klick → gespeicherte Favoriten anwenden */
