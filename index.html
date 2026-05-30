@@ -277,7 +277,7 @@
     z-index: 20;
     display: none;
     opacity: 0;
-    transition: opacity 1.5s ease;
+    transition: none;
   }
   #favoriten-card.open { opacity: 1; }
   .favoriten-header-row { display: flex; gap: 6px; margin-bottom: 12px; position: sticky; top: 0; background: rgba(15,17,30,0.98); z-index: 1; padding-top: 12px; }
@@ -360,7 +360,7 @@
     transition: opacity 3s ease, max-height 3s ease, padding 3s ease, margin 3s ease, border-width 3s ease;
   }
   #main-content { transition: opacity 3s ease; }
-  #main-content.favoriten-open > *:not(#favoriten-card) { opacity: 0 !important; pointer-events: none !important; transition: opacity 0.3s ease; }
+  #main-content.favoriten-open > *:not(#favoriten-card) { opacity: 0 !important; pointer-events: none !important; transition: none; }
   #matches-container { transition: opacity 2s ease; }
   #page-floor { background: transparent; min-height: 200px; margin: 24px -16px -48px; }
   #controls-slider { overflow: hidden; margin-bottom: 16px; position: sticky; top: var(--header-h, 90px); z-index: 4; background: #0f1117; }
@@ -2439,7 +2439,7 @@ function closeFavoriten(immediate) {
   if (immediate) {
     card.style.display = 'none';
   } else {
-    setTimeout(() => { card.style.display = 'none'; }, 1550);
+    card.style.display = 'none';
   }
   closeBtn.innerHTML = 'Meine<br>Favoriten<br>auswählen';
 
