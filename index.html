@@ -265,8 +265,10 @@
     position: fixed;
     top: var(--header-h);
     bottom: 16px;
-    left: 20px;
-    right: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 600px;
     background: rgba(15,17,30,0.98);
     border: 1px solid #3a3f60;
     border-radius: 16px;
@@ -334,6 +336,14 @@
     align-items: center;
     gap: 12px;
     margin-bottom: 18px;
+  }
+  .report-detail-header {
+    position: sticky;
+    top: 0;
+    background: inherit;
+    z-index: 1;
+    padding-top: 4px;
+    padding-bottom: 4px;
   }
   .btn-back {
     background: rgba(144,149,176,0.1);
@@ -952,11 +962,11 @@
 </div>
 
 <div id="report-view">
-  <div class="detail-header">
-    <button class="btn-back" onclick="backToList()">← Zurück</button>
-    <button class="btn-back" id="report-tabelle-btn" onclick="showTableFromReport()" style="margin-left:auto;">Tabelle</button>
-  </div>
   <div id="report-scroll">
+    <div class="detail-header report-detail-header">
+      <button class="btn-back" onclick="backToList()">← Zurück</button>
+      <button class="btn-back" id="report-tabelle-btn" onclick="showTableFromReport()" style="margin-left:auto;">Tabelle</button>
+    </div>
     <div id="report-content"></div>
   </div>
 </div>
