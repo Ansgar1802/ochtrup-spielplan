@@ -263,10 +263,10 @@
   /* Favoriten-Panel (schwebt direkt ein) */
   #favoriten-card {
     position: fixed;
-    top: calc(var(--header-h) + 8px);
+    top: var(--header-h);
     bottom: 16px;
-    left: 8px;
-    right: 8px;
+    left: 20px;
+    right: 20px;
     background: rgba(15,17,30,0.98);
     border: 1px solid #3a3f60;
     border-radius: 16px;
@@ -2843,7 +2843,7 @@ function applyMeineFavoriten() {
 
 /* ── Favoriten: Trigger in Controls-Bar und Close-Button im Panel */
 document.getElementById('btn-favoriten-editor').addEventListener('click', toggleFavoriten);
-document.getElementById('btn-favoriten-close').addEventListener('click', function() { closeFavoriten(); });
+document.getElementById('btn-favoriten-close').addEventListener('click', function() { closeFavoriten(true); });
 
 /* ── Start ─────────────────────────────────────────────────── */
 function updateHeaderH() {
