@@ -2423,7 +2423,7 @@ function openFavoriten() {
   if (!bd) {
     bd = document.createElement('div');
     bd.id = 'favoriten-backdrop';
-    bd.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:18;background:rgba(0,0,0,0);transition:background 0.3s ease;pointer-events:none;';
+    bd.style.cssText = 'position:fixed;top:var(--header-h,80px);left:0;right:0;bottom:0;z-index:18;background:rgba(0,0,0,0);transition:background 0.3s ease;pointer-events:none;';
     document.body.appendChild(bd);
   }
   requestAnimationFrame(() => { bd.style.background = 'rgba(0,0,0,0.72)'; });
