@@ -270,7 +270,7 @@
     background: rgba(15,17,30,0.98);
     border: 1px solid #3a3f60;
     border-radius: 16px;
-    box-shadow: 0 12px 50px rgba(0,0,0,0.75), 0 3px 14px rgba(0,0,0,0.5), -6px 0 24px rgba(0,0,0,0.4), 6px 0 24px rgba(0,0,0,0.4), 0 -4px 16px rgba(0,0,0,0.3);
+    box-shadow: 0 20px 80px rgba(0,0,0,0.95), 0 6px 24px rgba(0,0,0,0.85), -14px 0 50px rgba(0,0,0,0.75), 14px 0 50px rgba(0,0,0,0.75), 0 -8px 30px rgba(0,0,0,0.6);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding: 0 12px 12px;
@@ -1060,7 +1060,7 @@ const LIGHT_THEME_CSS = `
   .btn-favoriten-editor.open { color: #1a1d2e !important; border-color: rgba(90,100,160,0.75) !important; background: #c8cde4 !important; }
   .btn-meine-favoriten { color: #3a3f60 !important; border-color: rgba(90,100,160,0.35) !important; background: transparent !important; }
   .btn-meine-favoriten.on { color: #1a1d2e !important; font-weight: 700 !important; border-color: rgba(90,100,160,0.75) !important; background: #c8cde4 !important; }
-  #favoriten-card { background: #f0f2f8; border-color: rgba(90,100,160,0.35); box-shadow: 0 12px 50px rgba(20,30,80,0.22), 0 3px 14px rgba(20,30,80,0.12), -6px 0 24px rgba(20,30,80,0.1), 6px 0 24px rgba(20,30,80,0.1); }
+  #favoriten-card { background: #f0f2f8; border-color: rgba(90,100,160,0.35); box-shadow: 0 20px 80px rgba(20,30,80,0.55), 0 6px 24px rgba(20,30,80,0.4), -14px 0 50px rgba(20,30,80,0.35), 14px 0 50px rgba(20,30,80,0.35); }
   #favoriten-card .favoriten-header-row { background: #f0f2f8; }
   #favoriten-card #team-btns-container .btn { color: #3a3f60; }
   #favoriten-card #team-btns-container .btn.on { color: #ffffff !important; }
@@ -2419,6 +2419,9 @@ function openFavoriten() {
   meineAuswahlActive = true;
   closeBtn.innerHTML = 'Favoriten&shy;liste<br>schließen';
 
+  const mc = document.getElementById('main-content');
+  if (mc) { mc.style.transition = 'opacity 0.3s ease'; mc.style.opacity = '0'; mc.style.pointerEvents = 'none'; }
+
   card.style.display = 'block';
   requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add('open')));
 }
@@ -2428,6 +2431,9 @@ function closeFavoriten(immediate) {
   _favoritenOpen = false;
   const closeBtn = document.getElementById('btn-favoriten-close');
   const card = document.getElementById('favoriten-card');
+
+  const mc = document.getElementById('main-content');
+  if (mc) { mc.style.transition = 'none'; mc.style.opacity = '1'; mc.style.pointerEvents = ''; }
 
   localStorage.setItem(LS_AUSWAHL, JSON.stringify({ ...showTeams }));
 
