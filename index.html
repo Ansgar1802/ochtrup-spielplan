@@ -363,7 +363,7 @@
   }
   #main-content { transition: opacity 3s ease; }
   #matches-container { transition: opacity 2s ease; }
-  #page-floor { background: #ffffff; min-height: 200px; margin: 24px -16px -48px; }
+  #page-floor { background: transparent; min-height: 200px; margin: 24px -16px -48px; }
   #controls-slider { overflow: hidden; margin-bottom: 16px; position: sticky; top: var(--header-h, 90px); z-index: 4; background: #0f1117; }
   #controls-inner {
     display: flex;
@@ -819,7 +819,7 @@
   .update-info {
     text-align: center;
     font-size: 0.63rem;
-    color: #333650;
+    color: #555a7a;
     margin-top: 24px;
     letter-spacing: 0.04em;
   }
@@ -1093,6 +1093,8 @@ const LIGHT_THEME_CSS = `
   #pwa-hint-banner { background: rgba(0,112,186,0.08); border-color: rgba(0,112,186,0.22); color: #2a3060; }
   .pwa-hint-link { color: #0070ba; }
   .pwa-hint-close { color: #6a7090; }
+  .status-msg { color: #3a3f60; }
+  .update-info { color: #3a3f60; }
 `;
 
 const ROLAND_GARROS_CSS = `
@@ -1159,6 +1161,8 @@ const ROLAND_GARROS_CSS = `
   #pwa-hint-banner { background: rgba(0,0,0,0.12); border-color: rgba(255,255,255,0.2); color: #ffffff; }
   .pwa-hint-link { color: rgba(255,255,255,0.9); }
   .pwa-hint-close { color: rgba(255,255,255,0.7); }
+  .status-msg { color: rgba(255,255,255,0.6); }
+  .update-info { color: rgba(255,255,255,0.4); }
 `;
 
 let _scrollY = 0;
