@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-<title>TC 1928 Ochtrup – Spielplan 2026</title>
+<title>TV Feldmark Dorsten – Spielplan 2026</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="logo2.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -60,7 +60,7 @@
   }
   #info-view { display: none; }
   #settings-backdrop {
-    position: fixed; top: var(--header-h, 80px); left: 0; right: 0; bottom: 0; z-index: 19; display: none;
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 19; display: none;
   }
   #settings-view {
     position: fixed;
@@ -68,7 +68,7 @@
     left: max(32px, calc((100% - 576px) / 2));
     right: max(32px, calc((100% - 576px) / 2));
     background: #0f1117;
-    border: 1px solid #2e3150;
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 14px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 6px 20px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
     padding: 16px 18px 16px;
@@ -244,47 +244,46 @@
   .btn.on    { color: #fff; font-weight: 700; }
 
   .btn-filter.on  { border-color: #9095b0; background: rgba(144,149,176,0.08); }
-  .btn-mannschaften {
-    width: 100%;
-    padding: 9px;
-    border-radius: 20px;
-    border: 1px solid #2e3150;
-    background: transparent;
-    color: #555a7a;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.82rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    transition: all 0.15s;
-    user-select: none;
-  }
-  .mannschaften-wrapper { border-radius: 16px; transition: border-color 0.15s, background 0.15s; }
-  .mannschaften-wrapper.open { background: rgba(15,17,30,0.98); border: 1px solid #3a3f60; border-bottom: none; border-radius: 16px 16px 0 0; padding: 6px; display: flex; flex-direction: column; gap: 6px; }
-  .mannschaften-wrapper.open .btn-mannschaften { border-color: transparent; background: rgba(144,149,176,0.08); }
-  .btn-mannschaften::after { content: ' ▼'; font-size: 0.72em; opacity: 0.6; }
-  .btn-mannschaften.on::after { content: ' ▲'; opacity: 1; }
-  .btn-mannschaften.on { color: #fff; font-weight: 700; border-color: #9095b0; background: rgba(144,149,176,0.08); animation: blink 1s step-end infinite; }
-  .team-row { display: none; }
-  .team-row .btn { color: #9095b0; width: 100%; display: flex; justify-content: space-between; align-items: center; text-align: left; padding: 10px 13px; font-size: 0.88rem; white-space: normal; }
-  .top-btns-row .btn { display: block; text-align: center; justify-content: center; }
+  /* ── 3-Button Mannschaftsauswahl ── */
+  .team-select-row { position: relative; display: flex; gap: 6px; margin-bottom: 8px; }
+  .team-select-row .btn { flex: 1; min-width: 0; text-align: center; line-height: 1.35; white-space: normal; padding-top: 11px; padding-bottom: 11px; }
+  .btn-alle-mannschaften { color: rgba(110,185,145,0.45); border-color: rgba(110,185,145,0.22); -webkit-touch-callout: none; touch-action: none; }
+  .btn-alle-mannschaften.on { color: #82c9a0 !important; border-color: #4a9068 !important; background: rgba(80,150,110,0.15) !important; font-weight: 700; }
+  .btn-favoriten-editor { color: #9095b0; border-color: #2e3150; -webkit-touch-callout: none; margin: 0 6px; }
+  .btn-favoriten-editor.open { color: #fff; border-color: #9095b0; background: rgba(144,149,176,0.12); }
+  .btn-meine-favoriten { color: rgba(190,155,70,0.45); border-color: rgba(190,155,70,0.22); -webkit-touch-callout: none; touch-action: none; }
+  .btn-meine-favoriten.on { color: #d4b054 !important; border-color: #a07830 !important; background: rgba(170,130,50,0.18) !important; font-weight: 700; }
   .team-btn-rank { font-size: 0.75rem; opacity: 0.7; white-space: nowrap; margin-left: 8px; flex-shrink: 0; cursor: pointer; text-decoration: underline dotted; }
-  .team-row .btn.on { color: #fff; }
   #team-btns-container { display: flex; flex-direction: column; gap: 8px; }
-  #team-btns-container .btn { position: relative; isolation: isolate; }
+  #team-btns-container .btn { position: relative; isolation: isolate; width: 100%; display: flex; justify-content: space-between; align-items: center; text-align: left; padding: 10px 13px; font-size: 0.88rem; white-space: normal; }
   #team-btns-container .btn::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgba(255,255,255,var(--overlay-dark)); pointer-events: none; z-index: -1; }
-  .team-row.visible { display: flex; flex-direction: column; gap: 6px; align-items: stretch; background: rgba(15,17,30,0.98); border: 1px solid #3a3f60; border-top: none; border-radius: 0 0 16px 16px; padding: 6px; margin-bottom: 16px; }
-  .btn-close-teams { background: transparent; border: 1px solid #2e3150; border-radius: 20px; color: #555a7a; font-size: 0.78rem; font-family: 'DM Sans', sans-serif; font-weight: 600; padding: 7px 0; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; width: 100%; margin-top: 4px; transition: all 0.15s; }
-  .btn-select-all  { color: rgba(110,185,145,0.45) !important; border-color: rgba(110,185,145,0.22); }
-  .btn-select-all.on  { color: #82c9a0 !important; border-color: #4a9068 !important; background: rgba(80,150,110,0.15) !important; font-weight: 700; }
-  .btn-select-none { color: rgba(195,115,115,0.45) !important; border-color: rgba(195,115,115,0.22); }
-  .btn-select-none.on { color: #c47c7c !important; border-color: #8a4545 !important; background: rgba(175,80,80,0.14) !important; font-weight: 700; }
-  .top-btns-row { display: none; width: 100%; gap: 6px; }
-  .mannschaften-wrapper.open .top-btns-row { display: flex; }
-  .top-btns-row .btn { flex: 1; text-align: center; min-width: 0; padding-top: 17px; padding-bottom: 17px; white-space: normal; line-height: 1.4; }
-  .btn-meine-auswahl { color: rgba(190,155,70,0.45) !important; border-color: rgba(190,155,70,0.22); -webkit-touch-callout: none; touch-action: none; }
-  .btn-meine-auswahl.on { color: #d4b054 !important; border-color: #a07830 !important; background: rgba(170,130,50,0.18) !important; font-weight: 700; }
+  .btn-refresh-favoriten { background: transparent; border: 1px solid #2e3150; border-radius: 20px; color: #555a7a; font-size: 1rem; font-family: 'DM Sans', sans-serif; font-weight: 600; padding: 5px 0; cursor: pointer; text-transform: uppercase; letter-spacing: 0; width: 100%; margin-top: 4px; transition: all 0.15s; }
+  .btn-refresh-favoriten:disabled { opacity: 0.4; cursor: default; }
+  .btn-refresh-favoriten.spinning { animation: spin 0.7s linear infinite; }
+  /* Favoriten-Panel (schwebt direkt ein) */
+  #favoriten-card {
+    position: fixed;
+    top: calc(var(--header-h) + 8px);
+    bottom: 16px;
+    left: 8px;
+    right: 8px;
+    background: rgba(15,17,30,0.98);
+    border: 1px solid #3a3f60;
+    border-radius: 16px;
+    box-shadow: 0 12px 50px rgba(0,0,0,0.75), 0 3px 14px rgba(0,0,0,0.5), -6px 0 24px rgba(0,0,0,0.4), 6px 0 24px rgba(0,0,0,0.4), 0 -4px 16px rgba(0,0,0,0.3);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 12px 12px;
+    z-index: 20;
+    display: none;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+  }
+  #favoriten-card.open { opacity: 1; }
+  /* Header-Zeile im Panel: Close-Button zentriert, gleiche Größe wie Trigger */
+  .favoriten-header-row { display: flex; gap: 6px; margin-bottom: 12px; position: sticky; top: 0; background: rgba(15,17,30,0.98); z-index: 1; padding-top: 12px; }
+  .favoriten-header-spacer { flex: 1; }
+  .btn-favoriten-close { flex: 1; margin: 0 6px; padding-top: 14px; padding-bottom: 14px; }
   /* Team-Farben werden dynamisch per JS generiert → siehe #dynamic-team-css */
 
   .btn-refresh {
@@ -349,7 +348,6 @@
   }
   #report-tabelle-btn { background: rgba(100,140,220,0.15); border-color: #4a6aaa; color: #8aadd4; }
   /* ── Spenden-Banner ── */
-  #donate-banner, #info-donate { display: none !important; }
   #donate-banner {
     margin: 0 0 16px;
     padding: 18px 16px 14px;
@@ -857,10 +855,10 @@
   <button class="btn-settings" onclick="showSettings()" title="Einstellungen">⚙</button>
   <button class="btn-info" onclick="showInfo()" title="Info">i</button>
   <div class="header-title">
-    <img src="logo.png" class="header-logo" alt="TC 1928 Ochtrup Logo" onerror="this.style.display='none'">
-    <h1>TC 1928 Ochtrup</h1>
+    <img src="logo.png" class="header-logo" alt="TV Feldmark Dorsten Logo" onerror="this.style.display='none'">
+    <h1>TV Feldmark Dorsten</h1>
   </div>
-  <p>Spielplan · Münsterland · Sommer 2026</p>
+  <p>Spielplan · Ruhrgebiet · Sommer 2026</p>
 </div>
 
 <!-- Spenden-Banner -->
@@ -884,7 +882,7 @@
   <button class="btn-donate-later" onclick="closeDonate()">Vielleicht später →</button>
 </div>
 
-<div id="main-content">
+<div id="main-content" style="opacity:0;pointer-events:none">
 
 <!-- Nächstes Spiel -->
 <div id="next-match-box" class="next-match-box">
@@ -916,19 +914,21 @@
         <button class="btn btn-filter on" id="btn-heim"      onclick="toggleFilter('showHome')">Heim</button>
         <button class="btn btn-filter on" id="btn-auswaerts" onclick="toggleFilter('showAway')">Auswärts</button>
       </div>
-      <div class="mannschaften-wrapper" id="mannschaften-wrapper">
-        <button class="btn-mannschaften" id="btn-mannschaften" onclick="toggleMannschaften()">Mannschaften</button>
-        <div class="top-btns-row">
-          <button class="btn btn-select-all"  id="btn-select-all"  onclick="selectAllTeams()">Alle<br>auswählen</button>
-          <button class="btn btn-select-none" id="btn-select-none" onclick="selectNoTeams()">Keine<br>auswählen</button>
-          <button class="btn btn-meine-auswahl" id="btn-meine-auswahl">Meine<br>Auswahl</button>
-        </div>
+      <div class="team-select-row" id="team-select-row">
+        <button class="btn btn-alle-mannschaften" id="btn-alle-mannschaften">Alle<br>Mann&shy;schaften</button>
+        <button class="btn btn-favoriten-editor" id="btn-favoriten-editor">Meine<br>Favoriten<br>auswählen</button>
+        <button class="btn btn-meine-favoriten" id="btn-meine-favoriten">Meine<br>Favoriten</button>
       </div>
     </div>
   </div>
 </div>
 
-<div class="team-row" id="team-row">
+<div id="favoriten-card">
+  <div class="favoriten-header-row">
+    <div class="favoriten-header-spacer"></div>
+    <button class="btn btn-favoriten-close" id="btn-favoriten-close">Meine<br>Favoriten<br>auswählen</button>
+    <div class="favoriten-header-spacer"></div>
+  </div>
   <div id="team-btns-container"></div>
 </div>
 
@@ -1017,15 +1017,15 @@
 <script>
 /* ── Konfiguration ─────────────────────────────────────────── */
 /* ── Dynamische Mannschaftsliste ───────────────────────────── */
-const CLUB_NAME      = 'Ochtrup';
-const CLUB_TEAMS_URL = 'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/clubTeams?club=26831';
-const LS_STATE       = 'spielplan-state';
-const LS_AUSWAHL     = 'spielplan-meine-auswahl';
-const LS_LEAGUES     = 'spielplan-leagues-v6';
-const LS_THEME       = 'spielplan-theme';
+const CLUB_NAME      = 'Feldmark';
+const CLUB_TEAMS_URL = 'https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/clubTeams?club=25977';
+const LS_STATE       = 'feldmark-state';
+const LS_AUSWAHL     = 'feldmark-meine-auswahl';
+const LS_LEAGUES     = 'feldmark-leagues-v6';
+const LS_THEME       = 'feldmark-theme';
 const LS_OVERLAY_DARK  = 'spielplan-overlay-dark';
 const LS_OVERLAY_LIGHT = 'spielplan-overlay-light';
-const LS_STARTS      = 'spielplan-starts';
+const LS_STARTS      = 'feldmark-starts';
 
 const LIGHT_THEME_CSS = `
   html, body { background: #f0f2f8; }
@@ -1054,31 +1054,30 @@ const LIGHT_THEME_CSS = `
   .nm-match-teams span { color: #ffffff !important; }
   .btn-filter { border-color: rgba(90,100,160,0.35); color: #3a3f60; }
   .btn-filter.on { color: #1a1d2e; font-weight: 700; border-color: rgba(90,100,160,0.75); background: #c8cde4; }
-  .btn-mannschaften { color: #3a3f60; border-color: rgba(90,100,160,0.35); }
-  .btn-mannschaften.on { color: #1a1d2e; font-weight: 700; border-color: rgba(90,100,160,0.75); background: #c8cde4; animation: blink 1s step-end infinite; }
-  .mannschaften-wrapper.open { background: #eef0f8; border-color: rgba(255,255,255,0.5); }
-  .mannschaften-wrapper.open .btn-mannschaften { border-color: transparent; background: rgba(60,70,140,0.07); color: #1a1d2e; }
-  .team-row.visible { background: #eef0f8; border-color: rgba(255,255,255,0.5); }
-  .team-row .btn { color: #3a3f60; }
-  .btn-close-teams { border-color: rgba(255,255,255,0.5); color: #3a3f60; }
-  .btn-select-all  { color: #3a3f60 !important; border-color: rgba(90,100,160,0.35) !important; background: transparent !important; }
-  .btn-select-all.on  { color: #1a1d2e !important; font-weight: 700 !important; border-color: rgba(90,100,160,0.75) !important; background: #c8cde4 !important; }
-  .btn-select-none { color: #3a3f60 !important; border-color: rgba(90,100,160,0.35) !important; background: transparent !important; }
-  .btn-select-none.on { color: #1a1d2e !important; font-weight: 700 !important; border-color: rgba(90,100,160,0.75) !important; background: #c8cde4 !important; }
-  .btn-meine-auswahl { color: #3a3f60 !important; border-color: rgba(90,100,160,0.35) !important; background: transparent !important; }
-  .btn-meine-auswahl.on { color: #1a1d2e !important; font-weight: 700 !important; border-color: rgba(90,100,160,0.75) !important; background: #c8cde4 !important; }
+  .btn-alle-mannschaften { color: #3a3f60 !important; border-color: rgba(90,100,160,0.35) !important; background: transparent !important; }
+  .btn-alle-mannschaften.on { color: #1a1d2e !important; font-weight: 700 !important; border-color: rgba(90,100,160,0.75) !important; background: #c8cde4 !important; }
+  .btn-favoriten-editor { color: #3a3f60 !important; border-color: rgba(90,100,160,0.35) !important; background: transparent !important; }
+  .btn-favoriten-editor.open { color: #1a1d2e !important; border-color: rgba(90,100,160,0.75) !important; background: #c8cde4 !important; }
+  .btn-meine-favoriten { color: #3a3f60 !important; border-color: rgba(90,100,160,0.35) !important; background: transparent !important; }
+  .btn-meine-favoriten.on { color: #1a1d2e !important; font-weight: 700 !important; border-color: rgba(90,100,160,0.75) !important; background: #c8cde4 !important; }
+  #favoriten-card { background: #f0f2f8; border-color: rgba(90,100,160,0.35); box-shadow: 0 12px 50px rgba(20,30,80,0.22), 0 3px 14px rgba(20,30,80,0.12), -6px 0 24px rgba(20,30,80,0.1), 6px 0 24px rgba(20,30,80,0.1); }
+  #favoriten-card .favoriten-header-row { background: #f0f2f8; }
+  #favoriten-card #team-btns-container .btn { color: #3a3f60; }
+  #favoriten-card #team-btns-container .btn.on { color: #ffffff !important; }
+  .btn-favoriten-close { border-color: rgba(90,100,160,0.75); background: #c8cde4; color: #1a1d2e; }
+  .btn-refresh-favoriten { border-color: rgba(90,100,160,0.35); color: #3a3f60; }
   #info-view { background: #f0f2f8; }
   #btn-info-back { color: #1a1d2e !important; }
   #settings-view { background: #f0f2f8; border-color: rgba(90,100,160,0.35); box-shadow: 0 20px 60px rgba(20,30,80,0.28), 0 6px 20px rgba(20,30,80,0.15), 0 0 0 1px rgba(90,100,160,0.08); }
   #settings-view .btn-filter { border-color: rgba(90,100,160,0.35); color: #3a3f60; background: transparent; }
   #settings-view .btn-filter.on { border-color: rgba(90,100,160,0.75); background: #c8cde4; color: #1a1d2e; }
+  .settings-close-btn { color: #5a5f7a; }
+  .settings-close-row { border-top-color: rgba(90,100,160,0.15); }
   .btn-info { border-color: #5a6090; color: #3a3f60; background: rgba(60,70,140,0.08); }
   .btn-settings { border-color: #5a6090; color: #3a3f60; background: rgba(60,70,140,0.08); }
   .settings-section-label { color: #5a5f7a; }
   #settings-overlay-label { color: #1a1d2e; }
   .settings-slider-lbl { color: #3a3f60; }
-  .settings-close-btn { color: #5a5f7a; }
-  .settings-close-row { border-top-color: rgba(90,100,160,0.15); }
   .info-content { color: #1a1d2e; }
   .info-content h2 { color: #0f1020; }
   #donate-banner { background: rgba(0,48,135,0.06); border-color: rgba(0,112,186,0.25); }
@@ -1119,29 +1118,27 @@ const ROLAND_GARROS_CSS = `
   .btn.on { color: #ffffff; border-color: #ffffff; }
   .btn-filter { background: #143D26; border-color: rgba(255,255,255,0.5); color: rgba(255,255,255,0.7); }
   .btn-filter.on { color: #ffffff; font-weight: 700; border-color: #ffffff; background: #143D26; }
-  .btn-mannschaften { background: #143D26; color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.5); }
-  .btn-mannschaften.on { color: #ffffff; font-weight: 700; border-color: #ffffff; background: #143D26; animation: blink 1s step-end infinite; }
-  .mannschaften-wrapper.open { background: rgba(0,0,0,0.12); border-color: rgba(255,255,255,0.4); }
-  .mannschaften-wrapper.open .btn-mannschaften { border-color: rgba(255,255,255,0.5); background: #143D26; color: #ffffff; }
-  .team-row.visible { background: rgba(0,0,0,0.08); border-color: rgba(255,255,255,0.3); }
-  #team-btns-container .btn { color: rgba(255,255,255,0.4); background: #143D26; border-color: rgba(255,255,255,0.3); }
-  #team-btns-container .btn.on { color: #ffffff; background: #143D26; border-color: #ffffff; font-weight: 700; }
-  .btn-close-teams { background: #143D26; border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.4); }
-  .btn-select-all  { color: rgba(255,255,255,0.4) !important; border-color: rgba(255,255,255,0.3) !important; background: #143D26 !important; }
-  .btn-select-all.on  { color: #ffffff !important; font-weight: 700 !important; border-color: #ffffff !important; background: #143D26 !important; }
-  .btn-select-none { color: rgba(255,255,255,0.4) !important; border-color: rgba(255,255,255,0.3) !important; background: #143D26 !important; }
-  .btn-select-none.on { color: #ffffff !important; font-weight: 700 !important; border-color: #ffffff !important; background: #143D26 !important; }
-  .btn-meine-auswahl { color: rgba(255,255,255,0.4) !important; border-color: rgba(255,255,255,0.3) !important; background: #143D26 !important; }
-  .btn-meine-auswahl.on { color: #ffffff !important; font-weight: 700 !important; border-color: #ffffff !important; background: #143D26 !important; }
+  .btn-alle-mannschaften { color: rgba(255,255,255,0.4) !important; border-color: rgba(255,255,255,0.3) !important; background: #143D26 !important; }
+  .btn-alle-mannschaften.on { color: #ffffff !important; font-weight: 700 !important; border-color: #ffffff !important; background: #143D26 !important; }
+  .btn-favoriten-editor { color: rgba(255,255,255,0.4) !important; border-color: rgba(255,255,255,0.3) !important; background: #143D26 !important; }
+  .btn-favoriten-editor.open { color: #ffffff !important; border-color: #ffffff !important; background: #143D26 !important; }
+  .btn-meine-favoriten { color: rgba(255,255,255,0.4) !important; border-color: rgba(255,255,255,0.3) !important; background: #143D26 !important; }
+  .btn-meine-favoriten.on { color: #ffffff !important; font-weight: 700 !important; border-color: #ffffff !important; background: #143D26 !important; }
+  #favoriten-card { background: #642508; border-color: rgba(255,255,255,0.3); box-shadow: 0 12px 50px rgba(0,0,0,0.75), 0 3px 14px rgba(0,0,0,0.5), -6px 0 24px rgba(0,0,0,0.45), 6px 0 24px rgba(0,0,0,0.45); }
+  #favoriten-card .favoriten-header-row { background: #642508; }
+  #favoriten-card #team-btns-container .btn { color: rgba(255,255,255,0.4); background: #143D26; border-color: rgba(255,255,255,0.3); }
+  #favoriten-card #team-btns-container .btn.on { color: #ffffff; background: #143D26; border-color: #ffffff; font-weight: 700; }
+  .btn-favoriten-close { border-color: #ffffff; background: #143D26; color: #ffffff; }
+  .btn-refresh-favoriten { background: #143D26; border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.4); }
   .card::after, .next-match-box::after, .nm-league::after, .card-tag-row .tag::after, #team-btns-container .btn::after { background: transparent; }
   #info-view { background: #642508; }
   #settings-view { background: #642508; border-color: rgba(255,255,255,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.75), 0 6px 20px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.07); }
+  .settings-close-btn { color: rgba(255,255,255,0.45); }
+  .settings-close-row { border-top-color: rgba(255,255,255,0.12); }
   .btn-info { border-color: rgba(255,255,255,0.5); color: #ffffff; background: rgba(255,255,255,0.1); }
   .btn-settings { border-color: rgba(255,255,255,0.5); color: #ffffff; background: rgba(255,255,255,0.1); }
   .settings-section-label { color: rgba(255,255,255,0.65); }
   #settings-overlay-label { color: #ffffff; }
-  .settings-close-btn { color: rgba(255,255,255,0.45); }
-  .settings-close-row { border-top-color: rgba(255,255,255,0.12); }
   #info-donate .btn-donate-main { background: #143D26; color: #ffffff; border: 1px solid rgba(255,255,255,0.5); }
   .info-content { color: #ffffff; }
   .info-content h2 { color: #ffffff; }
@@ -1173,6 +1170,7 @@ function lockBodyScroll() {
   _sv.style.display = 'none';
   _sv.classList.remove('is-closing');
   document.getElementById('settings-backdrop').style.display = 'none';
+  if (_favoritenOpen) closeFavoriten(true);
   _scrollY = window.scrollY;
   document.body.style.position = 'fixed';
   document.body.style.top = `-${_scrollY}px`;
@@ -1531,25 +1529,19 @@ function buildTeamButtons() {
     btn.innerHTML = '<span>' + esc(l.label) + (l.sublabel ? '<br><span style="font-size:0.78rem;opacity:0.8">' + esc(l.sublabel) + '</span>' : '') + '</span><span class="team-btn-rank" id="rank-' + l.team + '"></span>';
     btn.querySelector('.team-btn-rank').addEventListener('click', () => {
       if (!l.rank) return;
-      const row = document.getElementById('team-row');
-      if (row && row.classList.contains('visible')) toggleMannschaften();
+      if (_favoritenOpen) closeFavoriten(true);
       showTable(l.team);
     });
     btn.addEventListener('click', e => { if (!e.target.classList.contains('team-btn-rank')) toggleTeam(l.team); });
     container.appendChild(btn);
   });
   const refresh = document.createElement('button');
-  refresh.className   = 'btn btn-refresh';
+  refresh.className   = 'btn-refresh-favoriten';
   refresh.id          = 'btn-refresh';
   refresh.title       = 'Neu laden';
   refresh.textContent = '↺';
   refresh.addEventListener('click', refreshData);
   container.appendChild(refresh);
-  const close = document.createElement('button');
-  close.className   = 'btn-close-teams';
-  close.textContent = '▲ Einklappen';
-  close.addEventListener('click', toggleMannschaften);
-  container.appendChild(close);
 }
 
 async function initLeagues() {
@@ -2105,7 +2097,7 @@ function renderNextMatch() {
 
   const next = allMatches.find(m => {
     const d = new Date(m.date); d.setHours(0, 0, 0, 0);
-    return d >= today && showFuture && showTeams[m.team] && (m.isHome ? showHome : showAway);
+    return d >= today && !isMatchOver(m) && showFuture && showTeams[m.team] && (m.isHome ? showHome : showAway);
   });
   if (!next) {
     document.getElementById('nm-date').innerHTML  = '';
@@ -2164,13 +2156,22 @@ function renderNextMatch() {
 
   if (diff === 0) {
     dEl.className = 'nm-days today';
-    dEl.dataset.nmMatchtime = matchDateTime(next.date, next.timeStr).getTime();
+    const nmMt = matchDateTime(next.date, next.timeStr);
+    const nmDur = matchDurationMs(next);
     uEl.textContent = '';
-    const ms0 = +dEl.dataset.nmMatchtime - Date.now();
+    const ms0 = nmMt.getTime() - Date.now();
     if (ms0 > 0) {
+      dEl.dataset.nmMatchtime = nmMt.getTime();
+      dEl.dataset.nmDuration = nmDur;
+      delete dEl.dataset.nmExpiry;
       const h0 = Math.floor(ms0/3600000), m0 = Math.floor((ms0%3600000)/60000), s0 = Math.floor((ms0%60000)/1000);
       dEl.textContent = String(h0).padStart(2,'0')+':'+String(m0).padStart(2,'0')+':'+String(s0).padStart(2,'0');
-    } else { dEl.textContent = 'läuft'; dEl.classList.add('blink'); delete dEl.dataset.nmMatchtime; }
+    } else {
+      dEl.textContent = 'läuft'; dEl.classList.add('blink');
+      dEl.dataset.nmExpiry = (nmMt.getTime() + nmDur).toString();
+      delete dEl.dataset.nmMatchtime;
+      delete dEl.dataset.nmDuration;
+    }
   } else {
     delete dEl.dataset.nmMatchtime;
     dEl.textContent = diff;    dEl.className = 'nm-days';
@@ -2188,7 +2189,7 @@ function matchDateTime(date, timeStr) {
   return dt;
 }
 
-function countdownLabel(date, timeStr) {
+function countdownLabel(date, timeStr, label) {
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const matchDay = new Date(date); matchDay.setHours(0, 0, 0, 0);
   const days = Math.round((matchDay - today) / 86400000);
@@ -2202,7 +2203,8 @@ function countdownLabel(date, timeStr) {
     const s = Math.floor((diffMs % 60000) / 1000);
     return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
   }
-  if (diffMs > -6 * 3600000) return 'läuft';
+  const dur = /\b2er\b/i.test(label || '') ? 4 * 3600000 : 6 * 3600000;
+  if (diffMs > -dur) return 'läuft';
   return '';
 }
 
@@ -2214,7 +2216,6 @@ function updateCountdowns() {
     renderMatches();
     return;
   }
-  // Nächstes-Spiel-Countdown
   const nmDays = document.getElementById('nm-days');
   if (nmDays && nmDays.dataset.nmMatchtime) {
     const ms = +nmDays.dataset.nmMatchtime - Date.now();
@@ -2224,9 +2225,19 @@ function updateCountdowns() {
     } else {
       nmDays.textContent = 'läuft';
       nmDays.classList.add('blink');
+      const dur = parseInt(nmDays.dataset.nmDuration || '21600000', 10);
+      nmDays.dataset.nmExpiry = (+nmDays.dataset.nmMatchtime + dur).toString();
       delete nmDays.dataset.nmMatchtime;
     }
   }
+  if (nmDays && nmDays.dataset.nmExpiry && Date.now() >= +nmDays.dataset.nmExpiry) {
+    delete nmDays.dataset.nmExpiry;
+    delete nmDays.dataset.nmDuration;
+    renderNextMatch();
+    renderMatches();
+    return;
+  }
+  let needsRerender = false;
   document.querySelectorAll('.card-countdown[data-matchtime]').forEach(el => {
     const mt = new Date(+el.dataset.matchtime);
     const now = new Date();
@@ -2234,6 +2245,7 @@ function updateCountdowns() {
     const today = new Date(); today.setHours(0,0,0,0);
     const matchDay = new Date(mt); matchDay.setHours(0,0,0,0);
     const days = Math.round((matchDay - today) / 86400000);
+    const dur = parseInt(el.dataset.matchduration || '21600000', 10);
     let txt = '', blink = false;
     if (days > 1) {
       txt = 'In ' + days + ' Tagen';
@@ -2244,18 +2256,37 @@ function updateCountdowns() {
       const m = Math.floor((diffMs % 3600000) / 60000);
       const s = Math.floor((diffMs % 60000) / 1000);
       txt = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
-    } else if (diffMs > -6 * 3600000) {
+    } else if (diffMs > -dur) {
       txt = 'läuft'; blink = true;
+    } else if (el.classList.contains('blink')) {
+      needsRerender = true;
     }
     el.textContent = txt;
     el.classList.toggle('blink', blink);
   });
+  if (needsRerender) {
+    renderNextMatch();
+    renderMatches();
+  }
 }
 
 function isPast(date) {
   const t = new Date(); t.setHours(0, 0, 0, 0);
   const d = new Date(date); d.setHours(0, 0, 0, 0);
   return d < t;
+}
+
+function matchDurationMs(match) {
+  return /\b2er\b/i.test(match.label || '') ? 4 * 3600000 : 6 * 3600000;
+}
+
+function isMatchOver(match) {
+  const matchDay = new Date(match.date); matchDay.setHours(0, 0, 0, 0);
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  if (matchDay < today) return true;
+  if (matchDay > today) return false;
+  const mt = matchDateTime(match.date, match.timeStr);
+  return (Date.now() - mt.getTime()) >= matchDurationMs(match);
 }
 
 function resultCls(result, isHome) {
@@ -2282,29 +2313,30 @@ function renderMatches() {
   const today0 = new Date(); today0.setHours(0, 0, 0, 0);
   const nextMatch = showFuture ? allMatches.find(m => {
     const d = new Date(m.date); d.setHours(0, 0, 0, 0);
-    return d >= today0 && showTeams[m.team] && (m.isHome ? showHome : showAway);
+    return d >= today0 && !isMatchOver(m) && showTeams[m.team] && (m.isHome ? showHome : showAway);
   }) : null;
 
-  const visible = allMatches.filter(m =>
+  let visible = allMatches.filter(m =>
     m !== nextMatch &&
     showTeams[m.team] &&
-    (isPast(m.date) ? showPast : showFuture) &&
+    (isMatchOver(m) ? showPast : showFuture) &&
     (m.isHome ? showHome : showAway)
   );
+  if (showPast) visible.sort((a, b) => matchDateTime(b.date, b.timeStr) - matchDateTime(a.date, a.timeStr));
 
   if (!visible.length) {
     container.innerHTML = '<div class="status-msg">Keine Spiele angezeigt.</div>';
     return;
   }
 
-  const hasPast   = visible.some(m =>  isPast(m.date));
-  const hasFuture = visible.some(m => !isPast(m.date));
+  const hasPast   = visible.some(m =>  isMatchOver(m));
+  const hasFuture = visible.some(m => !isMatchOver(m));
   const showDivider = hasPast && hasFuture;
 
   container.innerHTML = visible.map((m, idx) => {
     const teamCls = m.team;
     const tagCls  = 'tag-' + m.team;
-    const past    = isPast(m.date);
+    const past    = isMatchOver(m);
     const extra   = (m.isHome ? ' home-game' : '') + (past ? ' past-game' : '');
     const tabelleBtn = `<button class="btn-tabelle" onclick="event.stopPropagation();showTable('${m.team}')">Tabelle</button>`;
     const wd      = WEEKDAYS[m.date.getDay()];
@@ -2312,18 +2344,24 @@ function renderMatches() {
     const homeSpan = `<span class="team${m.isHome ? '' : ' opponent'}">${esc(m.homeTeam)}</span>`;
     const awaySpan = `<span class="team${m.isHome ? ' opponent' : ''}">${esc(m.awayTeam)}</span>`;
 
-    const divider = (showDivider && !past && (idx === 0 || isPast(visible[idx - 1].date)))
+    const divider = (showDivider && !past && (idx === 0 || isMatchOver(visible[idx - 1])))
       ? '<div class="past-divider"></div>'
+      : '';
+
+    const resultEl = past
+      ? (m.reportUrl
+          ? `<button class="result ${resultCls(m.result, m.isHome)}" onclick="showReport('${m.team}','${m.reportUrl}',allMatches.find(x=>x.reportUrl==='${m.reportUrl}'))">${resultTxt(m.result)}</button>`
+          : `<span class="result ${resultCls(m.result, m.isHome)}">${resultTxt(m.result)}</span>`)
       : '';
 
     return divider + `<div class="card ${teamCls}${extra}">
   <div class="card-tag-row"><span class="tag ${tagCls}">${m.label}</span></div>
   <div class="card-top">
     <span class="card-date">${wd} ${m.dateStr}<span class="card-time"> · ${m.timeStr}</span></span>
-    ${past ? '' : `<span class="card-countdown" data-matchtime="${matchDateTime(m.date, m.timeStr).getTime()}">${countdownLabel(m.date, m.timeStr)}</span>`}
+    ${past ? '' : `<span class="card-countdown" data-matchtime="${matchDateTime(m.date, m.timeStr).getTime()}" data-matchduration="${matchDurationMs(m)}">${countdownLabel(m.date, m.timeStr, m.label)}</span>`}
     ${tabelleBtn}
   </div>
-  <div class="card-match"><div class="card-match-teams">${homeSpan}<span class="vs">vs.</span>${awaySpan}</div>${past ? (m.reportUrl ? `<button class="result ${resultCls(m.result, m.isHome)}" onclick="showReport('${m.team}','${m.reportUrl}',allMatches.find(x=>x.reportUrl==='${m.reportUrl}'))">${resultTxt(m.result)}</button>` : `<span class="result ${resultCls(m.result, m.isHome)}">${resultTxt(m.result)}</span>`) : ''}</div>
+  <div class="card-match"><div class="card-match-teams">${homeSpan}<span class="vs">vs.</span>${awaySpan}</div>${resultEl}</div>
 </div>`;
   }).join('\n');
 }
@@ -2360,31 +2398,63 @@ function applyStateToButtons() {
   LEAGUES.forEach(l => {
     document.getElementById('btn-' + l.team).classList.toggle('on', showTeams[l.team]);
   });
-  document.getElementById('btn-select-all').classList.toggle('on', selectMode === 'all');
-  document.getElementById('btn-select-none').classList.toggle('on', selectMode === 'none');
-  document.getElementById('btn-meine-auswahl').classList.toggle('on', selectMode === 'meine');
+  document.getElementById('btn-alle-mannschaften').classList.toggle('on', selectMode === 'all');
+  document.getElementById('btn-meine-favoriten').classList.toggle('on', selectMode === 'meine');
 }
 
-function openMannschaften(e) {
-  if (e) e.stopPropagation();
-  const row = document.getElementById('team-row');
-  if (!row.classList.contains('visible')) toggleMannschaften();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+let _favoritenOpen = false;
+
+function toggleFavoriten() {
+  if (_favoritenOpen) closeFavoriten(); else openFavoriten();
 }
 
-function toggleMannschaften() {
-  const row     = document.getElementById('team-row');
-  const btn     = document.getElementById('btn-mannschaften');
-  const wrapper = document.getElementById('mannschaften-wrapper');
-  const open    = row.classList.toggle('visible');
-  btn.classList.toggle('on', open);
-  wrapper.classList.toggle('open', open);
-  if (open) {
-    document.getElementById('matches-container').style.display = 'none';
-    document.getElementById('update-info').style.display = 'none';
-  } else {
-    backToList();
+function openFavoriten() {
+  _favoritenOpen = true;
+  const closeBtn = document.getElementById('btn-favoriten-close');
+  const card = document.getElementById('favoriten-card');
+
+  // Load saved favorites into team buttons
+  const saved = loadMeineAuswahl();
+  if (saved) {
+    LEAGUES.forEach(l => {
+      const val = saved[l.team] !== undefined ? saved[l.team] : true;
+      showTeams[l.team] = val;
+      const el = document.getElementById('btn-' + l.team);
+      if (el) el.classList.toggle('on', val);
+    });
   }
+  meineAuswahlActive = true;
+  closeBtn.innerHTML = 'Favoriten&shy;liste<br>schließen';
+
+  card.style.display = 'block';
+  requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add('open')));
+}
+
+function closeFavoriten(immediate) {
+  if (!_favoritenOpen) return;
+  _favoritenOpen = false;
+  const closeBtn = document.getElementById('btn-favoriten-close');
+  const card = document.getElementById('favoriten-card');
+
+  // Save current team selection as favorites
+  localStorage.setItem(LS_AUSWAHL, JSON.stringify({ ...showTeams }));
+
+  card.classList.remove('open');
+  if (immediate) {
+    card.style.display = 'none';
+  } else {
+    setTimeout(() => { card.style.display = 'none'; }, 1550);
+  }
+  closeBtn.innerHTML = 'Meine<br>Favoriten<br>auswählen';
+
+  // Activate "Meine Favoriten" right button
+  selectMode = 'meine';
+  meineAuswahlActive = true;
+  document.getElementById('btn-meine-favoriten').classList.add('on');
+  document.getElementById('btn-alle-mannschaften').classList.remove('on');
+  saveState();
+  renderNextMatch();
+  renderMatches();
 }
 
 async function refreshData() { localStorage.removeItem(LS_LEAGUES); await initLeagues(); await loadAllData(); }
@@ -2485,6 +2555,7 @@ function backToList() {
   _sv2.style.display = 'none';
   _sv2.classList.remove('is-closing');
   document.getElementById('settings-backdrop').style.display = 'none';
+  if (_favoritenOpen) closeFavoriten(true);
   document.getElementById('matches-container').style.display = '';
   document.getElementById('update-info').style.display = '';
   document.getElementById('controls-slider').style.display = '';
@@ -2697,9 +2768,8 @@ function renderReport(html, m) {
 function selectAllTeams() {
   meineAuswahlActive = false;
   selectMode = 'all';
-  document.getElementById('btn-meine-auswahl').classList.remove('on');
-  document.getElementById('btn-select-all').classList.add('on');
-  document.getElementById('btn-select-none').classList.remove('on');
+  document.getElementById('btn-meine-favoriten').classList.remove('on');
+  document.getElementById('btn-alle-mannschaften').classList.add('on');
   LEAGUES.forEach(l => {
     showTeams[l.team] = true;
     document.getElementById('btn-' + l.team).classList.add('on');
@@ -2709,12 +2779,11 @@ function selectAllTeams() {
   renderMatches();
 }
 
-function selectNoTeams() {
+function deselectAllTeams() {
   meineAuswahlActive = false;
-  selectMode = 'none';
-  document.getElementById('btn-meine-auswahl').classList.remove('on');
-  document.getElementById('btn-select-none').classList.add('on');
-  document.getElementById('btn-select-all').classList.remove('on');
+  selectMode = null;
+  document.getElementById('btn-meine-favoriten').classList.remove('on');
+  document.getElementById('btn-alle-mannschaften').classList.remove('on');
   LEAGUES.forEach(l => {
     showTeams[l.team] = false;
     document.getElementById('btn-' + l.team).classList.remove('on');
@@ -2737,100 +2806,87 @@ function autoSaveMeineAuswahl() {
   localStorage.setItem(LS_AUSWAHL, JSON.stringify({ ...showTeams }));
 }
 
-function toggleMeineAuswahlMode() {
-  if (!meineAuswahlActive) {
-    meineAuswahlActive = true;
-    selectMode = 'meine';
-    document.getElementById('btn-meine-auswahl').classList.add('on');
-    document.getElementById('btn-select-all').classList.remove('on');
-    document.getElementById('btn-select-none').classList.remove('on');
-  }
+function applyMeineFavoriten() {
   const saved = loadMeineAuswahl();
+  meineAuswahlActive = true;
+  selectMode = 'meine';
+  document.getElementById('btn-meine-favoriten').classList.add('on');
+  document.getElementById('btn-alle-mannschaften').classList.remove('on');
   if (saved) {
     LEAGUES.forEach(l => {
       const val = saved[l.team] !== undefined ? saved[l.team] : true;
       showTeams[l.team] = val;
       document.getElementById('btn-' + l.team).classList.toggle('on', val);
     });
-    saveState();
-    renderNextMatch();
-    renderMatches();
   } else {
     LEAGUES.forEach(l => {
       showTeams[l.team] = false;
       document.getElementById('btn-' + l.team).classList.remove('on');
     });
-    autoSaveMeineAuswahl();
-    saveState();
-    renderNextMatch();
-    renderMatches();
   }
+  autoSaveMeineAuswahl();
+  saveState();
+  renderNextMatch();
+  renderMatches();
 }
 
-/* ── Meine Auswahl: Langdruck (1s) löscht gespeicherte Auswahl */
+/* ── Alle Mannschaften: Langdruck (3s) → alle abwählen; Doppelklick → alle auswählen */
 (function() {
-  const btn = document.getElementById('btn-meine-auswahl');
+  const btn = document.getElementById('btn-alle-mannschaften');
   let pressTimer = null;
   let longPressFired = false;
   let isTouch = false;
+  let lastClickTime = 0;
 
   function startTimer() {
     longPressFired = false;
     pressTimer = setTimeout(function() {
-      if (!meineAuswahlActive) return;
       longPressFired = true;
-      meineAuswahlActive = true;
-      selectMode = null;
-      btn.classList.add('on');
-      document.getElementById('btn-select-all').classList.remove('on');
-      document.getElementById('btn-select-none').classList.remove('on');
-      LEAGUES.forEach(l => {
-        showTeams[l.team] = false;
-        document.getElementById('btn-' + l.team).classList.remove('on');
-      });
-      localStorage.setItem(LS_AUSWAHL, JSON.stringify({ ...showTeams }));
-      saveState();
-      renderNextMatch();
-      renderMatches();
+      deselectAllTeams();
     }, 3000);
   }
+  function cancelTimer() { clearTimeout(pressTimer); pressTimer = null; }
 
-  function cancelTimer() {
-    clearTimeout(pressTimer);
-    pressTimer = null;
-  }
-
-  /* Touch: preventDefault verhindert iOS-Kontextmenü und synthetische Mouse-Events */
   btn.addEventListener('touchstart', function(e) {
     e.preventDefault();
     isTouch = true;
     startTimer();
   });
-
   btn.addEventListener('touchend', function(e) {
     e.preventDefault();
     cancelTimer();
-    if (!longPressFired) toggleMeineAuswahlMode();
+    if (!longPressFired) selectAllTeams();
     longPressFired = false;
     setTimeout(function() { isTouch = false; }, 600);
   });
-
   btn.addEventListener('touchcancel', function() {
     cancelTimer();
     longPressFired = false;
     setTimeout(function() { isTouch = false; }, 600);
   });
-
-  /* Maus (Desktop) */
   btn.addEventListener('mousedown',  function() { if (!isTouch) startTimer(); });
   btn.addEventListener('mouseup',    function() { if (!isTouch) cancelTimer(); });
   btn.addEventListener('mouseleave', function() { if (!isTouch) cancelTimer(); });
   btn.addEventListener('click',      function() {
     if (isTouch) return;
-    if (!longPressFired) toggleMeineAuswahlMode();
+    if (!longPressFired) selectAllTeams();
     longPressFired = false;
   });
 })();
+
+/* ── Meine Favoriten: Klick → gespeicherte Favoriten anwenden */
+(function() {
+  const btn = document.getElementById('btn-meine-favoriten');
+  let isTouch = false;
+  btn.addEventListener('touchstart', function(e) { e.preventDefault(); isTouch = true; });
+  btn.addEventListener('touchend',   function(e) { e.preventDefault(); applyMeineFavoriten(); setTimeout(function() { isTouch = false; }, 600); });
+  btn.addEventListener('touchcancel',function() { setTimeout(function() { isTouch = false; }, 600); });
+  btn.addEventListener('click',      function() { if (!isTouch) applyMeineFavoriten(); });
+})();
+
+/* ── Favoriten: Trigger in Controls-Bar und Close-Button im Panel */
+document.getElementById('btn-favoriten-editor').addEventListener('click', toggleFavoriten);
+document.getElementById('btn-favoriten-close').addEventListener('click', function() { closeFavoriten(); });
 
 /* ── Start ─────────────────────────────────────────────────── */
 function updateHeaderH() {
