@@ -995,7 +995,7 @@
       <button class="btn btn-filter" id="btn-settings-theme-roland-garros" onclick="setTheme('roland-garros')">Roland Garros</button>
     </div>
     <div id="settings-overlay-section">
-      <div class="settings-section-label">Transparenz</div>
+      <div class="settings-section-label">Helligkeit</div>
       <div class="settings-slider-row">
         <span class="settings-slider-lbl">0 %</span>
         <div class="custom-slider-wrap" id="settings-overlay-slider-wrap">
@@ -1004,9 +1004,9 @@
             <div class="custom-slider-thumb" id="settings-overlay-thumb" style="left:60%"></div>
           </div>
         </div>
-        <span class="settings-slider-lbl">50 %</span>
+        <span class="settings-slider-lbl">100 %</span>
       </div>
-      <div id="settings-overlay-label">30 %</div>
+      <div id="settings-overlay-label">60 %</div>
     </div>
     <div class="settings-close-row">
       <button class="settings-close-btn" onclick="backFromSettings()">Schließen</button>
@@ -1208,7 +1208,7 @@ function setOverlay(pct) {
     localStorage.setItem(LS_OVERLAY_LIGHT, pct);
   }
   const lbl = document.getElementById('settings-overlay-label');
-  if (lbl) lbl.textContent = pct + ' %';
+  if (lbl) lbl.textContent = (pct * 2) + ' %';
   updateOverlaySliderUI(pct);
 }
 
@@ -1222,7 +1222,7 @@ function updateSliderForTheme() {
     ? parseInt(localStorage.getItem(LS_OVERLAY_DARK)  || '30', 10)
     : parseInt(localStorage.getItem(LS_OVERLAY_LIGHT) || '30', 10);
   const lbl = document.getElementById('settings-overlay-label');
-  if (lbl) lbl.textContent = stored + ' %';
+  if (lbl) lbl.textContent = (stored * 2) + ' %';
   updateOverlaySliderUI(stored);
 }
 
