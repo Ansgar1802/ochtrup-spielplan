@@ -16,6 +16,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --overlay-dark: 0; --overlay-light: 0.3; }
 
   html { background: #0f1117; }
   body {
@@ -45,7 +46,58 @@
     font-family: Georgia, serif;
     transition: border-color 0.15s, color 0.15s;
   }
+  .btn-settings {
+    position: absolute; top: env(safe-area-inset-top); left: 0;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1px solid #3a3f60;
+    background: rgba(144,149,176,0.08);
+    color: #9095b0;
+    font-size: 1rem;
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: border-color 0.15s, color 0.15s;
+  }
   #info-view { display: none; }
+  #settings-backdrop {
+    position: fixed; top: var(--header-h, 80px); left: 0; right: 0; bottom: 0; z-index: 19; display: none;
+  }
+  #settings-view {
+    position: fixed;
+    top: calc(var(--header-h, 80px) + 8px);
+    left: max(32px, calc((100% - 576px) / 2));
+    right: max(32px, calc((100% - 576px) / 2));
+    background: #0f1117;
+    border: 1px solid #2e3150;
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.9), 0 6px 20px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+    padding: 16px 18px 16px;
+    z-index: 20;
+    display: none;
+    animation: settings-appear 1s ease;
+  }
+  @keyframes settings-appear {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes settings-disappear {
+    from { opacity: 1; transform: translateY(0); }
+    to   { opacity: 0; transform: translateY(-8px); }
+  }
+  #settings-view.is-closing { animation: settings-disappear 1s ease forwards; pointer-events: none; }
+  .settings-section-label { font-size: 0.88rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #7a7f96; margin-bottom: 12px; }
+  #settings-overlay-section { margin-top: 20px; }
+  .settings-theme-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  #settings-view .btn { font-size: 0.88rem; padding: 8px 16px; }
+  .settings-slider-row { display: flex; align-items: center; gap: 12px; margin: 8px 0 4px; }
+  .custom-slider-wrap { flex: 1; height: 72px; display: flex; align-items: center; cursor: pointer; touch-action: none; -webkit-user-select: none; user-select: none; }
+  .custom-slider-track { position: relative; width: 100%; height: 6px; background: rgba(144,149,176,0.22); border-radius: 3px; }
+  .custom-slider-fill { position: absolute; left: 0; top: 0; bottom: 0; background: #8aadd4; border-radius: 3px; pointer-events: none; }
+  .custom-slider-thumb { position: absolute; top: 50%; width: 30px; height: 30px; background: #8aadd4; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 2px 8px rgba(0,0,0,0.45); pointer-events: none; }
+  .settings-slider-lbl { color: #9095b0; font-size: 0.9rem; white-space: nowrap; }
+  #settings-overlay-label { font-size: 2rem; font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.08em; color: #fff; text-align: center; }
+  .settings-close-row { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.07); }
+  .settings-close-btn { width: 100%; background: none; border: none; padding: 12px 0; color: #555a7a; font-size: 0.95rem; font-family: 'DM Sans', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; }
   .info-content { color: #c8cade; font-size: 0.9rem; line-height: 1.7; padding-top: 8px; }
   .info-content h2 { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 0.06em; color: #fff; margin: 18px 0 6px; }
   .info-content p  { margin: 0 0 10px; }
@@ -79,7 +131,10 @@
     align-items: flex-start;
     gap: 0;
     min-height: calc(4.4rem + 4.2em + 75px);
+    position: relative;
+    isolation: isolate;
   }
+  .next-match-box::after { content: ''; position: absolute; inset: 0; border-radius: 12px; background: rgba(255,255,255,var(--overlay-dark)); pointer-events: none; z-index: -1; }
   .nm-top-row {
     display: flex;
     justify-content: space-between;
@@ -136,7 +191,10 @@
     letter-spacing: 0.04em;
     margin-top: 8px;
     white-space: nowrap;
+    position: relative;
+    isolation: isolate;
   }
+  .nm-league::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgba(255,255,255,var(--overlay-dark)); pointer-events: none; z-index: -1; }
   .nm-league:empty { display: none; }
   .nm-date { font-size: 0.88rem; color: #c8cae0; margin-top: 2px; }
   .nm-right { text-align: right; flex-shrink: 0; }
@@ -214,6 +272,8 @@
   .team-btn-rank { font-size: 0.75rem; opacity: 0.7; white-space: nowrap; margin-left: 8px; flex-shrink: 0; cursor: pointer; text-decoration: underline dotted; }
   .team-row .btn.on { color: #fff; }
   #team-btns-container { display: flex; flex-direction: column; gap: 8px; }
+  #team-btns-container .btn { position: relative; isolation: isolate; }
+  #team-btns-container .btn::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgba(255,255,255,var(--overlay-dark)); pointer-events: none; z-index: -1; }
   .team-row.visible { display: flex; flex-direction: column; gap: 6px; align-items: stretch; background: rgba(15,17,30,0.98); border: 1px solid #3a3f60; border-top: none; border-radius: 0 0 16px 16px; padding: 6px; margin-bottom: 16px; }
   .btn-close-teams { background: transparent; border: 1px solid #2e3150; border-radius: 20px; color: #555a7a; font-size: 0.78rem; font-family: 'DM Sans', sans-serif; font-weight: 600; padding: 7px 0; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; width: 100%; margin-top: 4px; transition: all 0.15s; }
   .btn-select-all  { color: rgba(110,185,145,0.45) !important; border-color: rgba(110,185,145,0.22); }
@@ -245,7 +305,10 @@
     margin-bottom: 10px;
     padding: 18px 16px;
     border: 1px solid #1e2235;
+    position: relative;
+    isolation: isolate;
   }
+  .card::after { content: ''; position: absolute; inset: 0; border-radius: 12px; background: rgba(255,255,255,var(--overlay-dark)); pointer-events: none; z-index: -1; }
   /* Karten-Farben werden dynamisch per JS generiert → siehe #dynamic-team-css */
   .card.home-game, #next-match-box.home-game { border-color: #fff !important; border-width: 2px; }
   .card.past-game .result {
@@ -300,6 +363,7 @@
   }
   #main-content { transition: opacity 3s ease; }
   #matches-container { transition: opacity 2s ease; }
+  #page-floor { background: #ffffff; min-height: 200px; margin: 24px -16px -48px; }
   #controls-slider { overflow: hidden; margin-bottom: 16px; position: sticky; top: var(--header-h, 90px); z-index: 4; background: #0f1117; }
   #controls-inner {
     display: flex;
@@ -464,7 +528,6 @@
       flex-shrink: 0;
     }
   }
-  .info-theme-row { margin-left: auto; display: flex; gap: 8px; }
   #btn-info-back { color: #ffffff !important; }
   #info-donate {
     margin: 48px 0 0;
@@ -659,7 +722,10 @@
     letter-spacing: 0.04em;
     text-transform: uppercase;
     white-space: nowrap;
+    position: relative;
+    isolation: isolate;
   }
+  .card-tag-row .tag::after { content: ''; position: absolute; inset: 0; border-radius: inherit; background: rgba(255,255,255,var(--overlay-dark)); pointer-events: none; z-index: -1; }
   /* Tag-Farben werden dynamisch per JS generiert → siehe #dynamic-team-css */
 
   .btn-tabelle {
@@ -788,6 +854,7 @@
 <body>
 
 <div class="header">
+  <button class="btn-settings" onclick="showSettings()" title="Einstellungen">⚙</button>
   <button class="btn-info" onclick="showInfo()" title="Info">i</button>
   <div class="header-title">
     <img src="logo.png" class="header-logo" alt="TC 1928 Ochtrup Logo" onerror="this.style.display='none'">
@@ -869,6 +936,7 @@
 <div id="loading-banner"  class="loading-row"><div class="spinner"></div>Spieldaten werden geladen …</div>
 <div id="matches-container"></div>
 <div id="update-info"     class="update-info" style="display:none"></div>
+<div id="page-floor"></div>
 
 </div><!-- /#main-content -->
 
@@ -894,11 +962,6 @@
 <div id="info-view">
   <div class="detail-header">
     <button class="btn btn-filter on" id="btn-info-back" onclick="backToList()">Zurück</button>
-    <div class="info-theme-row">
-      <button class="btn btn-filter" id="btn-info-theme-dark"  onclick="setTheme('dark')">Dunkel</button>
-      <button class="btn btn-filter" id="btn-info-theme-light" onclick="setTheme('light')">Hell</button>
-      <button class="btn btn-filter" id="btn-info-theme-roland-garros" onclick="setTheme('roland-garros')">Roland Garros</button>
-    </div>
   </div>
   <div class="info-content" id="info-content"></div>
   <div id="info-donate">
@@ -922,6 +985,35 @@
   </div>
 </div>
 
+<div id="settings-backdrop" onclick="backFromSettings()"></div>
+<div id="settings-view">
+  <div class="settings-content">
+    <div class="settings-section-label">Farbschema</div>
+    <div class="settings-theme-row">
+      <button class="btn btn-filter" id="btn-settings-theme-dark"          onclick="setTheme('dark')">Dunkel</button>
+      <button class="btn btn-filter" id="btn-settings-theme-light"         onclick="setTheme('light')">Hell</button>
+      <button class="btn btn-filter" id="btn-settings-theme-roland-garros" onclick="setTheme('roland-garros')">Roland Garros</button>
+    </div>
+    <div id="settings-overlay-section">
+      <div class="settings-section-label">Transparenz</div>
+      <div class="settings-slider-row">
+        <span class="settings-slider-lbl">0 %</span>
+        <div class="custom-slider-wrap" id="settings-overlay-slider-wrap">
+          <div class="custom-slider-track">
+            <div class="custom-slider-fill" id="settings-overlay-fill" style="width:60%"></div>
+            <div class="custom-slider-thumb" id="settings-overlay-thumb" style="left:60%"></div>
+          </div>
+        </div>
+        <span class="settings-slider-lbl">50 %</span>
+      </div>
+      <div id="settings-overlay-label">30 %</div>
+    </div>
+    <div class="settings-close-row">
+      <button class="settings-close-btn" onclick="backFromSettings()">Schließen</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ── Konfiguration ─────────────────────────────────────────── */
 /* ── Dynamische Mannschaftsliste ───────────────────────────── */
@@ -931,6 +1023,8 @@ const LS_STATE       = 'spielplan-state';
 const LS_AUSWAHL     = 'spielplan-meine-auswahl';
 const LS_LEAGUES     = 'spielplan-leagues-v6';
 const LS_THEME       = 'spielplan-theme';
+const LS_OVERLAY_DARK  = 'spielplan-overlay-dark';
+const LS_OVERLAY_LIGHT = 'spielplan-overlay-light';
 const LS_STARTS      = 'spielplan-starts';
 
 const LIGHT_THEME_CSS = `
@@ -939,28 +1033,50 @@ const LIGHT_THEME_CSS = `
   #controls-slider { background: #f0f2f8; }
   .header h1 { color: #1a1d2e; }
   .header p { color: #5a5f7a; }
-  .nm-label { color: #fff; }
+  .nm-label { color: #fff; border-color: rgba(255,255,255,0.5) !important; }
   .nm-days { color: #fff; }
   .nm-unit { color: #fff; }
   .next-match-box.no-match { background: #c8cde4; border-color: #5060a0; color: #1a1d2e; }
   .next-match-box.no-match .nm-label { color: #1a1d2e; font-weight: 700; }
-  .btn-filter { border-color: #b0b5cc; color: #3a3f60; }
-  .btn-filter.on { color: #1a1d2e; font-weight: 700; border-color: #5060a0; background: #c8cde4; }
-  .btn-mannschaften { color: #3a3f60; border-color: #b0b5cc; }
-  .btn-mannschaften.on { color: #1a1d2e; font-weight: 700; border-color: #5060a0; background: #c8cde4; animation: blink 1s step-end infinite; }
-  .mannschaften-wrapper.open { background: #eef0f8; border-color: #b0b5cc; }
+  .card::after { background: rgba(240,242,248,var(--overlay-light)); }
+  .next-match-box::after { background: rgba(240,242,248,var(--overlay-light)); }
+  .nm-league { border-color: rgba(255,255,255,0.5) !important; }
+  .nm-league::after { background: rgba(240,242,248,var(--overlay-light)); }
+  .card-tag-row .tag { border-color: rgba(255,255,255,0.5) !important; }
+  .card-tag-row .tag::after { background: rgba(240,242,248,var(--overlay-light)); }
+  #team-btns-container .btn { border-color: rgba(255,255,255,0.5) !important; }
+  #team-btns-container .btn::after { background: rgba(240,242,248,var(--overlay-light)); }
+  .card-date { color: #ffffff; font-weight: 400; }
+  .card-time { color: #ffffff; font-weight: 400; }
+  .team { color: #ffffff; font-weight: 700; }
+  .team.opponent { color: #ffffff; font-weight: 400; }
+  .nm-date { color: #ffffff; font-weight: 400; }
+  .nm-match-teams span { color: #ffffff !important; }
+  .btn-filter { border-color: rgba(255,255,255,0.5); color: #3a3f60; }
+  .btn-filter.on { color: #1a1d2e; font-weight: 700; border-color: rgba(255,255,255,0.75); background: #c8cde4; }
+  .btn-mannschaften { color: #3a3f60; border-color: rgba(255,255,255,0.5); }
+  .btn-mannschaften.on { color: #1a1d2e; font-weight: 700; border-color: rgba(255,255,255,0.75); background: #c8cde4; animation: blink 1s step-end infinite; }
+  .mannschaften-wrapper.open { background: #eef0f8; border-color: rgba(255,255,255,0.5); }
   .mannschaften-wrapper.open .btn-mannschaften { border-color: transparent; background: rgba(60,70,140,0.07); color: #1a1d2e; }
-  .team-row.visible { background: #eef0f8; border-color: #b0b5cc; }
+  .team-row.visible { background: #eef0f8; border-color: rgba(255,255,255,0.5); }
   .team-row .btn { color: #3a3f60; }
-  .btn-close-teams { border-color: #b0b5cc; color: #3a3f60; }
-  .btn-select-all  { color: #3a3f60 !important; border-color: #b0b5cc !important; background: transparent !important; }
-  .btn-select-all.on  { color: #1a1d2e !important; font-weight: 700 !important; border-color: #5060a0 !important; background: #c8cde4 !important; }
-  .btn-select-none { color: #3a3f60 !important; border-color: #b0b5cc !important; background: transparent !important; }
-  .btn-select-none.on { color: #1a1d2e !important; font-weight: 700 !important; border-color: #5060a0 !important; background: #c8cde4 !important; }
-  .btn-meine-auswahl { color: #3a3f60 !important; border-color: #b0b5cc !important; background: transparent !important; }
-  .btn-meine-auswahl.on { color: #1a1d2e !important; font-weight: 700 !important; border-color: #5060a0 !important; background: #c8cde4 !important; }
+  .btn-close-teams { border-color: rgba(255,255,255,0.5); color: #3a3f60; }
+  .btn-select-all  { color: #3a3f60 !important; border-color: rgba(255,255,255,0.5) !important; background: transparent !important; }
+  .btn-select-all.on  { color: #1a1d2e !important; font-weight: 700 !important; border-color: rgba(255,255,255,0.75) !important; background: #c8cde4 !important; }
+  .btn-select-none { color: #3a3f60 !important; border-color: rgba(255,255,255,0.5) !important; background: transparent !important; }
+  .btn-select-none.on { color: #1a1d2e !important; font-weight: 700 !important; border-color: rgba(255,255,255,0.75) !important; background: #c8cde4 !important; }
+  .btn-meine-auswahl { color: #3a3f60 !important; border-color: rgba(255,255,255,0.5) !important; background: transparent !important; }
+  .btn-meine-auswahl.on { color: #1a1d2e !important; font-weight: 700 !important; border-color: rgba(255,255,255,0.75) !important; background: #c8cde4 !important; }
   #info-view { background: #f0f2f8; }
+  #btn-info-back { color: #1a1d2e !important; }
+  #settings-view { background: #f0f2f8; border-color: rgba(90,100,160,0.35); box-shadow: 0 20px 60px rgba(20,30,80,0.28), 0 6px 20px rgba(20,30,80,0.15), 0 0 0 1px rgba(90,100,160,0.08); }
   .btn-info { border-color: #5a6090; color: #3a3f60; background: rgba(60,70,140,0.08); }
+  .btn-settings { border-color: #5a6090; color: #3a3f60; background: rgba(60,70,140,0.08); }
+  .settings-section-label { color: #5a5f7a; }
+  #settings-overlay-label { color: #1a1d2e; }
+  .settings-slider-lbl { color: #3a3f60; }
+  .settings-close-btn { color: #5a5f7a; }
+  .settings-close-row { border-top-color: rgba(90,100,160,0.15); }
   .info-content { color: #1a1d2e; }
   .info-content h2 { color: #0f1020; }
   #donate-banner { background: rgba(0,48,135,0.06); border-color: rgba(0,112,186,0.25); }
@@ -978,44 +1094,51 @@ const LIGHT_THEME_CSS = `
 `;
 
 const ROLAND_GARROS_CSS = `
-  html, body { background: #C84B11; }
-  .header { background: #C84B11; }
-  #controls-slider { background: #C84B11; }
+  html, body { background: #642508; }
+  .header { background: #642508; }
+  #controls-slider { background: #642508; }
   body { color: #ffffff; }
   .header h1 { color: #ffffff; }
   .header p { color: rgba(255,255,255,0.7); }
-  .next-match-box { background: #1B5233; border-color: #ffffff; }
+  .next-match-box { background: #143D26; border-color: #ffffff; }
   .nm-label { color: rgba(255,255,255,0.75) !important; border-color: rgba(255,255,255,0.4) !important; }
-  .nm-league { background: #1B5233 !important; color: #ffffff !important; border-color: rgba(255,255,255,0.5) !important; }
+  .nm-league { background: #143D26 !important; color: #ffffff !important; border-color: rgba(255,255,255,0.5) !important; }
   .nm-date { color: rgba(255,255,255,0.8) !important; }
   .nm-days { color: #ffffff !important; }
   .nm-unit { color: rgba(255,255,255,0.7) !important; }
-  .next-match-box.no-match { background: #1B5233; border-color: #ffffff; color: #ffffff; }
+  .next-match-box.no-match { background: #143D26; border-color: #ffffff; color: #ffffff; }
   .next-match-box.no-match .nm-label { color: #ffffff !important; font-weight: 700; }
-  .card, .next-match-box { background: #1B5233 !important; border-color: #ffffff !important; }
-  .card.home-game, #next-match-box.home-game { border-color: #ffffff !important; border-width: 2px; }
-  .card-tag-row .tag { background: #1B5233 !important; border-color: rgba(255,255,255,0.5) !important; color: #ffffff !important; }
-  .btn { color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.5); background: #1B5233; }
+  .card, .next-match-box { background: #143D26 !important; border-color: rgba(255,255,255,0.6) !important; }
+  .card.home-game, #next-match-box.home-game { border-color: rgba(255,255,255,0.6) !important; border-width: 2px; }
+  .card-tag-row .tag { background: #143D26 !important; border-color: rgba(255,255,255,0.5) !important; color: #ffffff !important; }
+  .btn { color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.5); background: #143D26; }
   .btn.on { color: #ffffff; border-color: #ffffff; }
-  .btn-filter { background: #1B5233; border-color: rgba(255,255,255,0.5); color: rgba(255,255,255,0.7); }
-  .btn-filter.on { color: #ffffff; font-weight: 700; border-color: #ffffff; background: #1B5233; }
-  .btn-mannschaften { background: #1B5233; color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.5); }
-  .btn-mannschaften.on { color: #ffffff; font-weight: 700; border-color: #ffffff; background: #1B5233; animation: blink 1s step-end infinite; }
+  .btn-filter { background: #143D26; border-color: rgba(255,255,255,0.5); color: rgba(255,255,255,0.7); }
+  .btn-filter.on { color: #ffffff; font-weight: 700; border-color: #ffffff; background: #143D26; }
+  .btn-mannschaften { background: #143D26; color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.5); }
+  .btn-mannschaften.on { color: #ffffff; font-weight: 700; border-color: #ffffff; background: #143D26; animation: blink 1s step-end infinite; }
   .mannschaften-wrapper.open { background: rgba(0,0,0,0.12); border-color: rgba(255,255,255,0.4); }
-  .mannschaften-wrapper.open .btn-mannschaften { border-color: rgba(255,255,255,0.5); background: #1B5233; color: #ffffff; }
+  .mannschaften-wrapper.open .btn-mannschaften { border-color: rgba(255,255,255,0.5); background: #143D26; color: #ffffff; }
   .team-row.visible { background: rgba(0,0,0,0.08); border-color: rgba(255,255,255,0.3); }
-  #team-btns-container .btn { color: rgba(255,255,255,0.4); background: #1B5233; border-color: rgba(255,255,255,0.3); }
-  #team-btns-container .btn.on { color: #ffffff; background: #1B5233; border-color: #ffffff; font-weight: 700; }
-  .btn-close-teams { background: #1B5233; border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.4); }
-  .btn-select-all  { color: rgba(255,255,255,0.4) !important; border-color: rgba(255,255,255,0.3) !important; background: #1B5233 !important; }
-  .btn-select-all.on  { color: #ffffff !important; font-weight: 700 !important; border-color: #ffffff !important; background: #1B5233 !important; }
-  .btn-select-none { color: rgba(255,255,255,0.4) !important; border-color: rgba(255,255,255,0.3) !important; background: #1B5233 !important; }
-  .btn-select-none.on { color: #ffffff !important; font-weight: 700 !important; border-color: #ffffff !important; background: #1B5233 !important; }
-  .btn-meine-auswahl { color: rgba(255,255,255,0.4) !important; border-color: rgba(255,255,255,0.3) !important; background: #1B5233 !important; }
-  .btn-meine-auswahl.on { color: #ffffff !important; font-weight: 700 !important; border-color: #ffffff !important; background: #1B5233 !important; }
-  #info-view { background: #C84B11; }
+  #team-btns-container .btn { color: rgba(255,255,255,0.4); background: #143D26; border-color: rgba(255,255,255,0.3); }
+  #team-btns-container .btn.on { color: #ffffff; background: #143D26; border-color: #ffffff; font-weight: 700; }
+  .btn-close-teams { background: #143D26; border-color: rgba(255,255,255,0.3); color: rgba(255,255,255,0.4); }
+  .btn-select-all  { color: rgba(255,255,255,0.4) !important; border-color: rgba(255,255,255,0.3) !important; background: #143D26 !important; }
+  .btn-select-all.on  { color: #ffffff !important; font-weight: 700 !important; border-color: #ffffff !important; background: #143D26 !important; }
+  .btn-select-none { color: rgba(255,255,255,0.4) !important; border-color: rgba(255,255,255,0.3) !important; background: #143D26 !important; }
+  .btn-select-none.on { color: #ffffff !important; font-weight: 700 !important; border-color: #ffffff !important; background: #143D26 !important; }
+  .btn-meine-auswahl { color: rgba(255,255,255,0.4) !important; border-color: rgba(255,255,255,0.3) !important; background: #143D26 !important; }
+  .btn-meine-auswahl.on { color: #ffffff !important; font-weight: 700 !important; border-color: #ffffff !important; background: #143D26 !important; }
+  .card::after, .next-match-box::after, .nm-league::after, .card-tag-row .tag::after, #team-btns-container .btn::after { background: transparent; }
+  #info-view { background: #642508; }
+  #settings-view { background: #642508; border-color: rgba(255,255,255,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.75), 0 6px 20px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.07); }
   .btn-info { border-color: rgba(255,255,255,0.5); color: #ffffff; background: rgba(255,255,255,0.1); }
-  #info-donate .btn-donate-main { background: #1B5233; color: #ffffff; border: 1px solid rgba(255,255,255,0.5); }
+  .btn-settings { border-color: rgba(255,255,255,0.5); color: #ffffff; background: rgba(255,255,255,0.1); }
+  .settings-section-label { color: rgba(255,255,255,0.65); }
+  #settings-overlay-label { color: #ffffff; }
+  .settings-close-btn { color: rgba(255,255,255,0.45); }
+  .settings-close-row { border-top-color: rgba(255,255,255,0.12); }
+  #info-donate .btn-donate-main { background: #143D26; color: #ffffff; border: 1px solid rgba(255,255,255,0.5); }
   .info-content { color: #ffffff; }
   .info-content h2 { color: #ffffff; }
   .info-content a { color: rgba(255,255,255,0.85); }
@@ -1026,7 +1149,7 @@ const ROLAND_GARROS_CSS = `
   .btn-amount.on { color: #ffffff; border-color: #ffffff; background: rgba(255,255,255,0.15); }
   #donate-custom-input { background: rgba(255,255,255,0.15); color: #ffffff; border-color: rgba(255,255,255,0.4); }
   .donate-custom-euro { color: rgba(255,255,255,0.7); }
-  #info-donate { background: #C84B11; border-color: rgba(255,255,255,0.35); }
+  #info-donate { background: #642508; border-color: rgba(255,255,255,0.35); }
   #info-donate .btn-amount { background: transparent; border-color: rgba(255,255,255,0.4); color: rgba(255,255,255,0.8); }
   #info-donate .btn-amount.on { background: rgba(255,255,255,0.15); border-color: #ffffff; color: #ffffff; }
   #info-donate .donate-custom-euro { color: rgba(255,255,255,0.7); }
@@ -1037,7 +1160,13 @@ const ROLAND_GARROS_CSS = `
 `;
 
 let _scrollY = 0;
+let _settingsCloseTimer = null;
 function lockBodyScroll() {
+  clearTimeout(_settingsCloseTimer);
+  const _sv = document.getElementById('settings-view');
+  _sv.style.display = 'none';
+  _sv.classList.remove('is-closing');
+  document.getElementById('settings-backdrop').style.display = 'none';
   _scrollY = window.scrollY;
   document.body.style.position = 'fixed';
   document.body.style.top = `-${_scrollY}px`;
@@ -1051,6 +1180,114 @@ function unlockBodyScroll() {
   document.body.style.width = '';
   window.scrollTo(0, _scrollY);
 }
+
+function initOverlays() {
+  const dark  = parseInt(localStorage.getItem(LS_OVERLAY_DARK)  || '30', 10);
+  const light = parseInt(localStorage.getItem(LS_OVERLAY_LIGHT) || '30', 10);
+  document.documentElement.style.setProperty('--overlay-dark',  (dark  / 100).toFixed(2));
+  document.documentElement.style.setProperty('--overlay-light', (light / 100).toFixed(2));
+}
+
+function updateOverlaySliderUI(val) {
+  const pct = (val / 50) * 100;
+  const fill  = document.getElementById('settings-overlay-fill');
+  const thumb = document.getElementById('settings-overlay-thumb');
+  if (fill)  fill.style.width = pct + '%';
+  if (thumb) thumb.style.left = pct + '%';
+}
+
+function setOverlay(pct) {
+  const theme = localStorage.getItem(LS_THEME) || 'dark';
+  if (theme === 'dark') {
+    document.documentElement.style.setProperty('--overlay-dark', (pct / 100).toFixed(2));
+    localStorage.setItem(LS_OVERLAY_DARK, pct);
+  } else if (theme === 'light') {
+    document.documentElement.style.setProperty('--overlay-light', (pct / 100).toFixed(2));
+    localStorage.setItem(LS_OVERLAY_LIGHT, pct);
+  }
+  const lbl = document.getElementById('settings-overlay-label');
+  if (lbl) lbl.textContent = pct + ' %';
+  updateOverlaySliderUI(pct);
+}
+
+function updateSliderForTheme() {
+  const theme   = localStorage.getItem(LS_THEME) || 'dark';
+  const section = document.getElementById('settings-overlay-section');
+  if (!section) return;
+  if (theme === 'roland-garros') { section.style.display = 'none'; return; }
+  section.style.display = '';
+  const stored = theme === 'dark'
+    ? parseInt(localStorage.getItem(LS_OVERLAY_DARK)  || '30', 10)
+    : parseInt(localStorage.getItem(LS_OVERLAY_LIGHT) || '30', 10);
+  const lbl = document.getElementById('settings-overlay-label');
+  if (lbl) lbl.textContent = stored + ' %';
+  updateOverlaySliderUI(stored);
+}
+
+function updateSettingsThemeButtons() {
+  const theme = localStorage.getItem(LS_THEME) || 'dark';
+  ['dark', 'light', 'roland-garros'].forEach(t => {
+    const btn = document.getElementById('btn-settings-theme-' + t);
+    if (btn) btn.classList.toggle('on', theme === t);
+  });
+  updateSliderForTheme();
+}
+
+(function initOverlaySlider() {
+  const wrap = document.getElementById('settings-overlay-slider-wrap');
+  if (!wrap) return;
+  function applyX(clientX) {
+    const rect = wrap.getBoundingClientRect();
+    const val = Math.round(Math.max(0, Math.min(1, (clientX - rect.left) / rect.width)) * 50);
+    setOverlay(val);
+  }
+  wrap.addEventListener('touchstart', e => { e.preventDefault(); applyX(e.touches[0].clientX); }, { passive: false });
+  wrap.addEventListener('touchmove',  e => { e.preventDefault(); applyX(e.touches[0].clientX); }, { passive: false });
+  let _drag = false;
+  wrap.addEventListener('mousedown', e => {
+    _drag = true; applyX(e.clientX);
+    const mv = e2 => { if (_drag) applyX(e2.clientX); };
+    const up = ()  => { _drag = false; document.removeEventListener('mousemove', mv); document.removeEventListener('mouseup', up); };
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', up);
+  });
+})();
+
+function showSettings() {
+  const sv = document.getElementById('settings-view');
+  if (sv.style.display === 'block' && !sv.classList.contains('is-closing')) { backFromSettings(); return; }
+  clearTimeout(_settingsCloseTimer);
+  sv.classList.remove('is-closing');
+  sv.style.display = 'block';
+  document.getElementById('settings-backdrop').style.display = 'block';
+  updateSettingsThemeButtons();
+}
+
+function backFromSettings() {
+  const sv = document.getElementById('settings-view');
+  if (sv.style.display !== 'block') return;
+  clearTimeout(_settingsCloseTimer);
+  sv.classList.add('is-closing');
+  document.getElementById('settings-backdrop').style.display = 'none';
+  _settingsCloseTimer = setTimeout(() => {
+    sv.style.display = 'none';
+    sv.classList.remove('is-closing');
+  }, 1000);
+}
+
+(function initSettingsSwipe() {
+  const sv = document.getElementById('settings-view');
+  let startY = 0, startX = 0;
+  sv.addEventListener('touchstart', e => {
+    startY = e.touches[0].clientY;
+    startX = e.touches[0].clientX;
+  }, { passive: true });
+  sv.addEventListener('touchend', e => {
+    const dy = e.changedTouches[0].clientY - startY;
+    const dx = Math.abs(e.changedTouches[0].clientX - startX);
+    if (dy < -40 && dx < 60) backFromSettings();
+  }, { passive: true });
+})();
 
 let _donateAmount = 2.50;
 let _donateCustom = false;
@@ -1163,15 +1400,11 @@ function updateDonateBtnInfo() {
 function setTheme(theme) {
   const css = theme === 'light' ? LIGHT_THEME_CSS : theme === 'roland-garros' ? ROLAND_GARROS_CSS : '';
   document.getElementById('theme-override-css').textContent = css;
-  const metaColor = theme === 'light' ? '#f0f2f8' : theme === 'roland-garros' ? '#C84B11' : '#0f1117';
+  const metaColor = theme === 'light' ? '#f0f2f8' : theme === 'roland-garros' ? '#642508' : '#0f1117';
   document.querySelector('meta[name="theme-color"]').content = metaColor;
-  const btnDark  = document.getElementById('btn-info-theme-dark');
-  const btnLight = document.getElementById('btn-info-theme-light');
-  const btnRG    = document.getElementById('btn-info-theme-roland-garros');
-  if (btnDark)  btnDark.classList.toggle('on',  theme === 'dark');
-  if (btnLight) btnLight.classList.toggle('on',  theme === 'light');
-  if (btnRG)    btnRG.classList.toggle('on',     theme === 'roland-garros');
   localStorage.setItem(LS_THEME, theme);
+  if (LEAGUES.length) document.getElementById('dynamic-team-css').textContent = buildTeamCSS(LEAGUES, theme);
+  updateSettingsThemeButtons();
 }
 
 // Kategorie-Paletten — hell → dunkel (jung → alt)
@@ -1248,14 +1481,18 @@ function parseClubTeams(html) {
   return results;
 }
 
-function buildTeamCSS(leagues) {
+function buildTeamCSS(leagues, theme) {
   const base = [18, 22, 42];
+  const isLight = theme === 'light';
   function blend(base, team, a) {
     return base.map((v,i) => Math.min(255, Math.round(v*(1-a) + team[i]*a)));
   }
   function toHex(rgb) { return '#' + rgb.map(x=>x.toString(16).padStart(2,'0')).join(''); }
   return leagues.map(l => {
-    const [r,g,b] = l.color;
+    let [r,g,b] = l.color;
+    if (isJugend(l.label))            [r,g,b] = [  3, 42,122];
+    else if (/damen/i.test(l.label))  [r,g,b] = [220, 80,130];
+    else if (/herren/i.test(l.label)) [r,g,b] = [  3, 78, 22];
     const br = Math.round(r*0.5+130), bg = Math.round(g*0.5+130), bb = Math.round(b*0.5+130);
     const bright  = '#' + [br,bg,bb].map(x=>Math.min(255,x).toString(16).padStart(2,'0')).join('');
     const cardBg  = toHex(blend(base, [r,g,b], 0.38));
@@ -1387,7 +1624,7 @@ function applyLeagues() {
   spreadColors(LEAGUES.filter(gemischtAdult),               PALETTE_GEMISCHT);
   LEAGUES.filter(l => !isJugend(l.label) && !/damen|herren/i.test(l.label) && !gemischtAdult(l))
          .forEach(l => l.color = PALETTE_JUGEND[0]);
-  document.getElementById('dynamic-team-css').textContent = buildTeamCSS(LEAGUES);
+  document.getElementById('dynamic-team-css').textContent = buildTeamCSS(LEAGUES, localStorage.getItem(LS_THEME) || 'dark');
   LEAGUES.forEach(l => { if (showTeams[l.team] === undefined) showTeams[l.team] = true; });
   buildTeamButtons();
   applyStateToButtons();
@@ -2234,9 +2471,14 @@ function showTable(team) {
 }
 
 function backToList() {
+  clearTimeout(_settingsCloseTimer);
   document.getElementById('detail-view').style.display = 'none';
   document.getElementById('report-view').style.display = 'none';
   document.getElementById('info-view').style.display = 'none';
+  const _sv2 = document.getElementById('settings-view');
+  _sv2.style.display = 'none';
+  _sv2.classList.remove('is-closing');
+  document.getElementById('settings-backdrop').style.display = 'none';
   document.getElementById('matches-container').style.display = '';
   document.getElementById('update-info').style.display = '';
   document.getElementById('controls-slider').style.display = '';
@@ -2593,6 +2835,7 @@ function updateHeaderH() {
 }
 
 setTheme(localStorage.getItem(LS_THEME) || 'light');
+initOverlays();
 updateHeaderH();
 document.fonts.ready.then(updateHeaderH);
 window.addEventListener('resize', updateHeaderH);
