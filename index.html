@@ -2868,7 +2868,7 @@ function applyMeineFavoriten() {
 (function() {
   let _touched = false;
   const btn = document.getElementById('btn-favoriten-editor');
-  btn.addEventListener('touchend', function(e) {
+  btn.addEventListener('touchstart', function(e) {
     _touched = true;
     e.preventDefault();
     toggleFavoriten();
