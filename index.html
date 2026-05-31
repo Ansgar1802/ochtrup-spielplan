@@ -2865,7 +2865,20 @@ function applyMeineFavoriten() {
 })();
 
 /* ── Favoriten: Trigger in Controls-Bar und Close-Button im Panel */
-document.getElementById('btn-favoriten-editor').addEventListener('click', toggleFavoriten);
+(function() {
+  let _touched = false;
+  const btn = document.getElementById('btn-favoriten-editor');
+  btn.addEventListener('touchend', function(e) {
+    _touched = true;
+    e.preventDefault();
+    toggleFavoriten();
+    setTimeout(function() { _touched = false; }, 600);
+  }, { passive: false });
+  btn.addEventListener('click', function() {
+    if (_touched) { _touched = false; return; }
+    toggleFavoriten();
+  });
+})();
 document.getElementById('btn-favoriten-close').addEventListener('click', function() { closeFavoriten(true); });
 
 /* ── Start ─────────────────────────────────────────────────── */
