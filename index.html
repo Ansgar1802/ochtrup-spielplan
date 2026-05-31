@@ -2529,11 +2529,34 @@ function parseStandingsTable(html) {
   return null;
 }
 
-function showTable(team) {
+async function showTable(team) {
   const league = LEAGUES.find(l => l.team === team);
-  const html   = leagueHtml[team];
-  if (!html || !league) return;
+  if (!league) return;
 
+  document.getElementById('matches-container').style.display = 'none';
+  document.getElementById('update-info').style.display = 'none';
+  lockBodyScroll();
+  document.getElementById('detail-view').style.display = 'block';
+  document.getElementById('detail-title').innerHTML = `<span class="detail-title-label">${esc(league.label)}</span>`;
+  document.getElementById('detail-table-container').innerHTML =
+    '<div class="loading-row"><div class="spinner"></div>Tabelle wird geladen …</div>';
+  document.getElementById('detail-schedule-container').innerHTML = '';
+
+  try {
+    const freshHtml = await fetchURL(league.url);
+    leagueHtml[team] = freshHtml;
+    league.rank = extractClubRank(freshHtml);
+    const newMatches = parseLeague(freshHtml, league);
+    allMatches = allMatches.filter(m => m.team !== team);
+    allMatches = [...allMatches, ...newMatches].sort((a, b) => a.date - b.date);
+    renderNextMatch(); renderMatches();
+  } catch(e) {
+    document.getElementById('detail-table-container').innerHTML =
+      '<div class="status-msg">Tabelle konnte nicht geladen werden.</div>';
+    return;
+  }
+
+  const html = leagueHtml[team];
   const table = parseStandingsTable(html);
   if (!table) { alert('Tabelle noch nicht verfügbar.'); return; }
 
@@ -2599,11 +2622,6 @@ function showTable(team) {
       `</div>`;
   }
   document.getElementById('detail-schedule-container').innerHTML = schedHtml;
-
-  document.getElementById('matches-container').style.display = 'none';
-  document.getElementById('update-info').style.display = 'none';
-  lockBodyScroll();
-  document.getElementById('detail-view').style.display = 'block';
 }
 
 function backToList() {
