@@ -2550,6 +2550,13 @@ async function showTable(team) {
     allMatches = allMatches.filter(m => m.team !== team);
     allMatches = [...allMatches, ...newMatches].sort((a, b) => a.date - b.date);
     renderNextMatch(); renderMatches();
+
+    // Gruppen-Seite für vollständigen Spielplan aller Mannschaften laden
+    const groupM = freshHtml.match(/href="([^"]*groupPage[^"]*)"/);
+    if (groupM) {
+      const groupUrl = groupM[1].startsWith('http') ? groupM[1] : 'https://wtv.liga.nu' + groupM[1];
+      try { league._groupHtml = await fetchURL(groupUrl); } catch(e) { league._groupHtml = null; }
+    }
   } catch(e) {
     document.getElementById('detail-table-container').innerHTML =
       '<div class="status-msg">Tabelle konnte nicht geladen werden.</div>';
@@ -2587,8 +2594,8 @@ async function showTable(team) {
     `<span class="detail-title-suffix">Tabelle · Spielplan</span>`;
   document.getElementById('detail-table-container').innerHTML = tableHtml;
 
-  // Alle Spiele der Gruppe (kompletter Gruppenspielplan)
-  const allGroupMatches = parseLeagueAll(html, league);
+  // Alle Spiele der Gruppe (kompletter Gruppenspielplan — Gruppen-Seite bevorzugen)
+  const allGroupMatches = parseLeagueAll(league._groupHtml || html, league);
   let schedHtml = '<div class="detail-schedule-title">Spielplan der Gruppe</div>';
   for (const m of allGroupMatches) {
     const past = isPast(m.date);
