@@ -2073,6 +2073,7 @@ async function loadAllData() {
   nmBox.style.opacity = '0';
   renderNextMatch();
   renderMatches();
+  scheduleAutoRefresh();
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       mc.style.opacity = '1'; nmBox.style.opacity = '1';
@@ -2285,6 +2286,7 @@ function updateCountdowns() {
     renderNextMatch();
     renderMatches();
   }
+  scheduleAutoRefresh();
 }
 
 function isPast(date) {
@@ -2298,6 +2300,7 @@ function matchDurationMs(match) {
 }
 
 function isMatchOver(match) {
+  if (/^\d+:\d+$/.test(match.result || '')) return true;
   const matchDay = new Date(match.date); matchDay.setHours(0, 0, 0, 0);
   const today = new Date(); today.setHours(0, 0, 0, 0);
   if (matchDay < today) return true;
@@ -2472,6 +2475,49 @@ function closeFavoriten(immediate) {
 }
 
 async function refreshData() { localStorage.removeItem(LS_LEAGUES); await initLeagues(); await loadAllData(); }
+
+/* ── Auto-Refresh laufende Spiele (alle 15 min, nur bei laufenden Spielen) */
+let _autoRefreshTimer = null;
+
+function getRunningMatches() {
+  const now = Date.now();
+  return allMatches.filter(m => {
+    if (/^\d+:\d+$/.test(m.result || '')) return false;
+    const mt = matchDateTime(m.date, m.timeStr).getTime();
+    if (mt > now) return false;
+    return (now - mt) < matchDurationMs(m);
+  });
+}
+
+async function autoRefreshRunning() {
+  _autoRefreshTimer = null;
+  const running = getRunningMatches();
+  if (!running.length) return;
+  const teamSet = new Set(running.map(m => m.team));
+  const leaguesToRefresh = LEAGUES.filter(l => teamSet.has(l.team));
+  for (const league of leaguesToRefresh) {
+    try {
+      const html = await fetchURL(league.url);
+      leagueHtml[league.team] = html;
+      league.rank = extractClubRank(html);
+      const newMatches = parseLeague(html, league);
+      allMatches = allMatches.filter(m => m.team !== league.team);
+      allMatches = [...allMatches, ...newMatches].sort((a, b) => a.date - b.date);
+    } catch(e) { /* silent — nächster Versuch in 15 min */ }
+  }
+  renderNextMatch();
+  renderMatches();
+  if (getRunningMatches().length) {
+    _autoRefreshTimer = setTimeout(autoRefreshRunning, 15 * 60 * 1000);
+  }
+}
+
+function scheduleAutoRefresh() {
+  if (_autoRefreshTimer) return;
+  if (getRunningMatches().length) {
+    _autoRefreshTimer = setTimeout(autoRefreshRunning, 15 * 60 * 1000);
+  }
+}
 
 /* ── Tabellen-Ansicht ──────────────────────────────────────── */
 function parseStandingsTable(html) {
